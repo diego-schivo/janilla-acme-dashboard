@@ -1,0 +1,44 @@
+<article class="Customers">
+	<h1>Customers</h1>
+	<header>
+		<label for="search" class="sr-only">Search</label>
+		<div class="control">
+			<input id="search" type="text" placeholder="Search customers..." />
+			<{icons.magnifying-glass}>
+		</div>
+	</header>
+	<{table}>
+</article>
+
+<template id="Customers-Table">
+	<section class="Table">
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Total Invoices</th>
+					<th>Total Pending</th>
+					<th>Total Paid</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<{items}>
+			</tbody>
+		</table>
+	</section>
+</template>
+
+<template id="Customers-TableRow">
+	<tr>
+		<td>
+			<img src="{imageUrl}" />
+			{name}
+		</td>
+		<td>{email}</td>
+		<td>{invoiceCount}</td>
+		<td>{pendingAmount}</td>
+		<td>{paidAmount}</td>
+	</tr>
+</template>

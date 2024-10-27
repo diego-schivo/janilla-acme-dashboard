@@ -1,0 +1,91 @@
+<article class="Invoices">
+	<h1>Invoices</h1>
+	<header>
+		<label for="search" class="sr-only">Search</label>
+		<div class="control">
+			<input id="search" type="text" placeholder="Search invoices..." />
+			<{icons.magnifying-glass}>
+		</div>
+		<a href="/dashboard/invoices/create" class="button-primary">
+			<span>Create Invoice</span>
+			<{icons.plus}>
+		</a>
+	</header>
+	<{table}>
+	<{pagination}>
+</article>
+
+<template id="Invoices-Table">
+	<section class="Table">
+		<table>
+			<thead>
+				<tr>
+					<th>Customer</th>
+					<th>Email</th>
+					<th>Amount</th>
+					<th>Date</th>
+					<th>Status</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<{items}>
+			</tbody>
+		</table>
+	</section>
+</template>
+
+<template id="Invoices-TableRow">
+	<tr>
+		<td>
+			<img src="{customer.imageUrl}" />
+			{customer.name}
+		</td>
+		<td>{customer.email}</td>
+		<td>{amount}</td>
+		<td>{date}</td>
+		<td>{status}</td>
+		<td>
+			<a href="/dashboard/invoices/{id}/edit">
+				<span class="sr-only">Edit</span>
+				<{icons.pencil}>
+			</a>
+			<form>
+				<input type="hidden" name="id" value="{id}" />
+				<button>
+					<span class="sr-only">Delete</span>
+					<{icons.trash}>
+				</button>
+			</form>
+		</td>
+	</tr>
+</template>
+
+<template id="Invoices-TableStatus">
+	<span class="{className}">
+		{text}
+		<{icon}>
+	</span>
+</template>
+
+<template id="Invoices-Pagination">
+	<section class="Pagination">
+		<{previousItem}>
+		<div>
+			<{items}>
+		</div>
+		<{nextItem}>
+	</section>
+</template>
+
+<template id="Invoices-PaginationItem">
+	<span class="{active}">
+		<{content}>
+	</span>
+</template>
+
+<template id="Invoices-PaginationLink">
+	<a href="{url}">
+		<{content}>
+	</a>
+</template>

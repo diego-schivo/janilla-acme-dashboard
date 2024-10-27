@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Todo</title>
+	<link href="/style.css" rel="stylesheet" />
+	<script src="/script.js" type="module"></script>
+</head>
+<body>
+</body>
+</html>
+
+<template id="AcmeDashboard-Content">
+	<div class="Content">
+		<{nav}>
+		<main>
+			<{page}>
+		</main>
+	</div>
+</template>
+
+<template id="AcmeDashboard-Nav">
+	<aside class="Nav">
+		<header>
+			<{logo}>
+		</header>
+		<ul>
+			<{links}>
+			<li></li>
+			<li>
+				<form>
+					<button>
+						<{icons.power}>
+						Sign Out
+					</button>
+				</form>
+			</li>
+		</ul>
+	</aside>
+</template>
+
+<template id="AcmeDashboard-NavLink">
+	<li>
+		<a href="{path}">
+			<{icon}>
+			{text}
+		</a>
+	</li>
+</template>
+
+<template id="AcmeDashboard-Logo">
+	<div class="Logo">
+		<{icons.globe-alt}>
+		<p>Acme</p>
+	</div>
+</template>

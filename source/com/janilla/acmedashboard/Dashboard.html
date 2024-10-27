@@ -1,0 +1,69 @@
+<article class="Dashboard">
+	<h1>Dashboard</h1>
+	<div>
+		<article class="cards">
+			<{cards}>
+		</article>
+		<article class="revenues">
+			<h2>Recent Revenue</h2>
+			<div>
+				<{revenueChart}>
+				<footer>
+					<{icons.calendar}>
+					<h3>Last 12 months</h3>
+				</footer>
+			</div>
+		</article>
+		<article class="invoices">
+			<h2>Latest Invoices</h2>
+			<div>
+				<div class="list">
+					<{invoices}>
+				</div>
+				<footer>
+					<{icons.arrow-path}>
+					<h3>Updated just now</h3>
+				</footer>
+			</div>
+		</article>
+	</div>
+</article>
+
+<template id="Dashboard-Card">
+	<article class="Card">
+		<div>
+			<{icon}>
+			<h3>{title}</h3>
+		</div>
+		<p>{value}</p>
+	</article>
+</template>
+
+<template id="Dashboard-Chart">
+	<div class="Chart">
+		<div>
+			<{yLabels}>
+		</div>
+		<div>
+			<{bars}>
+		</div>
+	</div>
+</template>
+
+<template id="Dashboard-ChartYLabel">
+	<p>{}</p>
+</template>
+
+<template id="Dashboard-ChartBar">
+	<div style="height: {percentage}%"></div>
+	<p>{xLabel}</p>
+</template>
+
+<template id="Dashboard-Invoice">
+	<article class="Invoice">
+		<img src="{customer.imageUrl}" />
+		<p>{customer.name}</p>
+		<p>{customer.email}</p>
+		<p>{amount}</p>
+	</article>
+</template>
