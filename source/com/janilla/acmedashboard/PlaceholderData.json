@@ -3,32 +3,32 @@
     {
       "name": "Evil Rabbit",
       "email": "evil@rabbit.com",
-      "imageUrl": "/images/customers/evil-rabbit.png"
+      "imageUrl": "/images/customers/evil-rabbit.webp"
     },
     {
       "name": "Delba de Oliveira",
       "email": "delba@oliveira.com",
-      "imageUrl": "/images/customers/delba-de-oliveira.png"
+      "imageUrl": "/images/customers/delba-de-oliveira.webp"
     },
     {
       "name": "Lee Robinson",
       "email": "lee@robinson.com",
-      "imageUrl": "/images/customers/lee-robinson.png"
+      "imageUrl": "/images/customers/lee-robinson.webp"
     },
     {
       "name": "Michael Novotny",
       "email": "michael@novotny.com",
-      "imageUrl": "/images/customers/michael-novotny.png"
+      "imageUrl": "/images/customers/michael-novotny.webp"
     },
     {
       "name": "Amy Burns",
       "email": "amy@burns.com",
-      "imageUrl": "/images/customers/amy-burns.png"
+      "imageUrl": "/images/customers/amy-burns.webp"
     },
     {
       "name": "Balazs Orban",
       "email": "balazs@orban.com",
-      "imageUrl": "/images/customers/balazs-orban.png"
+      "imageUrl": "/images/customers/balazs-orban.webp"
     }
   ],
   "invoices": [

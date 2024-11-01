@@ -48,7 +48,7 @@ public class HeroIcons {
 		var l = Thread.currentThread().getContextClassLoader();
 		URI u;
 		try {
-			u = l.getResource(HeroIcons.class.getPackageName().replace('.', '/') + "/heroicons.zip").toURI();
+			u = l.getResource(HeroIcons.class.getPackageName().replace('.', '/') + "/images.zip").toURI();
 		} catch (URISyntaxException g) {
 			throw new RuntimeException(g);
 		}
@@ -58,16 +58,14 @@ public class HeroIcons {
 		try {
 			var t = IO.zipFileSystem(u);
 			map = new HashMap<>();
-			Files.walkFileTree(t.getPath("/"), new SimpleFileVisitor<>() {
+			Files.walkFileTree(t.getPath("/heroicons"), new SimpleFileVisitor<>() {
 
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					if (file.getParent().toString().equals("/24/outline")) {
-						var n = file.getFileName().toString();
-						if (n.endsWith(".svg"))
-							map.put(n.substring(0, n.length() - ".svg".length()),
-									Files.readString(file).replace("#0F172A", "currentColor"));
-					}
+					var n = file.getFileName().toString();
+					if (n.endsWith(".svg"))
+						map.put(n.substring(0, n.length() - ".svg".length()),
+								Files.readString(file).replace("#0F172A", "currentColor"));
 					return FileVisitResult.CONTINUE;
 				}
 			});
