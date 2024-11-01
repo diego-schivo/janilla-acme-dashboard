@@ -34,7 +34,7 @@ import com.janilla.reflect.Flatten;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 
-public class Customers {
+public class CustomerApi {
 
 	public Persistence persistence;
 

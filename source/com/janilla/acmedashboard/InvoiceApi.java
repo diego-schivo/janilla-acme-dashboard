@@ -35,7 +35,7 @@ import com.janilla.reflect.Reflection;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 
-public class Invoices {
+public class InvoiceApi {
 
 	public Persistence persistence;
 

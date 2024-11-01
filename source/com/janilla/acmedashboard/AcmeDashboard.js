@@ -22,44 +22,107 @@
  * SOFTWARE.
  */
 import Customers from "./Customers.js";
-import Dashboard from "./Dashboard.js";
+import Home from "./Home.js";
+import Dashboard, { Layout } from "./Dashboard.js";
 import Invoice from "./Invoice.js";
 import Invoices from "./Invoices.js";
+import Login from "./Login.js";
 import RenderEngine from "./RenderEngine.js";
 import heroIcons from "./heroIcons.js";
 
-const foo1 = {
+const pages1 = {
+	"/": () => new Home(),
 	"/dashboard": () => new Dashboard(),
 	"/dashboard/customers": () => new Customers(),
 	"/dashboard/invoices": () => new Invoices(),
 	"/dashboard/invoices/create": () => new Invoice(),
+	"/login": () => new Login(),
 };
 
-const foo2 = new Map();
-foo2.set(new RegExp("^/dashboard/invoices/(\\d+)/edit$"), x => new Invoice(parseInt(x, 10)));
+const pages2 = new Map();
+pages2.set(new RegExp("^/dashboard/invoices/(\\d+)/edit$"), x => new Invoice(parseInt(x, 10)));
 
 export default class AcmeDashboard {
 
-	content = new Content();
+	renderEngine;
+
+	icons = heroIcons;
+
+	logo = new Logo();
+
+	page;
+
+	layout = new Layout();
+
+	currencyFormatter = new Intl.NumberFormat("en-US", {
+		style: "currency",
+		currency: "USD"
+	});
+
+	dateFormatter = new Intl.DateTimeFormat("en-US", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+	});
+
+	get content() {
+		return this.page instanceof Home || this.page instanceof Login ? this.page : this.layout;
+	}
 
 	run = async () => {
 		const u = new URL(location.href);
-		const p = u.pathname;
-		this.content.page = this.createPage(p);
-		document.body.innerHTML = await new RenderEngine().render({ value: this.content });
-		this.content.listen();
-		history.replaceState(this.content.page.state, "", p + u.search);
+		let p = u.pathname;
+		if (p === "/")
+			p = await (await fetch("/api/authentication")).json() ? "/dashboard" : "/";
+		this.page = this.createPage(p);
+		document.body.innerHTML = await new RenderEngine().render({ value: this });
+		this.listen();
+		history.replaceState(this.page.state, "", p + u.search);
 		document.addEventListener("click", this.handleClick);
 		addEventListener("urlchange", this.handleUrlchange);
 		addEventListener("popstate", this.handlePopstate);
 	}
 
+	render = async re => {
+		return await re.match([this], (_, o) => {
+			this.renderEngine = re.clone();
+			o.template = "AcmeDashboard";
+		}) || await re.match(["amount"], (_, o) => {
+			o.value = this.currencyFormatter.format(o.value);
+		}) || await re.match(["pendingAmount"], (_, o) => {
+			o.value = this.currencyFormatter.format(o.value);
+		}) || await re.match(["paidAmount"], (_, o) => {
+			o.value = this.currencyFormatter.format(o.value);
+		}) || await re.match(["date"], (_, o) => {
+			o.value = this.dateFormatter.format(new Date(o.value));
+		});
+	}
+
+	listen = () => {
+		if (this.content === this.layout)
+			this.layout.listen();
+		this.page.listen();
+	}
+
+	refreshPage = async p => {
+		const l = this.content === this.layout;
+		this.page = p;
+		if (l && this.content === this.layout) {
+			document.querySelector("main").innerHTML = await this.renderEngine.render({ value: this.page });
+			this.page.listen();
+		} else {
+			document.body.innerHTML = await new RenderEngine().render({ value: this });
+			this.listen();
+		}
+	}
+
 	createPage = (path) => {
-		const f = foo1[path];
-		if (f)
-			return f();
-		for (const [k, v] of foo2) {
-			const m = path.match(k);
+		const p = path.length > 1 && path.endsWith("/") ? path.substring(0, path.length - 1) : path;
+		const q = pages1[p];
+		if (q)
+			return q();
+		for (const [k, v] of pages2) {
+			const m = p.match(k);
 			if (m)
 				return v(...m.slice(1));
 		}
@@ -77,8 +140,8 @@ export default class AcmeDashboard {
 	handleUrlchange = async e => {
 		const u = e.detail.url;
 		history.pushState({}, "", u.pathname + u.search);
-		await this.content.refreshPage(this.createPage(u.pathname));
-		history.replaceState(this.content.page.state, "", u.pathname + u.search);
+		await this.refreshPage(this.createPage(u.pathname));
+		history.replaceState(this.page.state, "", u.pathname + u.search);
 		dispatchEvent(new Event("popstate"));
 	}
 
@@ -87,85 +150,7 @@ export default class AcmeDashboard {
 			return;
 		const p = this.createPage(document.location.pathname);
 		p.state = e.state;
-		await this.content.refreshPage(p);
-	}
-}
-
-class Content {
-
-	renderEngine;
-
-	icons = heroIcons;
-
-	nav = new Nav();
-
-	logo = new Logo();
-
-	page;
-
-	currencyFormatter = new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "USD"
-	});
-
-	dateFormatter = new Intl.DateTimeFormat("en-US", {
-		day: "numeric",
-		month: "short",
-		year: "numeric",
-	});
-
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			this.renderEngine = re.clone();
-			o.template = "AcmeDashboard-Content";
-		}) || await re.match(["amount"], (_, o) => {
-			o.value = this.currencyFormatter.format(o.value);
-		}) || await re.match(["pendingAmount"], (_, o) => {
-			o.value = this.currencyFormatter.format(o.value);
-		}) || await re.match(["paidAmount"], (_, o) => {
-			o.value = this.currencyFormatter.format(o.value);
-		}) || await re.match(["date"], (_, o) => {
-			o.value = this.dateFormatter.format(new Date(o.value));
-		});
-	}
-
-	listen = () => {
-		this.nav.listen();
-		this.page.listen();
-	}
-
-	refreshPage = async p => {
-		this.page = p;
-		document.querySelector("main").innerHTML = await this.renderEngine.render({ value: this.page });
-		this.page.listen();
-	}
-}
-
-class Nav {
-
-	links = [
-		{ path: "/dashboard", text: "Home", icon: "home" },
-		{ path: "/dashboard/invoices", text: "Invoices", icon: "document-duplicate" },
-		{ path: "/dashboard/customers", text: "Customers", icon: "user-group" },
-	];
-
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			o.template = "AcmeDashboard-Nav";
-		}) || await re.match([this, "links", "number"], (_, o) => {
-			o.template = "AcmeDashboard-NavLink";
-		}) || await re.match([this, "links", "number", "icon"], (_, o) => {
-			o.value = heroIcons[o.value];
-		});
-	}
-
-	listen = () => {
-		this.handlePopstate();
-		addEventListener("popstate", this.handlePopstate);
-	}
-
-	handlePopstate = () => {
-		document.querySelectorAll("#Nav a").forEach(x => x.parentElement.classList[x.getAttribute("href") === document.location.pathname ? "add" : "remove"]("active"));
+		await this.refreshPage(p);
 	}
 }
 

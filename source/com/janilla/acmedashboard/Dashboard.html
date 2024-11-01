@@ -1,3 +1,41 @@
+<template id="Dashboard-Layout">
+	<div class="Layout">
+		<{nav}>
+		<main>
+			<{page}>
+		</main>
+	</div>
+</template>
+
+<template id="Dashboard-Nav">
+	<aside class="Nav">
+		<header>
+			<{logo}>
+		</header>
+		<ul>
+			<{links}>
+			<li></li>
+			<li>
+				<form>
+					<button>
+						<{icons.power}>
+						Sign Out
+					</button>
+				</form>
+			</li>
+		</ul>
+	</aside>
+</template>
+
+<template id="Dashboard-NavLink">
+	<li>
+		<a href="{path}">
+			<{icon}>
+			{text}
+		</a>
+	</li>
+</template>
+
 <article class="Dashboard">
 	<h1>Dashboard</h1>
 	<div>

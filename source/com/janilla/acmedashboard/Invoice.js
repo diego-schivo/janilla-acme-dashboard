@@ -65,10 +65,21 @@ export default class Invoice {
 
 	handleSubmit = async e => {
 		e.preventDefault();
+		const i = Object.fromEntries(new FormData(e.target));
+		const mm = {
+			customerId: i.customerId ? "" : "Please select a customer.",
+			amount: i.amount ? "" : "Please enter an amount greater than $0.",
+			status: i.status ? "" : "Please select an invoice status."
+		};
+		Object.entries(mm).forEach(([k, v]) => document.querySelector(`.Invoice .${k}-error`).innerHTML = v.length ? `<p>${v}</p>` : "");
+		const v = Object.values(mm).every(x => !x.length);
+		document.querySelector(".Invoice .error").innerHTML = v ? "" : `<p>Missing Fields. Failed to ${this.title}.</p>`;
+		if (!v)
+			return;
 		await fetch(this.id ? `/api/invoices/${this.id}` : "/api/invoices", {
 			method: this.id ? "PUT" : "POST",
 			headers: { "content-type": "application/json" },
-			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+			body: JSON.stringify(i)
 		});
 		dispatchEvent(new CustomEvent("urlchange", { detail: { url: new URL("/dashboard/invoices", location.href) } }));
 	}

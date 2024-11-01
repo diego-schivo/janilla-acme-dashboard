@@ -21,33 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard;
+export default class Home {
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import com.janilla.acmedashboard.Invoices.Invoice2;
-import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
-
-public class Dashboard {
-
-	public Persistence persistence;
-
-	@Handle(method = "GET", path = "/api/dashboard")
-	public Data get() {
-		var ic = persistence.crud(Invoice.class);
-		var rc = persistence.crud(Revenue.class);
-		return new Data(
-				ic.read(ic.filter("status", Invoice.Status.PAID)).map(Invoice::amount).reduce(BigDecimal.ZERO,
-						BigDecimal::add),
-				ic.read(ic.filter("status", Invoice.Status.PENDING)).map(Invoice::amount).reduce(BigDecimal.ZERO,
-						BigDecimal::add),
-				ic.count(), persistence.crud(Customer.class).count(), rc.read(rc.list()).toList(),
-				ic.read(ic.list(0, 5).ids()).map(x -> Invoice2.of(x, persistence)).toList());
+	render = async re => {
+		return await re.match([this], (_, o) => {
+			o.template = "Home";
+		});
 	}
 
-	public record Data(BigDecimal paidAmount, BigDecimal pendingAmount, long invoiceCount, long customerCount,
-			List<Revenue> revenues, List<Invoice2> invoices) {
+	listen = () => {
 	}
 }

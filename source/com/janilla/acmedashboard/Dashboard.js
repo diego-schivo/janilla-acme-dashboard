@@ -23,6 +23,56 @@
  */
 import heroIcons from "./heroIcons.js";
 
+export class Layout {
+
+	nav = new Nav();
+
+	render = async re => {
+		return await re.match([this], async (_, o) => {
+			o.template = "Dashboard-Layout";
+		});
+	}
+
+	listen = () => {
+		this.nav.listen();
+	}
+}
+
+class Nav {
+
+	links = [
+		{ path: "/dashboard", text: "Home", icon: "home" },
+		{ path: "/dashboard/invoices", text: "Invoices", icon: "document-duplicate" },
+		{ path: "/dashboard/customers", text: "Customers", icon: "user-group" },
+	];
+
+	render = async re => {
+		return await re.match([this], (_, o) => {
+			o.template = "Dashboard-Nav";
+		}) || await re.match([this, "links", "number"], (_, o) => {
+			o.template = "Dashboard-NavLink";
+		}) || await re.match([this, "links", "number", "icon"], (_, o) => {
+			o.value = heroIcons[o.value];
+		});
+	}
+
+	listen = () => {
+		this.handlePopstate();
+		addEventListener("popstate", this.handlePopstate);
+		document.querySelector(".Nav").addEventListener("submit", this.handleSubmit);
+	}
+
+	handlePopstate = () => {
+		document.querySelectorAll(".Nav a").forEach(x => x.parentElement.classList[x.getAttribute("href") === document.location.pathname ? "add" : "remove"]("active"));
+	}
+
+	handleSubmit = async e => {
+		e.preventDefault();
+		await fetch("/api/authentication", { method: "DELETE" });
+		dispatchEvent(new CustomEvent("urlchange", { detail: { url: new URL("/login", location.href) } }));
+	}
+}
+
 export default class Dashboard {
 
 	data;
@@ -43,7 +93,6 @@ export default class Dashboard {
 
 	render = async re => {
 		return await re.match([this], async (_, o) => {
-			o.template = "Dashboard";
 			if (!this.data)
 				this.data = await (await fetch("/api/dashboard")).json();
 			if (!this.cards)
@@ -57,6 +106,7 @@ export default class Dashboard {
 				this.revenueChart = new Chart(this.data.revenues.map(x => ({ label: x.month, value: x.revenue })));
 			if (!this.invoices)
 				this.invoices = this.data.invoices;
+			o.template = "Dashboard";
 		}) || await re.match([this, "invoices", "number"], (_, o) => {
 			o.template = "Dashboard-Invoice";
 		});

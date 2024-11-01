@@ -30,7 +30,8 @@ import java.util.List;
 import com.janilla.json.Converter;
 import com.janilla.json.Json;
 
-public record PlaceholderData(List<Customer> customers, List<Invoice> invoices, List<Revenue> revenue) {
+public record PlaceholderData(List<Customer> customers, List<Invoice> invoices, List<Revenue> revenue,
+		List<User> users) {
 
 	public static PlaceholderData INSTANCE;
 

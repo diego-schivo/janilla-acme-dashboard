@@ -42,7 +42,7 @@ import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
-@Render("AcmeDashboard.html")
+@Render("AcmeDashboard-Document.html")
 public class AcmeDashboard {
 
 	public static void main(String[] args) throws Exception {
@@ -101,7 +101,7 @@ public class AcmeDashboard {
 		}
 	}
 
-	@Handle(method = "GET", path = "/dashboard(/.*)?")
+	@Handle(method = "GET", path = "(/[a-z/]*)")
 	public AcmeDashboard getApplication() {
 		return this;
 	}

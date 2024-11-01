@@ -14,44 +14,48 @@
 		<section>
 			<div>
 				<label for="customerId">Choose customer</label>
-				<div class="control">
+				<div class="customerId-control">
 					<select id="customerId" name="customerId">
 						<option value="">Select a customer</option>
 						<{customers}>
 					</select>
 					<{icons.user-circle}>
 				</div>
+				<div class="customerId-error" aria-live="polite" aria-atomic="true"></div>
 			</div>
 			<div>
 				<label for="amount">Choose an amount</label>
-				<div class="control">
+				<div class="amount-control">
 					<input id="amount" name="amount" type="number" step="0.01" placeholder="Enter USD amount" />
 					<{icons.currency-dollar}>
 				</div>
+				<div class="amount-error" aria-live="polite" aria-atomic="true"></div>
 			</div>
 			<fieldset>
 				<legend>Set the invoice status</legend>
 				<ol>
 					<li>
 						<input id="pending" name="status" type="radio" value="PENDING" />
-						<label for="pending" class="status-pending">
+						<label for="pending" class="pending-status">
 							Pending
 							<{icons.clock}>
 						</label>
 					</li>
 					<li>
 						<input id="paid" name="status" type="radio" value="PAID" />
-						<label for="paid" class="status-paid">
+						<label for="paid" class="paid-status">
 							Paid
 							<{icons.check}>
 						</label>
 					</li>
 				</ol>
+				<div class="status-error" aria-live="polite" aria-atomic="true"></div>
 			</fieldset>
+			<div class="error" aria-live="polite" aria-atomic="true"></div>
 		</section>
 		<section>
-			<a href="/dashboard/invoices" class="button-secondary">Cancel</a>
-			<button class="button-primary">{title}</button>
+			<a href="/dashboard/invoices" class="secondary-button">Cancel</a>
+			<button class="primary-button">{title}</button>
 		</section>
 	</form>
 </article>

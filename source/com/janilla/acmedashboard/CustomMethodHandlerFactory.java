@@ -23,34 +23,18 @@
  */
 package com.janilla.acmedashboard;
 
-import java.nio.file.Files;
+import com.janilla.http.HttpExchange;
+import com.janilla.web.MethodHandlerFactory;
 
-import com.janilla.persistence.ApplicationPersistenceBuilder;
-import com.janilla.persistence.Persistence;
-
-public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	@Override
-	public Persistence build() {
-		var e = Files.exists(file);
-		var p = super.build();
-		p.setTypeResolver(x -> {
-			try {
-				return Class.forName(AcmeDashboard.class.getPackageName() + "." + x.replace('.', '$'));
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
-			}
-		});
-		if (!e)
-			seed(p);
-		return p;
-	}
-
-	void seed(Persistence persistence) {
-		var pd = PlaceholderData.INSTANCE;
-		pd.customers().forEach(persistence.crud(Customer.class)::create);
-		pd.invoices().forEach(persistence.crud(Invoice.class)::create);
-		pd.revenue().forEach(persistence.crud(Revenue.class)::create);
-		pd.users().forEach(persistence.crud(User.class)::create);
+	protected void handle(Invocation invocation, HttpExchange exchange) {
+		var ex = (CustomExchange) exchange;
+		var rq = ex.getRequest();
+		var p = rq.getPath();
+		if (p.startsWith("/api") && !p.equals("/api/authentication"))
+			ex.requireSessionEmail();
+		super.handle(invocation, exchange);
 	}
 }

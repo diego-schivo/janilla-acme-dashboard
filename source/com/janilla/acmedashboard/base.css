@@ -51,7 +51,9 @@ select {
 	appearance: none;
 }
 
+[type="email"],
 [type="number"],
+[type="password"],
 [type="text"],
 select {
 	border: 1px solid rgb(229, 231, 235);
@@ -60,7 +62,9 @@ select {
 	width: 100%;
 }
 
+[type="email"],
 [type="number"],
+[type="password"],
 [type="text"] {
 	background: rgb(255, 255, 255);
 }
@@ -83,7 +87,7 @@ select {
 	cursor: pointer;
 }
 
-[class^="button-"] {
+[class$="-button"] {
 	align-items: center;
 	border-radius: 0.5rem;
 	display: flex;
@@ -94,7 +98,7 @@ select {
 	}
 }
 
-.button-primary {
+.primary-button {
 	background: rgb(0, 112, 243);
 	color: rgb(255, 255, 255);
 
@@ -103,7 +107,7 @@ select {
 	}
 }
 
-.button-secondary {
+.secondary-button {
 	background: rgb(243, 244, 246);
 	color: rgb(75, 85, 99);
 
@@ -124,7 +128,7 @@ select {
 	width: 1px;
 }
 
-.control {
+[class$="-control"] {
 	position: relative;
 
 	svg {
@@ -137,7 +141,16 @@ select {
 	}
 }
 
-[class^="status-"] {
+.error,
+[class$="-error"] {
+	color: rgb(239, 68, 68);
+
+	&:empty {
+		display: none;
+	}
+}
+
+[class$="-status"] {
 	align-items: center;
 	border-radius: 9999px;
 	display: inline-flex;
@@ -151,12 +164,12 @@ select {
 	}
 }
 
-.status-paid {
+.paid-status {
 	background: rgb(34, 197, 94);
 	color: rgb(255, 255, 255);
 }
 
-.status-pending {
+.pending-status {
 	background: rgb(243, 244, 246);
 	color: rgb(107, 114, 128);
 }

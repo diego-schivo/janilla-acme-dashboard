@@ -23,34 +23,38 @@
  */
 package com.janilla.acmedashboard;
 
-import java.nio.file.Files;
+import java.util.Map;
+import java.util.Properties;
 
-import com.janilla.persistence.ApplicationPersistenceBuilder;
+import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
+import com.janilla.web.Handle;
 
-public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+public class AuthenticationApi {
 
-	@Override
-	public Persistence build() {
-		var e = Files.exists(file);
-		var p = super.build();
-		p.setTypeResolver(x -> {
-			try {
-				return Class.forName(AcmeDashboard.class.getPackageName() + "." + x.replace('.', '$'));
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
-			}
-		});
-		if (!e)
-			seed(p);
-		return p;
+	public Properties configuration;
+
+	public Persistence persistence;
+
+	@Handle(method = "POST", path = "/api/authentication")
+	public void create(User user, CustomExchange exchange) {
+		var uc = persistence.crud(User.class);
+		var u = uc.read(uc.find("email", user.email()));
+		if (!u.password().equals(user.password()))
+			throw new RuntimeException();
+		var h = Map.of("alg", "HS256", "typ", "JWT");
+		var p = Map.of("loggedInAs", u.email());
+		var t = Jwt.generateToken(h, p, configuration.getProperty("acmedashboard.jwt.key"));
+		exchange.setSessionCookie(t);
 	}
 
-	void seed(Persistence persistence) {
-		var pd = PlaceholderData.INSTANCE;
-		pd.customers().forEach(persistence.crud(Customer.class)::create);
-		pd.invoices().forEach(persistence.crud(Invoice.class)::create);
-		pd.revenue().forEach(persistence.crud(Revenue.class)::create);
-		pd.users().forEach(persistence.crud(User.class)::create);
+	@Handle(method = "GET", path = "/api/authentication")
+	public User read(CustomExchange exchange) {
+		return exchange.getSessionUser();
+	}
+
+	@Handle(method = "DELETE", path = "/api/authentication")
+	public void delete(User user, CustomExchange exchange) {
+		exchange.setSessionCookie(null);
 	}
 }

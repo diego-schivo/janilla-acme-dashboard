@@ -23,34 +23,17 @@
  */
 package com.janilla.acmedashboard;
 
-import java.nio.file.Files;
+import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpProtocol;
+import com.janilla.http.HttpRequest;
+import com.janilla.reflect.Factory;
 
-import com.janilla.persistence.ApplicationPersistenceBuilder;
-import com.janilla.persistence.Persistence;
+public class CustomProtocol extends HttpProtocol {
 
-public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+	public Factory factory;
 
 	@Override
-	public Persistence build() {
-		var e = Files.exists(file);
-		var p = super.build();
-		p.setTypeResolver(x -> {
-			try {
-				return Class.forName(AcmeDashboard.class.getPackageName() + "." + x.replace('.', '$'));
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
-			}
-		});
-		if (!e)
-			seed(p);
-		return p;
-	}
-
-	void seed(Persistence persistence) {
-		var pd = PlaceholderData.INSTANCE;
-		pd.customers().forEach(persistence.crud(Customer.class)::create);
-		pd.invoices().forEach(persistence.crud(Invoice.class)::create);
-		pd.revenue().forEach(persistence.crud(Revenue.class)::create);
-		pd.users().forEach(persistence.crud(User.class)::create);
+	protected HttpExchange createExchange(HttpRequest request) {
+		return factory.create(CustomExchange.class);
 	}
 }

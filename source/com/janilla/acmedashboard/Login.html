@@ -1,0 +1,28 @@
+<article class="Login">
+	<header>
+		<{logo}>
+	</header>
+	<form>
+		<div>
+			<h1>Please log in to continue.</h1>
+			<div>
+				<label for="email">Email</label>
+				<div class="control">
+					<input id="email" name="email" type="email" placeholder="Enter your email address" required />
+					<{icons.at-symbol}>
+				</div>
+			</div>
+			<div>
+				<label for="password">Password</label>
+				<div class="control">
+					<input id="password" name="password" type="password" placeholder="Enter password" required minlength="6" />
+					<{icons.key}>
+				</div>
+			</div>
+			<button class="primary-button">
+				Log in
+				<{icons.arrow-right}>
+			</button>
+		</div>
+	</form>
+</article>

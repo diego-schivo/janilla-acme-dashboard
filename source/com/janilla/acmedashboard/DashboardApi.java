@@ -23,34 +23,31 @@
  */
 package com.janilla.acmedashboard;
 
-import java.nio.file.Files;
+import java.math.BigDecimal;
+import java.util.List;
 
-import com.janilla.persistence.ApplicationPersistenceBuilder;
+import com.janilla.acmedashboard.InvoiceApi.Invoice2;
 import com.janilla.persistence.Persistence;
+import com.janilla.web.Handle;
 
-public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+public class DashboardApi {
 
-	@Override
-	public Persistence build() {
-		var e = Files.exists(file);
-		var p = super.build();
-		p.setTypeResolver(x -> {
-			try {
-				return Class.forName(AcmeDashboard.class.getPackageName() + "." + x.replace('.', '$'));
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
-			}
-		});
-		if (!e)
-			seed(p);
-		return p;
+	public Persistence persistence;
+
+	@Handle(method = "GET", path = "/api/dashboard")
+	public Data get() {
+		var ic = persistence.crud(Invoice.class);
+		var rc = persistence.crud(Revenue.class);
+		return new Data(
+				ic.read(ic.filter("status", Invoice.Status.PAID)).map(Invoice::amount).reduce(BigDecimal.ZERO,
+						BigDecimal::add),
+				ic.read(ic.filter("status", Invoice.Status.PENDING)).map(Invoice::amount).reduce(BigDecimal.ZERO,
+						BigDecimal::add),
+				ic.count(), persistence.crud(Customer.class).count(), rc.read(rc.list()).toList(),
+				ic.read(ic.list(0, 5).ids()).map(x -> Invoice2.of(x, persistence)).toList());
 	}
 
-	void seed(Persistence persistence) {
-		var pd = PlaceholderData.INSTANCE;
-		pd.customers().forEach(persistence.crud(Customer.class)::create);
-		pd.invoices().forEach(persistence.crud(Invoice.class)::create);
-		pd.revenue().forEach(persistence.crud(Revenue.class)::create);
-		pd.users().forEach(persistence.crud(User.class)::create);
+	public record Data(BigDecimal paidAmount, BigDecimal pendingAmount, long invoiceCount, long customerCount,
+			List<Revenue> revenues, List<Invoice2> invoices) {
 	}
 }

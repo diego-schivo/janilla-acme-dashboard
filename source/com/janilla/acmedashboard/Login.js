@@ -21,36 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard;
+export default class Login {
 
-import java.nio.file.Files;
-
-import com.janilla.persistence.ApplicationPersistenceBuilder;
-import com.janilla.persistence.Persistence;
-
-public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
-
-	@Override
-	public Persistence build() {
-		var e = Files.exists(file);
-		var p = super.build();
-		p.setTypeResolver(x -> {
-			try {
-				return Class.forName(AcmeDashboard.class.getPackageName() + "." + x.replace('.', '$'));
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
-			}
+	render = async re => {
+		return await re.match([this], (_, o) => {
+			o.template = "Login";
 		});
-		if (!e)
-			seed(p);
-		return p;
 	}
 
-	void seed(Persistence persistence) {
-		var pd = PlaceholderData.INSTANCE;
-		pd.customers().forEach(persistence.crud(Customer.class)::create);
-		pd.invoices().forEach(persistence.crud(Invoice.class)::create);
-		pd.revenue().forEach(persistence.crud(Revenue.class)::create);
-		pd.users().forEach(persistence.crud(User.class)::create);
+	listen = () => {
+		const e = document.querySelector(".Login");
+		e.addEventListener("submit", this.handleSubmit);
+	}
+
+	handleSubmit = async e => {
+		e.preventDefault();
+		await fetch("/api/authentication", {
+			method: "POST",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+		});
+		dispatchEvent(new CustomEvent("urlchange", { detail: { url: new URL("/dashboard", location.href) } }));
 	}
 }

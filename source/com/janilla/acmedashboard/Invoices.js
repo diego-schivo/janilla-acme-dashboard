@@ -109,12 +109,12 @@ export default class Invoices {
 
 const foo = {
 	"PAID": {
-		className: "status-paid",
+		className: "paid-status",
 		icon: heroIcons["check"],
 		text: "Paid"
 	},
 	"PENDING": {
-		className: "status-pending",
+		className: "pending-status",
 		icon: heroIcons["clock"],
 		text: "Pending"
 	}
