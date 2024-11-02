@@ -76,11 +76,16 @@ export default class Invoice {
 		document.querySelector(".Invoice .error").innerHTML = v ? "" : `<p>Missing Fields. Failed to ${this.title}.</p>`;
 		if (!v)
 			return;
-		await fetch(this.id ? `/api/invoices/${this.id}` : "/api/invoices", {
+		const r = await fetch(this.id ? `/api/invoices/${this.id}` : "/api/invoices", {
 			method: this.id ? "PUT" : "POST",
 			headers: { "content-type": "application/json" },
 			body: JSON.stringify(i)
 		});
-		dispatchEvent(new CustomEvent("urlchange", { detail: { url: new URL("/dashboard/invoices", location.href) } }));
+		if (r.ok)
+			dispatchEvent(new CustomEvent("urlchange", { detail: { url: new URL("/dashboard/invoices", location.href) } }));
+		else {
+			const t = await r.text();
+			document.querySelector(".Invoice .error").innerHTML = `<p>${t}</p>`;
+		}
 	}
 }

@@ -45,33 +45,36 @@ import com.janilla.web.Render;
 @Render("AcmeDashboard-Document.html")
 public class AcmeDashboard {
 
-	public static void main(String[] args) throws Exception {
-		var pp = new Properties();
-		try (var is = AcmeDashboard.class.getResourceAsStream("configuration.properties")) {
-			pp.load(is);
-			if (args.length > 0) {
-				var p = args[0];
-				if (p.startsWith("~"))
-					p = System.getProperty("user.home") + p.substring(1);
-				pp.load(Files.newInputStream(Path.of(p)));
+	public static void main(String[] args) {
+		try {
+			var pp = new Properties();
+			try (var is = AcmeDashboard.class.getResourceAsStream("configuration.properties")) {
+				pp.load(is);
+				if (args.length > 0) {
+					var p = args[0];
+					if (p.startsWith("~"))
+						p = System.getProperty("user.home") + p.substring(1);
+					pp.load(Files.newInputStream(Path.of(p)));
+				}
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
 			}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			var a = new AcmeDashboard(pp);
+			var hp = a.factory.create(HttpProtocol.class);
+			try (var is = Net.class.getResourceAsStream("testkeys")) {
+				hp.setSslContext(Net.getSSLContext("JKS", is, "passphrase".toCharArray()));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			hp.setHandler(a.handler);
+			var s = new Server();
+			s.setAddress(
+					new InetSocketAddress(Integer.parseInt(a.configuration.getProperty("acmedashboard.server.port"))));
+			s.setProtocol(hp);
+			s.serve();
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
-		var a = new AcmeDashboard(pp);
-
-		var hp = a.factory.create(HttpProtocol.class);
-		try (var is = Net.class.getResourceAsStream("testkeys")) {
-			hp.setSslContext(Net.getSSLContext("JKS", is, "passphrase".toCharArray()));
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		hp.setHandler(a.handler);
-
-		var s = new Server();
-		s.setAddress(new InetSocketAddress(Integer.parseInt(a.configuration.getProperty("acmedashboard.server.port"))));
-		s.setProtocol(hp);
-		s.serve();
 	}
 
 	public Properties configuration;
@@ -84,13 +87,10 @@ public class AcmeDashboard {
 
 	public AcmeDashboard(Properties configuration) {
 		this.configuration = configuration;
-
 		factory = new Factory();
 		factory.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
 		factory.setSource(this);
-
 		handler = factory.create(ApplicationHandlerBuilder.class).build();
-
 		{
 			var pb = factory.create(ApplicationPersistenceBuilder.class);
 			var p = configuration.getProperty("acmedashboard.database.file");

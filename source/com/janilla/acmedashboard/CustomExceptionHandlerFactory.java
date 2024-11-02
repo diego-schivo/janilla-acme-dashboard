@@ -24,21 +24,22 @@
 package com.janilla.acmedashboard;
 
 import com.janilla.frontend.RenderEngine;
-import com.janilla.http.HeaderField;
 import com.janilla.http.HttpExchange;
-import com.janilla.web.TemplateHandlerFactory;
+import com.janilla.web.Error;
+import com.janilla.web.ExceptionHandlerFactory;
+import com.janilla.web.WebHandlerFactory;
 
-public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
+public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
+
+	public WebHandlerFactory mainFactory;
 
 	@Override
-	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
-//		var a = exchange.getRequest().getHeaders().stream().filter(x -> x.name().equals("accept"))
-//				.map(HeaderField::value).findFirst().orElse(null);
-//		if (!a.equals("*/*")) {
-//			var p = (Layout.Page) input.getValue();
-//			var l = new Layout(new Layout.Nav(new Logo()), p);
-//			input = RenderEngine.Entry.of(null, l, null);
-//		}
-		super.render(input, exchange);
+	protected boolean handle(Error error, HttpExchange exchange) {
+		super.handle(error, exchange);
+		if (exchange.getException() instanceof MethodBlockedException e) {
+			var o = RenderEngine.Entry.of(null, e, null);
+			mainFactory.createHandler(o, exchange).handle(exchange);
+		}
+		return true;
 	}
 }

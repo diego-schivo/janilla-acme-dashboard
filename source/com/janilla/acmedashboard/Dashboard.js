@@ -103,7 +103,7 @@ export default class Dashboard {
 					new Card("customers", "Total Customers", this.data.customerCount)
 				];
 			if (!this.revenueChart)
-				this.revenueChart = new Chart(this.data.revenues.map(x => ({ label: x.month, value: x.revenue })));
+				this.revenueChart = new Chart(this.data.revenue.map(x => ({ label: x.month, value: x.revenue })));
 			if (!this.invoices)
 				this.invoices = this.data.invoices;
 			o.template = "Dashboard";
@@ -153,7 +153,7 @@ class Chart {
 	constructor(items) {
 		var k = Math.ceil(Math.max(...items.map(x => x.value)) / 1000);
 		this.yLabels = Array.from({ length: 1 + k }, (_, i) => `$${i}K`).reverse();
-		this.bars = items.map(x => ({ percentage: x.value / (1000 * k) * 100, xLabel: x.label }));
+		this.bars = items.map(x => ({ height100: x.value / (1000 * k) * 100, xLabel: x.label }));
 	}
 
 	render = async re => {

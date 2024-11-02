@@ -23,31 +23,18 @@
  */
 package com.janilla.acmedashboard;
 
-import java.math.BigDecimal;
-import java.util.List;
+import com.janilla.web.Error;
+import com.janilla.web.Render;
 
-import com.janilla.acmedashboard.InvoiceApi.Invoice2;
-import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
+@Error(code = 403, text = "Forbidden")
+@Render("""
+		{message}
+		""")
+public class MethodBlockedException extends RuntimeException {
 
-public class DashboardApi {
+	private static final long serialVersionUID = -7450331330327132850L;
 
-	public Persistence persistence;
-
-	@Handle(method = "GET", path = "/api/dashboard")
-	public Data get() {
-		var ic = persistence.crud(Invoice.class);
-		var rc = persistence.crud(Revenue.class);
-		return new Data(
-				ic.read(ic.filter("status", Invoice.Status.PAID)).map(Invoice::amount).reduce(BigDecimal.ZERO,
-						BigDecimal::add),
-				ic.read(ic.filter("status", Invoice.Status.PENDING)).map(Invoice::amount).reduce(BigDecimal.ZERO,
-						BigDecimal::add),
-				ic.count(), persistence.crud(Customer.class).count(), rc.read(rc.list()).toList(),
-				ic.read(ic.list(0, 5).ids()).map(x -> Invoice2.of(x, persistence)).toList());
-	}
-
-	public record Data(BigDecimal paidAmount, BigDecimal pendingAmount, long invoiceCount, long customerCount,
-			List<Revenue> revenue, List<Invoice2> invoices) {
+	public MethodBlockedException() {
+		super("The requested action is disabled on this public server: please set up and run the application locally");
 	}
 }

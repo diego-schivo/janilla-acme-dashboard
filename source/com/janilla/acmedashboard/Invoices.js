@@ -87,8 +87,13 @@ export default class Invoices {
 
 	handleSubmit = async e => {
 		e.preventDefault();
-		await fetch(`/api/invoices/${new FormData(e.target).get("id")}`, { method: "DELETE" });
-		await this.update();
+		const r = await fetch(`/api/invoices/${new FormData(e.target).get("id")}`, { method: "DELETE" });
+		if (r.ok)
+			await this.update();
+		else {
+			const t = await r.text();
+			alert(t);
+		}
 	}
 
 	handlePagechange = async () => {
@@ -107,7 +112,7 @@ export default class Invoices {
 	}
 }
 
-const foo = {
+const statuses = {
 	"PAID": {
 		className: "paid-status",
 		icon: heroIcons["check"],
@@ -133,7 +138,7 @@ class Table {
 		}) || await re.match([this.items, "number"], (_, o) => {
 			o.template = "Invoices-TableRow";
 		}) || await re.match(["status"], (_, o) => {
-			o.value = foo[o.value];
+			o.value = statuses[o.value];
 			o.template = "Invoices-TableStatus";
 		});
 	}

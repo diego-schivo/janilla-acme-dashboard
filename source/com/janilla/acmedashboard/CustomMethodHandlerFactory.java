@@ -23,18 +23,24 @@
  */
 package com.janilla.acmedashboard;
 
+import java.util.Properties;
+
 import com.janilla.http.HttpExchange;
+import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
 
 public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
+	public Properties configuration;
+
 	@Override
 	protected void handle(Invocation invocation, HttpExchange exchange) {
-		var ex = (CustomExchange) exchange;
-		var rq = ex.getRequest();
-		var p = rq.getPath();
-		if (p.startsWith("/api") && !p.equals("/api/authentication"))
-			ex.requireSessionEmail();
+		var rq = exchange.getRequest();
+		if (Boolean.parseBoolean(configuration.getProperty("acmedashboard.live-demo")))
+			if (!rq.getMethod().equals("GET") && !rq.getPath().equals("/api/authentication"))
+						throw new HandleException(new MethodBlockedException());
+		if (rq.getPath().startsWith("/api") && !rq.getPath().equals("/api/authentication"))
+			((CustomExchange) exchange).requireSessionEmail();
 		super.handle(invocation, exchange);
 	}
 }

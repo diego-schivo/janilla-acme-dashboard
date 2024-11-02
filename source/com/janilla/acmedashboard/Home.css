@@ -16,37 +16,41 @@
 		display: grid;
 		gap: 1rem;
 		grid-template-columns: 40% 60%;
-	}
-	
-	article {
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
-		justify-content: center;
-		
-		&:first-child {
-			background-color: rgb(249, 250, 251);
-			padding: 2.5rem 5rem;
-		}
-		
-		&:nth-child(2) {
-			padding: 3rem 7rem;
+
+		div {
+			display: flex;
+			flex-direction: column;
+			gap: 1.5rem;
+			justify-content: center;
+			
+			&:first-child {
+				background-color: rgb(249, 250, 251);
+				padding: 2.5rem 5rem;
+			}
+			
+			&:nth-child(2) {
+				padding: 3rem 7rem;
+			}
 		}
 
 		p {
-			font-family: 'Lusitana';
+			font-family: "Lusitana";
 			font-size: 1.875rem;
 			line-height: 1.5;
+			
+			a {
+				color: rgb(0, 112, 243);
+			}
 		}
 		
-		> a {
+		.primary-button {
 			align-self: flex-start;
 			gap: 1.25rem;
 			padding: 0.75rem 1.5rem;
-		}
 	
-		svg {
-			width: 1.5rem;
+			svg {
+				width: 1.5rem;
+			}
 		}
 		
 		img {

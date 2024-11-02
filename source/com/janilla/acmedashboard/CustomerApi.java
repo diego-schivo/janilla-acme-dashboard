@@ -49,7 +49,9 @@ public class CustomerApi {
 	@Handle(method = "GET", path = "/api/customers")
 	public Stream<Customer2> list(@Bind("query") String query) {
 		var cc = persistence.crud(Customer.class);
-		return cc.read(query == null || query.isEmpty() ? cc.list() : cc.filter("name", query))
+		return cc
+				.read(query == null || query.isEmpty() ? cc.list()
+						: cc.filter("name", x -> ((String) x).toLowerCase().contains(query.toLowerCase())))
 				.map(x -> Customer2.of(x, persistence));
 	}
 

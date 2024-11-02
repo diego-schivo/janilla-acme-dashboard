@@ -1,4 +1,4 @@
-.Layout {
+body:has(.Nav) {
 	display: flex;
 	height: 100vh;
 
@@ -138,7 +138,7 @@
 		}
 	}
 
-	.revenues,
+	.revenue,
 	.invoices {
 		display: flex;
 		flex-direction: column;
@@ -172,7 +172,7 @@
 		}
 	}
 
-	.revenues {
+	.revenue {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;

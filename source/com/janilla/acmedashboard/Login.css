@@ -56,7 +56,7 @@ body:has(.Login) {
 	}
 
 	h1 {
-		font-family: 'Lusitana';
+		font-family: "Lusitana";
 		font-size: 1.5rem;
 		line-height: 2rem;
 	}
