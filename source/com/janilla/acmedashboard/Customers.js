@@ -23,6 +23,8 @@
  */
 export default class Customers {
 
+	title = "Customers";
+
 	query = "";
 
 	table = new Table();

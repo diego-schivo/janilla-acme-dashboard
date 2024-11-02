@@ -75,6 +75,7 @@ export default class AcmeDashboard {
 		if (p === "/")
 			p = await (await fetch("/api/authentication")).json() ? "/dashboard" : "/";
 		this.page = this.createPage(p);
+		document.title = [this.page.title, document.title.split(" | ").at(-1)].filter(x => x).join(" | ");
 		document.body.innerHTML = await new RenderEngine().render({ value: this });
 		this.listen();
 		history.replaceState(this.page.state, "", p + u.search);
@@ -107,6 +108,7 @@ export default class AcmeDashboard {
 	refreshPage = async p => {
 		const l = this.content === this.layout;
 		this.page = p;
+		document.title = [this.page.title, document.title.split(" | ").at(-1)].filter(x => x).join(" | ");
 		if (l && this.content === this.layout) {
 			document.querySelector("main").innerHTML = await this.renderEngine.render({ value: this.page });
 			this.page.listen();

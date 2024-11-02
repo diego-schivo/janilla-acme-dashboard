@@ -25,6 +25,8 @@ import heroIcons from "./heroIcons.js";
 
 export default class Invoices {
 
+	title = "Invoices";
+
 	query = "";
 
 	table = new Table();
