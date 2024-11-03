@@ -1,22 +1,22 @@
 <template id="Dashboard-Layout">
-	<{nav}>
+	<aside render="nav"></aside>
 	<main>
-		<{page}>
+		<div render="page"></div>
 	</main>
 </template>
 
 <template id="Dashboard-Nav">
 	<aside class="Nav">
 		<header>
-			<{logo}>
+			<div render="logo"></div>
 		</header>
 		<ul>
-			<{links}>
+			<li render="links"></li>
 			<li></li>
 			<li>
 				<form>
 					<button>
-						<{icons.power}>
+						<svg render="icons.power"></svg>
 						Sign Out
 					</button>
 				</form>
@@ -28,47 +28,49 @@
 <template id="Dashboard-NavLink">
 	<li>
 		<a href="{path}">
-			<{icon}>
+			<svg render="icon"></svg>
 			{text}
 		</a>
 	</li>
 </template>
 
-<article class="Dashboard">
-	<h1>Dashboard</h1>
-	<div>
-		<article class="cards">
-			<{cards}>
-		</article>
-		<article class="revenue">
-			<h2>Recent Revenue</h2>
-			<div>
-				<{revenueChart}>
-				<footer>
-					<{icons.calendar}>
-					<h3>Last 12 months</h3>
-				</footer>
-			</div>
-		</article>
-		<article class="invoices">
-			<h2>Latest Invoices</h2>
-			<div>
-				<div class="list">
-					<{invoices}>
+<template id="Dashboard">
+	<article class="Dashboard">
+		<h1>Dashboard</h1>
+		<div>
+			<article class="cards">
+				<article render="cards"></article>
+			</article>
+			<article class="revenue">
+				<h2>Recent Revenue</h2>
+				<div>
+					<div render="revenueChart"></div>
+					<footer>
+						<svg render="icons.calendar"></svg>
+						<h3>Last 12 months</h3>
+					</footer>
 				</div>
-				<footer>
-					<{icons.arrow-path}>
-					<h3>Updated just now</h3>
-				</footer>
-			</div>
-		</article>
-	</div>
-</article>
+			</article>
+			<article class="invoices">
+				<h2>Latest Invoices</h2>
+				<div>
+					<div class="list">
+						<article render="invoices"></article>
+					</div>
+					<footer>
+						<svg render="icons.arrow-path"></svg>
+						<h3>Updated just now</h3>
+					</footer>
+				</div>
+			</article>
+		</div>
+	</article>
+</template>
 
 <template id="Dashboard-Card">
 	<article class="Card">
 		<div>
-			<{icon}>
+			<svg render="icon"></svg>
 			<h3>{title}</h3>
 		</div>
 		<p>{value}</p>
@@ -78,10 +80,10 @@
 <template id="Dashboard-Chart">
 	<div class="Chart">
 		<div>
-			<{yLabels}>
+			<p render="yLabels"></p>
 		</div>
 		<div>
-			<{bars}>
+			<div render="bars"></div>
 		</div>
 	</div>
 </template>

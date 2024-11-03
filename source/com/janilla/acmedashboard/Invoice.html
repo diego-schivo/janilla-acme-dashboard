@@ -1,64 +1,66 @@
-<article class="Invoice">
-	<nav aria-label="Breadcrumb">
-		<ol>
-			<li>
-				<a href="/dashboard/invoices">Invoices</a>
-				<span>/</span>
-			</li>
-			<li aria-current="true">
-				<h1>{title}</h1>
-			</li>
-		</ol>
-	</nav>
-	<form>
-		<section>
-			<div>
-				<label for="customerId">Choose customer</label>
-				<div class="customerId-control">
-					<select id="customerId" name="customerId">
-						<option value="">Select a customer</option>
-						<{customers}>
-					</select>
-					<{icons.user-circle}>
+<template id="Invoice">
+	<article class="Invoice">
+		<nav aria-label="Breadcrumb">
+			<ol>
+				<li>
+					<a href="/dashboard/invoices">Invoices</a>
+					<span>/</span>
+				</li>
+				<li aria-current="true">
+					<h1>{title}</h1>
+				</li>
+			</ol>
+		</nav>
+		<form>
+			<section>
+				<div>
+					<label for="customerId">Choose customer</label>
+					<div class="customerId-control">
+						<select id="customerId" name="customerId">
+							<option value="">Select a customer</option>
+							<option render="customers"></option>
+						</select>
+						<svg render="icons.user-circle"></svg>
+					</div>
+					<div class="customerId-error" aria-live="polite" aria-atomic="true"></div>
 				</div>
-				<div class="customerId-error" aria-live="polite" aria-atomic="true"></div>
-			</div>
-			<div>
-				<label for="amount">Choose an amount</label>
-				<div class="amount-control">
-					<input id="amount" name="amount" type="number" step="0.01" placeholder="Enter USD amount" />
-					<{icons.currency-dollar}>
+				<div>
+					<label for="amount">Choose an amount</label>
+					<div class="amount-control">
+						<input id="amount" name="amount" type="number" step="0.01" placeholder="Enter USD amount" />
+						<svg render="icons.currency-dollar"></svg>
+					</div>
+					<div class="amount-error" aria-live="polite" aria-atomic="true"></div>
 				</div>
-				<div class="amount-error" aria-live="polite" aria-atomic="true"></div>
-			</div>
-			<fieldset>
-				<legend>Set the invoice status</legend>
-				<ol>
-					<li>
-						<input id="pending" name="status" type="radio" value="PENDING" />
-						<label for="pending" class="pending-status">
-							Pending
-							<{icons.clock}>
-						</label>
-					</li>
-					<li>
-						<input id="paid" name="status" type="radio" value="PAID" />
-						<label for="paid" class="paid-status">
-							Paid
-							<{icons.check}>
-						</label>
-					</li>
-				</ol>
-				<div class="status-error" aria-live="polite" aria-atomic="true"></div>
-			</fieldset>
-			<div class="error" aria-live="polite" aria-atomic="true"></div>
-		</section>
-		<section>
-			<a href="/dashboard/invoices" class="secondary-button">Cancel</a>
-			<button class="primary-button">{title}</button>
-		</section>
-	</form>
-</article>
+				<fieldset>
+					<legend>Set the invoice status</legend>
+					<ol>
+						<li>
+							<input id="pending" name="status" type="radio" value="PENDING" />
+							<label for="pending" class="pending-status">
+								Pending
+								<svg render="icons.clock"></svg>
+							</label>
+						</li>
+						<li>
+							<input id="paid" name="status" type="radio" value="PAID" />
+							<label for="paid" class="paid-status">
+								Paid
+								<svg render="icons.check"></svg>
+							</label>
+						</li>
+					</ol>
+					<div class="status-error" aria-live="polite" aria-atomic="true"></div>
+				</fieldset>
+				<div class="error" aria-live="polite" aria-atomic="true"></div>
+			</section>
+			<section>
+				<a href="/dashboard/invoices" class="secondary-button">Cancel</a>
+				<button class="primary-button">{title}</button>
+			</section>
+		</form>
+	</article>
+</template>
 
 <template id="Invoice-customer">
 	<option value="{key}">{value}</option>

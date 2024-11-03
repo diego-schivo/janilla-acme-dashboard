@@ -29,9 +29,11 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpProtocol;
+import com.janilla.io.IO;
 import com.janilla.net.Net;
 import com.janilla.net.Server;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
@@ -85,6 +87,8 @@ public class AcmeDashboard {
 
 	public Persistence persistence;
 
+	public Iterable<String> templates;
+
 	public AcmeDashboard(Properties configuration) {
 		this.configuration = configuration;
 		factory = new Factory();
@@ -99,6 +103,18 @@ public class AcmeDashboard {
 			pb.setFile(Path.of(p));
 			persistence = pb.build();
 		}
+		templates = // Stream.of(TemplatesWeb.class.getPackageName(), getClass().getPackageName())
+				Stream.of(getClass().getPackageName()).flatMap(
+						p -> IO.getPackageFiles(p).filter(f -> f.getFileName().toString().endsWith(".html")).map(f -> {
+							return p.replace('.', '/') + "/" + f.getFileName().toString();
+						})).map(x -> {
+							var l = Thread.currentThread().getContextClassLoader();
+							try (var is = l.getResourceAsStream(x)) {
+								return new String(is.readAllBytes());
+							} catch (IOException e) {
+								throw new UncheckedIOException(e);
+							}
+						}).filter(x -> x.contains("<template id=")).toList();
 	}
 
 	@Handle(method = "GET", path = "(/[a-z/]*)")

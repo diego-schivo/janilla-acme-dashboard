@@ -76,7 +76,8 @@ export default class AcmeDashboard {
 			p = await (await fetch("/api/authentication")).json() ? "/dashboard" : "/";
 		this.page = this.createPage(p);
 		document.title = [this.page.title, document.title.split(" | ").at(-1)].filter(x => x).join(" | ");
-		document.body.innerHTML = await new RenderEngine().render({ value: this });
+		const re = new RenderEngine(document.body.querySelectorAll("template"));
+		document.body.innerHTML = await re.render({ value: this });
 		this.listen();
 		history.replaceState(this.page.state, "", p + u.search);
 		document.addEventListener("click", this.handleClick);
@@ -113,7 +114,9 @@ export default class AcmeDashboard {
 			document.querySelector("main").innerHTML = await this.renderEngine.render({ value: this.page });
 			this.page.listen();
 		} else {
-			document.body.innerHTML = await new RenderEngine().render({ value: this });
+			const re = new RenderEngine();
+			re.templates = this.renderEngine.templates;
+			document.body.innerHTML = await re.render({ value: this });
 			this.listen();
 		}
 	}

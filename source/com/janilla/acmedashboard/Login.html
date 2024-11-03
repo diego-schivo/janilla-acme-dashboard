@@ -1,28 +1,30 @@
-<article class="Login">
-	<header>
-		<{logo}>
-	</header>
-	<form>
-		<div>
-			<h1>Please log in to continue.</h1>
+<template id="Login">
+	<article class="Login">
+		<header>
+			<div render="logo"></div>
+		</header>
+		<form>
 			<div>
-				<label for="email">Email</label>
-				<div class="control">
-					<input id="email" name="email" type="email" placeholder="Enter your email address" required />
-					<{icons.at-symbol}>
+				<h1>Please log in to continue.</h1>
+				<div>
+					<label for="email">Email</label>
+					<div class="control">
+						<input id="email" name="email" type="email" placeholder="Enter your email address" required />
+						<svg render="icons.at-symbol"></svg>
+					</div>
 				</div>
-			</div>
-			<div>
-				<label for="password">Password</label>
-				<div class="control">
-					<input id="password" name="password" type="password" placeholder="Enter password" required minlength="6" />
-					<{icons.key}>
+				<div>
+					<label for="password">Password</label>
+					<div class="control">
+						<input id="password" name="password" type="password" placeholder="Enter password" required minlength="6" />
+						<svg render="icons.key"></svg>
+					</div>
 				</div>
+				<button class="primary-button">
+					Log in
+					<svg render="icons.arrow-right"></svg>
+				</button>
 			</div>
-			<button class="primary-button">
-				Log in
-				<{icons.arrow-right}>
-			</button>
-		</div>
-	</form>
-</article>
+		</form>
+	</article>
+</template>

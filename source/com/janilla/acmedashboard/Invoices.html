@@ -1,19 +1,21 @@
-<article class="Invoices">
-	<h1>Invoices</h1>
-	<header>
-		<label for="search" class="sr-only">Search</label>
-		<div class="control">
-			<input id="search" type="text" placeholder="Search invoices..." />
-			<{icons.magnifying-glass}>
-		</div>
-		<a href="/dashboard/invoices/create" class="primary-button">
-			<span>Create Invoice</span>
-			<{icons.plus}>
-		</a>
-	</header>
-	<{table}>
-	<{pagination}>
-</article>
+<template id="Invoices">
+	<article class="Invoices">
+		<h1>Invoices</h1>
+		<header>
+			<label for="search" class="sr-only">Search</label>
+			<div class="control">
+				<input id="search" type="text" placeholder="Search invoices..." />
+				<svg render="icons.magnifying-glass"></svg>
+			</div>
+			<a href="/dashboard/invoices/create" class="primary-button">
+				<span>Create Invoice</span>
+				<svg render="icons.plus"></svg>
+			</a>
+		</header>
+		<section render="table"></section>
+		<section render="pagination"></section>
+	</article>
+</template>
 
 <template id="Invoices-Table">
 	<section class="Table">
@@ -29,7 +31,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<{items}>
+				<tr render="items"></tr>
 			</tbody>
 		</table>
 	</section>
@@ -48,13 +50,13 @@
 		<td>
 			<a href="/dashboard/invoices/{id}/edit">
 				<span class="sr-only">Edit</span>
-				<{icons.pencil}>
+				<svg render="icons.pencil"></svg>
 			</a>
 			<form>
 				<input type="hidden" name="id" value="{id}" />
 				<button>
 					<span class="sr-only">Delete</span>
-					<{icons.trash}>
+					<svg render="icons.trash"></svg>
 				</button>
 			</form>
 		</td>
@@ -64,28 +66,28 @@
 <template id="Invoices-TableStatus">
 	<span class="{className}">
 		{text}
-		<{icon}>
+		<svg render="icon"></svg>
 	</span>
 </template>
 
 <template id="Invoices-Pagination">
 	<section class="Pagination">
-		<{previousItem}>
+		<span render="previousItem"></span>
 		<div>
-			<{items}>
+			<span render="items"></span>
 		</div>
-		<{nextItem}>
+		<span render="nextItem"></span>
 	</section>
 </template>
 
 <template id="Invoices-PaginationItem">
 	<span class="{active}">
-		<{content}>
+		<div render="content"></div>
 	</span>
 </template>
 
 <template id="Invoices-PaginationLink">
 	<a href="{url}">
-		<{content}>
+		<div render="content"></div>
 	</a>
 </template>

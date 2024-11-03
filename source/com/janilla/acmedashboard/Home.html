@@ -1,22 +1,24 @@
-<article class="Home">
-	<header>
-		<{logo}>
-	</header>
-	<main>
-		<div>
-			<p>
-				<strong>Welcome to Acme.</strong>
-				This is an example for the
-				<a href="https://janilla.com/">Janilla Solution Stack</a>
-				, brought to you by Janilla and Vercel.
-			</p>
-			<a href="/login" class="primary-button">
-				<span>Log in</span>
-				<{icons.arrow-right}>
-			</a>
-		</div>
-		<div>
-			<img src="/images/hero-desktop.webp" />
-		</div>
-	</main>
-</article>
+<template id="Home">
+	<article class="Home">
+		<header>
+			<div render="logo"></div>
+		</header>
+		<main>
+			<div>
+				<p>
+					<strong>Welcome to Acme.</strong>
+					This is an example for the
+					<a href="https://janilla.com/">Janilla Solution Stack</a>
+					, brought to you by Janilla and Vercel.
+				</p>
+				<a href="/login" class="primary-button">
+					<span>Log in</span>
+					<svg render="icons.arrow-right"></svg>
+				</a>
+			</div>
+			<div>
+				<img src="/images/hero-desktop.webp" />
+			</div>
+		</main>
+	</article>
+</template>
