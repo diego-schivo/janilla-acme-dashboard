@@ -28,7 +28,7 @@ export class Layout {
 	nav = new Nav();
 
 	render = async re => {
-		return await re.match([this], async (_, o) => {
+		return await re.match([this], (_, o) => {
 			o.template = "Dashboard-Layout";
 		});
 	}
@@ -49,10 +49,8 @@ class Nav {
 	render = async re => {
 		return await re.match([this], (_, o) => {
 			o.template = "Dashboard-Nav";
-		}) || await re.match([this, "links", "number"], (_, o) => {
+		}) || await re.match([this.links, '[type="number"]'], (_, o) => {
 			o.template = "Dashboard-NavLink";
-		}) || await re.match([this, "links", "number", "icon"], (_, o) => {
-			o.value = heroIcons[o.value];
 		});
 	}
 
@@ -63,7 +61,10 @@ class Nav {
 	}
 
 	handlePopstate = () => {
-		document.querySelectorAll(".Nav a").forEach(x => x.parentElement.classList[x.getAttribute("href") === document.location.pathname ? "add" : "remove"]("active"));
+		document.querySelectorAll(".Nav a").forEach(x => {
+			const a = x.getAttribute("href") === document.location.pathname;
+			x.parentElement.classList[a ? "add" : "remove"]("active");
+		});
 	}
 
 	handleSubmit = async e => {
@@ -107,7 +108,7 @@ export default class Dashboard {
 			if (!this.invoices)
 				this.invoices = this.data.invoices;
 			o.template = "Dashboard";
-		}) || await re.match([this, "invoices", "number"], (_, o) => {
+		}) || await re.match([this.invoices, '[type="number"]'], (_, o) => {
 			o.template = "Dashboard-Invoice";
 		});
 	}
@@ -133,7 +134,7 @@ class Card {
 	render = async re => {
 		return await re.match([this], (_, o) => {
 			o.template = "Dashboard-Card";
-		}) || await re.match([this, "icon"], (_, o) => {
+		}) || await re.match(['[key="icon"]'], (_, o) => {
 			o.value = heroIcons[{
 				collected: "banknotes",
 				pending: "clock",
@@ -159,9 +160,9 @@ class Chart {
 	render = async re => {
 		return await re.match([this], (_, o) => {
 			o.template = "Dashboard-Chart";
-		}) || await re.match([this, "yLabels", "number"], (_, o) => {
+		}) || await re.match([this.yLabels, '[type="number"]'], (_, o) => {
 			o.template = "Dashboard-ChartYLabel";
-		}) || await re.match([this, "bars", "number"], (_, o) => {
+		}) || await re.match([this.bars, '[type="number"]'], (_, o) => {
 			o.template = "Dashboard-ChartBar";
 		});
 	}

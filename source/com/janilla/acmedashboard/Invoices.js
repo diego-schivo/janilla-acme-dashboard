@@ -134,12 +134,12 @@ class Table {
 	items;
 
 	render = async re => {
-		return await re.match([this], async (_, o) => {
+		return await re.match([this], (_, o) => {
 			this.renderEngine = re.clone();
 			o.template = "Invoices-Table";
-		}) || await re.match([this.items, "number"], (_, o) => {
+		}) || await re.match([this.items, '[type="number"]'], (_, o) => {
 			o.template = "Invoices-TableRow";
-		}) || await re.match(["status"], (_, o) => {
+		}) || await re.match(['[key="status"]'], (_, o) => {
 			o.value = statuses[o.value];
 			o.template = "Invoices-TableStatus";
 		});
@@ -190,7 +190,7 @@ class Pagination {
 				url: this.page !== this.pageCount ? u.pathname + u.search : undefined
 			};
 			o.template = "Invoices-Pagination";
-		}) || await re.match([this.items, "number"], (_, o) => {
+		}) || await re.match([this.items, '[type="number"]'], (_, o) => {
 			o.template = o.value.url ? "Invoices-PaginationLink" : "Invoices-PaginationItem";
 		}) || await re.match([this.previousItem], (_, o) => {
 			o.template = o.value.url ? "Invoices-PaginationLink" : "Invoices-PaginationItem";

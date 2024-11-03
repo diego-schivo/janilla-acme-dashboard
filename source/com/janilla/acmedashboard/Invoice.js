@@ -51,7 +51,7 @@ export default class Invoice {
 				this.invoice = this.id ? await (await fetch(`/api/invoices/${this.id}`)).json() : {};
 			this.customers = await (await fetch("/api/customers/names")).json();
 			o.template = "Invoice";
-		}) || await re.match([this.customers, "number"], async (_, o) => {
+		}) || await re.match([this.customers, '[type="number"]'], (_, o) => {
 			o.template = "Invoice-customer";
 		});
 	}

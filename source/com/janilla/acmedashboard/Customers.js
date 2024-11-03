@@ -88,10 +88,10 @@ class Table {
 	items;
 
 	render = async re => {
-		return await re.match([this], async (_, o) => {
+		return await re.match([this], (_, o) => {
 			this.renderEngine = re.clone();
 			o.template = "Customers-Table";
-		}) || await re.match([this.items, "number"], (_, o) => {
+		}) || await re.match([this.items, '[type="number"]'], (_, o) => {
 			o.template = "Customers-TableRow";
 		});
 	}

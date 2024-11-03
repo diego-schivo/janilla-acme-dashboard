@@ -87,11 +87,15 @@ export default class AcmeDashboard {
 
 	render = async re => {
 		const o = re.stack.at(-1);
-		if (o.key === "amount" || o.key?.endsWith("Amount")) {
+		if (typeof o.key === "string" && (o.key === "icon" || o.key.endsWith("Icon"))) {
+			o.value = heroIcons[o.value];
+			return true;
+		}
+		if (typeof o.key === "string" && (o.key === "amount" || o.key.endsWith("Amount"))) {
 			o.value = currencyFormatter.format(o.value);
 			return true;
 		}
-		if (o.key === "date" || o.key?.endsWith("Date")) {
+		if (typeof o.key === "string" && (o.key === "date" || o.key.endsWith("Date"))) {
 			o.value = dateFormatter.format(new Date(o.value));
 			return true;
 		}
