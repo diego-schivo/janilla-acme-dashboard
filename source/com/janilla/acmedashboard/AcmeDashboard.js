@@ -42,6 +42,17 @@ const pages1 = {
 const pages2 = new Map();
 pages2.set(new RegExp("^/dashboard/invoices/(\\d+)/edit$"), x => new Invoice(parseInt(x, 10)));
 
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+	style: "currency",
+	currency: "USD"
+});
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+	day: "numeric",
+	month: "short",
+	year: "numeric",
+});
+
 export default class AcmeDashboard {
 
 	renderEngine;
@@ -53,17 +64,6 @@ export default class AcmeDashboard {
 	page;
 
 	layout = new Layout();
-
-	currencyFormatter = new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "USD"
-	});
-
-	dateFormatter = new Intl.DateTimeFormat("en-US", {
-		day: "numeric",
-		month: "short",
-		year: "numeric",
-	});
 
 	get content() {
 		return this.page instanceof Home || this.page instanceof Login ? this.page : this.layout;
@@ -86,17 +86,18 @@ export default class AcmeDashboard {
 	}
 
 	render = async re => {
+		const o = re.stack.at(-1);
+		if (o.key === "amount" || o.key?.endsWith("Amount")) {
+			o.value = currencyFormatter.format(o.value);
+			return true;
+		}
+		if (o.key === "date" || o.key?.endsWith("Date")) {
+			o.value = dateFormatter.format(new Date(o.value));
+			return true;
+		}
 		return await re.match([this], (_, o) => {
 			this.renderEngine = re.clone();
 			o.template = "AcmeDashboard";
-		}) || await re.match(["amount"], (_, o) => {
-			o.value = this.currencyFormatter.format(o.value);
-		}) || await re.match(["pendingAmount"], (_, o) => {
-			o.value = this.currencyFormatter.format(o.value);
-		}) || await re.match(["paidAmount"], (_, o) => {
-			o.value = this.currencyFormatter.format(o.value);
-		}) || await re.match(["date"], (_, o) => {
-			o.value = this.dateFormatter.format(new Date(o.value));
 		});
 	}
 

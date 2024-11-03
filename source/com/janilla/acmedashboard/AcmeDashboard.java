@@ -117,7 +117,7 @@ public class AcmeDashboard {
 						}).filter(x -> x.contains("<template id=")).toList();
 	}
 
-	@Handle(method = "GET", path = "(/[a-z/]*)")
+	@Handle(method = "GET", path = "(/[\\w\\d/-]*)")
 	public AcmeDashboard getApplication() {
 		return this;
 	}

@@ -40,13 +40,15 @@
 <template id="Invoices-TableRow">
 	<tr>
 		<td>
-			<img src="{customer.imageUrl}" />
+			<img loading="lazy" src="{customer.imageUrl}" />
 			{customer.name}
 		</td>
 		<td>{customer.email}</td>
 		<td>{amount}</td>
 		<td>{date}</td>
-		<td>{status}</td>
+		<td>
+			<span render="status"></span>
+		</td>
 		<td>
 			<a href="/dashboard/invoices/{id}/edit">
 				<span class="sr-only">Edit</span>
