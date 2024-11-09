@@ -5,15 +5,15 @@
 			<label for="search" class="sr-only">Search</label>
 			<div class="control">
 				<input id="search" type="text" placeholder="Search invoices..." />
-				<svg render="icons.magnifying-glass"></svg>
+				<svg data-render="icons.magnifying-glass"></svg>
 			</div>
 			<a href="/dashboard/invoices/create" class="primary-button">
 				<span>Create Invoice</span>
-				<svg render="icons.plus"></svg>
+				<svg data-render="icons.plus"></svg>
 			</a>
 		</header>
-		<section render="table"></section>
-		<section render="pagination"></section>
+		<section data-render="table"></section>
+		<section data-render="pagination"></section>
 	</article>
 </template>
 
@@ -31,7 +31,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr render="items"></tr>
+				<tr data-render="items"></tr>
 			</tbody>
 		</table>
 	</section>
@@ -40,25 +40,25 @@
 <template id="Invoices-TableRow">
 	<tr>
 		<td>
-			<img loading="lazy" src="{customer.imageUrl}" />
-			{customer.name}
+			<img loading="lazy" src="${customer.imageUrl}" />
+			${customer.name}
 		</td>
-		<td>{customer.email}</td>
-		<td>{amount}</td>
-		<td>{date}</td>
+		<td>${customer.email}</td>
+		<td>${amount}</td>
+		<td>${date}</td>
 		<td>
-			<span render="status"></span>
+			<span data-render="status"></span>
 		</td>
 		<td>
-			<a href="/dashboard/invoices/{id}/edit">
+			<a href="/dashboard/invoices/${id}/edit">
 				<span class="sr-only">Edit</span>
-				<svg render="icons.pencil"></svg>
+				<svg data-render="icons.pencil"></svg>
 			</a>
 			<form>
-				<input type="hidden" name="id" value="{id}" />
+				<input type="hidden" name="id" value="${id}" />
 				<button>
 					<span class="sr-only">Delete</span>
-					<svg render="icons.trash"></svg>
+					<svg data-render="icons.trash"></svg>
 				</button>
 			</form>
 		</td>
@@ -66,30 +66,30 @@
 </template>
 
 <template id="Invoices-TableStatus">
-	<span class="{className}">
-		{text}
-		<svg render="icon"></svg>
+	<span class="${className}">
+		${text}
+		<svg data-render="icon"></svg>
 	</span>
 </template>
 
 <template id="Invoices-Pagination">
 	<section class="Pagination">
-		<span render="previousItem"></span>
+		<span data-render="previousItem"></span>
 		<div>
-			<span render="items"></span>
+			<span data-render="items"></span>
 		</div>
-		<span render="nextItem"></span>
+		<span data-render="nextItem"></span>
 	</section>
 </template>
 
 <template id="Invoices-PaginationItem">
-	<span class="{active}">
-		<div render="content"></div>
+	<span class="${active}">
+		<div data-render="content"></div>
 	</span>
 </template>
 
 <template id="Invoices-PaginationLink">
-	<a href="{url}">
-		<div render="content"></div>
+	<a href="${url}">
+		<div data-render="content"></div>
 	</a>
 </template>

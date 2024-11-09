@@ -5,10 +5,10 @@
 			<label for="search" class="sr-only">Search</label>
 			<div class="control">
 				<input id="search" type="text" placeholder="Search customers..." />
-				<svg render="icons.magnifying-glass"></svg>
+				<svg data-render="icons.magnifying-glass"></svg>
 			</div>
 		</header>
-		<section render="table"></section>
+		<section data-render="table"></section>
 	</article>
 </template>
 
@@ -26,7 +26,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr render="items"></tr>
+				<tr data-render="items"></tr>
 			</tbody>
 		</table>
 	</section>
@@ -35,12 +35,12 @@
 <template id="Customers-TableRow">
 	<tr>
 		<td>
-			<img loading="lazy" src="{imageUrl}" />
-			{name}
+			<img loading="lazy" src="${imageUrl}" />
+			${name}
 		</td>
-		<td>{email}</td>
-		<td>{invoiceCount}</td>
-		<td>{pendingAmount}</td>
-		<td>{paidAmount}</td>
+		<td>${email}</td>
+		<td>${invoiceCount}</td>
+		<td>${pendingAmount}</td>
+		<td>${paidAmount}</td>
 	</tr>
 </template>

@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import Component from "./Component.js";
 import Customers from "./Customers.js";
 import Home from "./Home.js";
 import Dashboard, { Layout } from "./Dashboard.js";
@@ -53,9 +54,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 	year: "numeric",
 });
 
-export default class AcmeDashboard {
-
-	renderEngine;
+export default class AcmeDashboard extends Component {
 
 	icons = heroIcons;
 
@@ -65,11 +64,15 @@ export default class AcmeDashboard {
 
 	layout = new Layout();
 
+	constructor() {
+		super("AcmeDashboard");
+	}
+
 	get content() {
 		return this.page instanceof Home || this.page instanceof Login ? this.page : this.layout;
 	}
 
-	run = async () => {
+	async run() {
 		const u = new URL(location.href);
 		let p = u.pathname;
 		if (p === "/")
@@ -77,7 +80,8 @@ export default class AcmeDashboard {
 		this.page = this.createPage(p);
 		document.title = [this.page.title, document.title.split(" | ").at(-1)].filter(x => x).join(" | ");
 		const re = new RenderEngine(document.body.querySelectorAll("template"));
-		document.body.innerHTML = await re.render({ value: this });
+		document.body.innerHTML = "";
+		document.body.append(...re.render({ value: this }));
 		this.listen();
 		history.replaceState(this.page.state, "", p + u.search);
 		document.addEventListener("click", this.handleClick);
@@ -85,7 +89,7 @@ export default class AcmeDashboard {
 		addEventListener("popstate", this.handlePopstate);
 	}
 
-	render = async re => {
+	tryRender(re) {
 		const o = re.stack.at(-1);
 		if (typeof o.key === "string" && (o.key === "icon" || o.key.endsWith("Icon"))) {
 			o.value = heroIcons[o.value];
@@ -99,34 +103,35 @@ export default class AcmeDashboard {
 			o.value = dateFormatter.format(new Date(o.value));
 			return true;
 		}
-		return await re.match([this], (_, o) => {
-			this.renderEngine = re.clone();
-			o.template = "AcmeDashboard";
-		});
+		return super.tryRender(re);
 	}
 
-	listen = () => {
+	listen() {
 		if (this.content === this.layout)
 			this.layout.listen();
 		this.page.listen();
 	}
 
-	refreshPage = async p => {
+	refreshPage(p) {
 		const l = this.content === this.layout;
 		this.page = p;
 		document.title = [this.page.title, document.title.split(" | ").at(-1)].filter(x => x).join(" | ");
 		if (l && this.content === this.layout) {
-			document.querySelector("main").innerHTML = await this.renderEngine.render({ value: this.page });
+			const m = document.querySelector("main");
+			m.innerHTML = "";
+			const nn = this.renderEngine.render({ value: this.page });
+			m.append(...nn);
+			this.page.renderedNodes = nn;
 			this.page.listen();
 		} else {
-			const re = new RenderEngine();
-			re.templates = this.renderEngine.templates;
-			document.body.innerHTML = await re.render({ value: this });
+			const re = new RenderEngine(this.renderEngine.templates);
+			document.body.innerHTML = "";
+			document.body.append(...re.render({ value: this }));
 			this.listen();
 		}
 	}
 
-	createPage = (path) => {
+	createPage(path) {
 		const p = path.length > 1 && path.endsWith("/") ? path.substring(0, path.length - 1) : path;
 		const q = pages1[p];
 		if (q)
@@ -139,7 +144,7 @@ export default class AcmeDashboard {
 		throw new Error();
 	}
 
-	handleClick = async e => {
+	handleClick = e => {
 		const a = e.target.closest("a");
 		if (!a)
 			return;
@@ -147,27 +152,31 @@ export default class AcmeDashboard {
 		dispatchEvent(new CustomEvent("urlchange", { detail: { url: new URL(a.href) } }));
 	}
 
-	handleUrlchange = async e => {
+	handleUrlchange = e => {
 		const u = e.detail.url;
 		history.pushState({}, "", u.pathname + u.search);
-		await this.refreshPage(this.createPage(u.pathname));
-		history.replaceState(this.page.state, "", u.pathname + u.search);
+		this.refreshPage(this.createPage(u.pathname));
+		history.replaceState(this.page.state, "");
 		dispatchEvent(new Event("popstate"));
 	}
 
-	handlePopstate = async e => {
+	handlePopstate = e => {
 		if (!e.state)
 			return;
 		const p = this.createPage(document.location.pathname);
 		p.state = e.state;
-		await this.refreshPage(p);
+		this.refreshPage(p);
 	}
 }
 
-class Logo {
+class Logo extends Component {
 
-	render = async re => {
-		return await re.match([this], (_, o) => {
+	constructor() {
+		super("AcmeDashboard");
+	}
+
+	tryRender(re) {
+		return re.match([this], (_, o) => {
 			o.template = "AcmeDashboard-Logo";
 		});
 	}

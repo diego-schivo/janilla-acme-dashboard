@@ -21,17 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-export default class Login {
+import Component from "./Component.js";
 
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			o.template = "Login";
-		});
-	}
+export default class Login extends Component {
 
-	listen = () => {
-		const e = document.querySelector(".Login");
-		e.addEventListener("submit", this.handleSubmit);
+	listen() {
+		this.element.addEventListener("submit", this.handleSubmit);
 	}
 
 	handleSubmit = async e => {

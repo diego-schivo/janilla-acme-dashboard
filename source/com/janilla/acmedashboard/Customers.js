@@ -21,13 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-export default class Customers {
+import Component from "./Component.js";
+
+export default class Customers extends Component {
 
 	title = "Customers";
 
 	query = "";
 
 	table = new Table();
+
+	constructor() {
+		super("Customers");
+	}
 
 	get state() {
 		return {
@@ -41,23 +47,26 @@ export default class Customers {
 		this.table.items = x.items;
 	}
 
-	render = async re => {
-		return await re.match([this], async (_, o) => {
-			await this.load();
-			o.template = "Customers";
-		});
+	listen() {
+		if (!this.table.items)
+			this.load().then(() => this.table.refresh());
+		this.element.addEventListener("input", this.handleInput);
 	}
 
-	listen = () => {
-		const e = document.querySelector(".Customers");
-		e.addEventListener("input", this.handleInput);
-	}
-
-	load = async () => {
+	async load() {
 		const u = new URL("/api/customers", location.href);
 		if (this.query.length)
 			u.searchParams.append("query", this.query);
 		this.table.items = await (await fetch(u)).json();
+		history.replaceState(this.state, "");
+	}
+
+	async update() {
+		const u = new URL(location.href);
+		this.query.length ? u.searchParams.set("query", this.query) : u.searchParams.delete("query");
+		history.pushState({}, "", u.href);
+		await this.load();
+		this.table.refresh();
 	}
 
 	handleInput = e => {
@@ -70,33 +79,19 @@ export default class Customers {
 			await this.update();
 		}, 2000);
 	}
-
-	update = async () => {
-		const u = new URL(location.href);
-		this.query.length ? u.searchParams.set("query", this.query) : u.searchParams.delete("query");
-		history.pushState({}, "", u.href);
-		await this.load();
-		await this.table.refresh();
-		history.replaceState(this.state, "", u.href);
-	}
 }
 
-class Table {
-
-	renderEngine;
+class Table extends Component {
 
 	items;
 
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			this.renderEngine = re.clone();
-			o.template = "Customers-Table";
-		}) || await re.match([this.items, '[type="number"]'], (_, o) => {
-			o.template = "Customers-TableRow";
-		});
+	constructor() {
+		super("Customers");
 	}
 
-	refresh = async () => {
-		document.querySelector(".Customers .Table").outerHTML = await this.renderEngine.render({ value: this });
+	tryRender(re) {
+		return super.tryRender(re) || re.match([this.items, '[type="number"]'], (_, o) => {
+			o.template = "Customers-TableRow";
+		});
 	}
 }

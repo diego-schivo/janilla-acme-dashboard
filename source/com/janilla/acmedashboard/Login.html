@@ -1,7 +1,7 @@
 <template id="Login">
 	<article class="Login">
 		<header>
-			<div render="logo"></div>
+			<div data-render="logo"></div>
 		</header>
 		<form>
 			<div>
@@ -10,19 +10,19 @@
 					<label for="email">Email</label>
 					<div class="control">
 						<input id="email" name="email" type="email" placeholder="Enter your email address" required />
-						<svg render="icons.at-symbol"></svg>
+						<svg data-render="icons.at-symbol"></svg>
 					</div>
 				</div>
 				<div>
 					<label for="password">Password</label>
 					<div class="control">
 						<input id="password" name="password" type="password" placeholder="Enter password" required minlength="6" />
-						<svg render="icons.key"></svg>
+						<svg data-render="icons.key"></svg>
 					</div>
 				</div>
 				<button class="primary-button">
 					Log in
-					<svg render="icons.arrow-right"></svg>
+					<svg data-render="icons.arrow-right"></svg>
 				</button>
 			</div>
 		</form>

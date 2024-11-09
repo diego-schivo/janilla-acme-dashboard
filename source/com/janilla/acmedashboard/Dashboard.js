@@ -21,24 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import Component from "./Component.js";
 import heroIcons from "./heroIcons.js";
 
-export class Layout {
+export class Layout extends Component {
 
 	nav = new Nav();
 
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			o.template = "Dashboard-Layout";
-		});
+	constructor() {
+		super("Dashboard");
 	}
 
-	listen = () => {
+	listen() {
 		this.nav.listen();
 	}
 }
 
-class Nav {
+class Nav extends Component {
 
 	links = [
 		{ path: "/dashboard", text: "Home", icon: "home" },
@@ -46,22 +45,24 @@ class Nav {
 		{ path: "/dashboard/customers", text: "Customers", icon: "user-group" },
 	];
 
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			o.template = "Dashboard-Nav";
-		}) || await re.match([this.links, '[type="number"]'], (_, o) => {
+	constructor() {
+		super("Dashboard");
+	}
+
+	tryRender(re) {
+		return super.tryRender(re) || re.match([this.links, '[type="number"]'], (_, o) => {
 			o.template = "Dashboard-NavLink";
 		});
 	}
 
-	listen = () => {
+	listen() {
 		this.handlePopstate();
 		addEventListener("popstate", this.handlePopstate);
-		document.querySelector(".Nav").addEventListener("submit", this.handleSubmit);
+		this.element.addEventListener("submit", this.handleSubmit);
 	}
 
 	handlePopstate = () => {
-		document.querySelectorAll(".Nav a").forEach(x => {
+		this.element.querySelectorAll("a").forEach(x => {
 			const a = x.getAttribute("href") === document.location.pathname;
 			x.parentElement.classList[a ? "add" : "remove"]("active");
 		});
@@ -74,7 +75,7 @@ class Nav {
 	}
 }
 
-export default class Dashboard {
+export default class Dashboard extends Component {
 
 	data;
 
@@ -84,6 +85,10 @@ export default class Dashboard {
 
 	invoices;
 
+	constructor() {
+		super("Dashboard");
+	}
+
 	get state() {
 		return this.data;
 	}
@@ -92,32 +97,39 @@ export default class Dashboard {
 		this.data = x;
 	}
 
-	render = async re => {
-		return await re.match([this], async (_, o) => {
-			if (!this.data)
-				this.data = await (await fetch("/api/dashboard")).json();
-			if (!this.cards)
-				this.cards = [
-					new Card("collected", "Collected", this.data.paidAmount),
-					new Card("pending", "Pending", this.data.pendingAmount),
-					new Card("invoices", "Total Invoices", this.data.invoiceCount),
-					new Card("customers", "Total Customers", this.data.customerCount)
-				];
-			if (!this.revenueChart)
-				this.revenueChart = new Chart(this.data.revenue.map(x => ({ label: x.month, value: x.revenue })));
-			if (!this.invoices)
-				this.invoices = this.data.invoices;
-			o.template = "Dashboard";
-		}) || await re.match([this.invoices, '[type="number"]'], (_, o) => {
+	tryRender(re) {
+		return super.tryRender(re) || re.match([this.invoices, '[type="number"]'], (_, o) => {
 			o.template = "Dashboard-Invoice";
 		});
 	}
 
-	listen = () => {
+	initRender() {
+		if (this.data) {
+			this.cards = [
+				new Card("collected", "Collected", this.data.paidAmount),
+				new Card("pending", "Pending", this.data.pendingAmount),
+				new Card("invoices", "Total Invoices", this.data.invoiceCount),
+				new Card("customers", "Total Customers", this.data.customerCount)
+			];
+			this.revenueChart = new Chart(this.data.revenue.map(x => ({ label: x.month, value: x.revenue })));
+			this.invoices = this.data.invoices;
+		}
+	}
+
+	listen() {
+		if (!this.data)
+			this.load().then(() => this.refresh());
+		else if (!this.cards)
+			this.refresh();
+	}
+
+	async load() {
+		this.data = await (await fetch("/api/dashboard")).json();
+		history.replaceState(this.state, "");
 	}
 }
 
-class Card {
+class Card extends Component {
 
 	type;
 
@@ -126,15 +138,14 @@ class Card {
 	value;
 
 	constructor(type, title, value) {
+		super("Dashboard");
 		this.type = type;
 		this.title = title;
 		this.value = value;
 	}
 
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			o.template = "Dashboard-Card";
-		}) || await re.match(['[key="icon"]'], (_, o) => {
+	tryRender(re) {
+		return super.tryRender(re) || re.match(['[key="icon"]'], (_, o) => {
 			o.value = heroIcons[{
 				collected: "banknotes",
 				pending: "clock",
@@ -145,24 +156,23 @@ class Card {
 	}
 }
 
-class Chart {
+class Chart extends Component {
 
 	yLabels;
 
 	bars;
 
 	constructor(items) {
+		super("Dashboard");
 		var k = Math.ceil(Math.max(...items.map(x => x.value)) / 1000);
 		this.yLabels = Array.from({ length: 1 + k }, (_, i) => `$${i}K`).reverse();
 		this.bars = items.map(x => ({ height100: x.value / (1000 * k) * 100, xLabel: x.label }));
 	}
 
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			o.template = "Dashboard-Chart";
-		}) || await re.match([this.yLabels, '[type="number"]'], (_, o) => {
+	tryRender(re) {
+		return super.tryRender(re) || re.match([this.yLabels, '[type="number"]'], (_, o) => {
 			o.template = "Dashboard-ChartYLabel";
-		}) || await re.match([this.bars, '[type="number"]'], (_, o) => {
+		}) || re.match([this.bars, '[type="number"]'], (_, o) => {
 			o.template = "Dashboard-ChartBar";
 		});
 	}

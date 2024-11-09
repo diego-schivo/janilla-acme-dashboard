@@ -1,22 +1,22 @@
 <template id="Dashboard-Layout">
-	<aside render="nav"></aside>
+	<aside data-render="nav"></aside>
 	<main>
-		<div render="page"></div>
+		<div data-render="page"></div>
 	</main>
 </template>
 
 <template id="Dashboard-Nav">
 	<aside class="Nav">
 		<header>
-			<div render="logo"></div>
+			<div data-render="logo"></div>
 		</header>
 		<ul>
-			<li render="links"></li>
+			<li data-render="links"></li>
 			<li></li>
 			<li>
 				<form>
 					<button>
-						<svg render="icons.power"></svg>
+						<svg data-render="icons.power"></svg>
 						Sign Out
 					</button>
 				</form>
@@ -27,9 +27,9 @@
 
 <template id="Dashboard-NavLink">
 	<li>
-		<a href="{path}">
-			<svg render="icon"></svg>
-			{text}
+		<a href="${path}">
+			<svg data-render="icon"></svg>
+			${text}
 		</a>
 	</li>
 </template>
@@ -39,14 +39,14 @@
 		<h1>Dashboard</h1>
 		<div>
 			<article class="cards">
-				<article render="cards"></article>
+				<article data-render="cards"></article>
 			</article>
 			<article class="revenue">
 				<h2>Recent Revenue</h2>
 				<div>
-					<div render="revenueChart"></div>
+					<div data-render="revenueChart"></div>
 					<footer>
-						<svg render="icons.calendar"></svg>
+						<svg data-render="icons.calendar"></svg>
 						<h3>Last 12 months</h3>
 					</footer>
 				</div>
@@ -55,10 +55,10 @@
 				<h2>Latest Invoices</h2>
 				<div>
 					<div class="list">
-						<article render="invoices"></article>
+						<article data-render="invoices"></article>
 					</div>
 					<footer>
-						<svg render="icons.arrow-path"></svg>
+						<svg data-render="icons.arrow-path"></svg>
 						<h3>Updated just now</h3>
 					</footer>
 				</div>
@@ -70,38 +70,38 @@
 <template id="Dashboard-Card">
 	<article class="Card">
 		<div>
-			<svg render="icon"></svg>
-			<h3>{title}</h3>
+			<svg data-render="icon"></svg>
+			<h3>${title}</h3>
 		</div>
-		<p>{value}</p>
+		<p>${value}</p>
 	</article>
 </template>
 
 <template id="Dashboard-Chart">
 	<div class="Chart">
 		<div>
-			<p render="yLabels"></p>
+			<p data-render="yLabels"></p>
 		</div>
 		<div>
-			<div render="bars"></div>
+			<div data-render="bars"></div>
 		</div>
 	</div>
 </template>
 
 <template id="Dashboard-ChartYLabel">
-	<p>{}</p>
+	<p>${}</p>
 </template>
 
 <template id="Dashboard-ChartBar">
-	<div style="height: {height100}%"></div>
-	<p>{xLabel}</p>
+	<div style="height: ${height100}%"></div>
+	<p>${xLabel}</p>
 </template>
 
 <template id="Dashboard-Invoice">
 	<article class="Invoice">
-		<img loading="lazy" src="{customer.imageUrl}" />
-		<p>{customer.name}</p>
-		<p>{customer.email}</p>
-		<p>{amount}</p>
+		<img loading="lazy" src="${customer.imageUrl}" />
+		<p>${customer.name}</p>
+		<p>${customer.email}</p>
+		<p>${amount}</p>
 	</article>
 </template>

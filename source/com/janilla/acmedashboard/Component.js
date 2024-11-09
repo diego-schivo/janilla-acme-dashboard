@@ -21,7 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import Component from "./Component.js";
+export default class Component {
 
-export default class Home extends Component {
+	moduleName;
+
+	renderEngine;
+
+	renderedNodes = [];
+
+	constructor(moduleName) {
+		this.moduleName = moduleName;
+	}
+
+	get element() {
+		return this.renderedNodes[0];
+	}
+
+	tryRender(renderEngine) {
+		return renderEngine.match([this], (_, o) => {
+			this.renderEngine = renderEngine.clone();
+			o.template = this.constructor.name;
+			if (this.moduleName && this.moduleName !== o.template)
+				o.template = `${this.moduleName}-${o.template}`;
+			this.initRender();
+		});
+	}
+
+	initRender() {
+	}
+
+	listen() {
+	}
+
+	refresh() {
+		this.element.innerHTML = "";
+		this.element.append(...this.renderEngine.render({ value: this }));
+		this.listen();
+	}
 }

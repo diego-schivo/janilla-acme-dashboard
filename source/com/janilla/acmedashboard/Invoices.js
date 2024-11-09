@@ -21,9 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import Component from "./Component.js";
 import heroIcons from "./heroIcons.js";
 
-export default class Invoices {
+export default class Invoices extends Component {
 
 	title = "Invoices";
 
@@ -32,6 +33,10 @@ export default class Invoices {
 	table = new Table();
 
 	pagination = new Pagination();
+
+	constructor() {
+		super("Invoices");
+	}
 
 	get state() {
 		return {
@@ -49,22 +54,19 @@ export default class Invoices {
 		this.pagination.pageCount = x.pageCount;
 	}
 
-	render = async re => {
-		return await re.match([this], async (_, o) => {
-			await this.load();
-			o.template = "Invoices";
-		});
-	}
-
-	listen = () => {
-		const e = document.querySelector(".Invoices");
-		e.addEventListener("input", this.handleInput);
-		e.addEventListener("submit", this.handleSubmit);
-		e.addEventListener("pagechange", this.handlePagechange);
+	listen() {
+		if (!this.table.items)
+			this.load().then(() => {
+				this.table.refresh();
+				this.pagination.refresh();
+			});
+		this.element.addEventListener("input", this.handleInput);
+		this.element.addEventListener("submit", this.handleSubmit);
+		this.element.addEventListener("pagechange", this.handlePagechange);
 		this.pagination.listen();
 	}
 
-	load = async () => {
+	async load() {
 		const u = new URL("/api/invoices", location.href);
 		if (this.query.length)
 			u.searchParams.append("query", this.query);
@@ -73,6 +75,17 @@ export default class Invoices {
 		const j = await (await fetch(u)).json();
 		this.table.items = j.items;
 		this.pagination.pageCount = Math.ceil(j.total / 6);
+		history.replaceState(this.state, "");
+	}
+
+	async update() {
+		const u = new URL(location.href);
+		this.query.length ? u.searchParams.set("query", this.query) : u.searchParams.delete("query");
+		this.pagination.page !== 1 ? u.searchParams.set("page", this.pagination.page) : u.searchParams.delete("page");
+		history.pushState({}, "", u.href);
+		await this.load();
+		this.table.refresh();
+		this.pagination.refresh();
 	}
 
 	handleInput = e => {
@@ -101,17 +114,6 @@ export default class Invoices {
 	handlePagechange = async () => {
 		await this.update();
 	}
-
-	update = async () => {
-		const u = new URL(location.href);
-		this.query.length ? u.searchParams.set("query", this.query) : u.searchParams.delete("query");
-		this.pagination.page !== 1 ? u.searchParams.set("page", this.pagination.page) : u.searchParams.delete("page");
-		history.pushState({}, "", u.href);
-		await this.load();
-		await this.table.refresh();
-		await this.pagination.refresh();
-		history.replaceState(this.state, "", u.href);
-	}
 }
 
 const statuses = {
@@ -127,36 +129,29 @@ const statuses = {
 	}
 };
 
-class Table {
-
-	renderEngine;
+class Table extends Component {
 
 	items;
 
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			this.renderEngine = re.clone();
-			o.template = "Invoices-Table";
-		}) || await re.match([this.items, '[type="number"]'], (_, o) => {
+	constructor() {
+		super("Invoices");
+	}
+
+	tryRender(re) {
+		return super.tryRender(re) || re.match([this.items, '[type="number"]'], (_, o) => {
 			o.template = "Invoices-TableRow";
-		}) || await re.match(['[key="status"]'], (_, o) => {
+		}) || re.match(['[key="status"]'], (_, o) => {
 			o.value = statuses[o.value];
 			o.template = "Invoices-TableStatus";
 		});
 	}
-
-	refresh = async () => {
-		document.querySelector(".Invoices .Table").outerHTML = await this.renderEngine.render({ value: this });
-	}
 }
 
-class Pagination {
+class Pagination extends Component {
 
 	page = 1;
 
 	pageCount;
-
-	renderEngine;
 
 	items;
 
@@ -164,52 +159,48 @@ class Pagination {
 
 	nextItem;
 
-	element;
+	constructor() {
+		super("Invoices");
+	}
 
-	render = async re => {
-		return await re.match([this], (_, o) => {
-			this.renderEngine = re.clone();
-			const u = new URL(location.href);
-			this.items = Array.from({ length: this.pageCount }, (_, i) => {
-				const p = 1 + i;
-				u.searchParams.set("page", p);
-				return {
-					content: p,
-					url: p !== this.page ? u.pathname + u.search : undefined,
-					active: p === this.page ? "active" : undefined
-				};
-			});
-			u.searchParams.set("page", this.page - 1);
-			this.previousItem = {
-				content: heroIcons["arrow-left"],
-				url: this.page !== 1 ? u.pathname + u.search : undefined
-			};
-			u.searchParams.set("page", this.page + 1);
-			this.nextItem = {
-				content: heroIcons["arrow-right"],
-				url: this.page !== this.pageCount ? u.pathname + u.search : undefined
-			};
-			o.template = "Invoices-Pagination";
-		}) || await re.match([this.items, '[type="number"]'], (_, o) => {
+	tryRender(re) {
+		return super.tryRender(re) || re.match([this.previousItem], (_, o) => {
 			o.template = o.value.url ? "Invoices-PaginationLink" : "Invoices-PaginationItem";
-		}) || await re.match([this.previousItem], (_, o) => {
+		}) || re.match([this.items, '[type="number"]'], (_, o) => {
 			o.template = o.value.url ? "Invoices-PaginationLink" : "Invoices-PaginationItem";
-		}) || await re.match([this.nextItem], (_, o) => {
+		}) || re.match([this.nextItem], (_, o) => {
 			o.template = o.value.url ? "Invoices-PaginationLink" : "Invoices-PaginationItem";
 		});
 	}
 
-	listen = () => {
-		this.element = document.querySelector(".Invoices .Pagination");
+	initRender() {
+		const u = new URL(location.href);
+		this.items = Array.from({ length: this.pageCount }, (_, i) => {
+			const p = 1 + i;
+			u.searchParams.set("page", p);
+			return {
+				content: p,
+				url: p !== this.page ? u.pathname + u.search : undefined,
+				active: p === this.page ? "active" : undefined
+			};
+		});
+		u.searchParams.set("page", this.page - 1);
+		this.previousItem = {
+			content: heroIcons["arrow-left"],
+			url: this.page !== 1 ? u.pathname + u.search : undefined
+		};
+		u.searchParams.set("page", this.page + 1);
+		this.nextItem = {
+			content: heroIcons["arrow-right"],
+			url: this.page !== this.pageCount ? u.pathname + u.search : undefined
+		};
+	}
+
+	listen() {
 		this.element.addEventListener("click", this.handleClick);
 	}
 
-	refresh = async () => {
-		this.element.outerHTML = await this.renderEngine.render({ value: this });
-		this.listen();
-	}
-
-	handleClick = async e => {
+	handleClick = e => {
 		const a = e.target.closest("a");
 		if (!a)
 			return;

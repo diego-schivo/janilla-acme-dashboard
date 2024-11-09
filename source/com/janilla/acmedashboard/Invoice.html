@@ -7,7 +7,7 @@
 					<span>/</span>
 				</li>
 				<li aria-current="true">
-					<h1>{title}</h1>
+					<h1>${title}</h1>
 				</li>
 			</ol>
 		</nav>
@@ -18,9 +18,9 @@
 					<div class="customerId-control">
 						<select id="customerId" name="customerId">
 							<option value="">Select a customer</option>
-							<option render="customers"></option>
+							<option data-render="customers"></option>
 						</select>
-						<svg render="icons.user-circle"></svg>
+						<svg data-render="icons.user-circle"></svg>
 					</div>
 					<div class="customerId-error" aria-live="polite" aria-atomic="true"></div>
 				</div>
@@ -28,7 +28,7 @@
 					<label for="amount">Choose an amount</label>
 					<div class="amount-control">
 						<input id="amount" name="amount" type="number" step="0.01" placeholder="Enter USD amount" />
-						<svg render="icons.currency-dollar"></svg>
+						<svg data-render="icons.currency-dollar"></svg>
 					</div>
 					<div class="amount-error" aria-live="polite" aria-atomic="true"></div>
 				</div>
@@ -39,14 +39,14 @@
 							<input id="pending" name="status" type="radio" value="PENDING" />
 							<label for="pending" class="pending-status">
 								Pending
-								<svg render="icons.clock"></svg>
+								<svg data-render="icons.clock"></svg>
 							</label>
 						</li>
 						<li>
 							<input id="paid" name="status" type="radio" value="PAID" />
 							<label for="paid" class="paid-status">
 								Paid
-								<svg render="icons.check"></svg>
+								<svg data-render="icons.check"></svg>
 							</label>
 						</li>
 					</ol>
@@ -56,12 +56,12 @@
 			</section>
 			<section>
 				<a href="/dashboard/invoices" class="secondary-button">Cancel</a>
-				<button class="primary-button">{title}</button>
+				<button class="primary-button">${title}</button>
 			</section>
 		</form>
 	</article>
 </template>
 
 <template id="Invoice-customer">
-	<option value="{key}">{value}</option>
+	<option value="${key}">${value}</option>
 </template>

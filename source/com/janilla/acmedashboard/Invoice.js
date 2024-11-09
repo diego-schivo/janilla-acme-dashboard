@@ -21,7 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-export default class Invoice {
+import Component from "./Component.js";
+
+export default class Invoice extends Component {
 
 	id;
 
@@ -30,6 +32,7 @@ export default class Invoice {
 	customers;
 
 	constructor(id) {
+		super("Invoice");
 		this.id = id;
 	}
 
@@ -45,22 +48,27 @@ export default class Invoice {
 		Object.entries(x).forEach(([k, v]) => this[k] = v);
 	}
 
-	render = async re => {
-		return await re.match([this], async (_, o) => {
-			if (!this.invoice)
-				this.invoice = this.id ? await (await fetch(`/api/invoices/${this.id}`)).json() : {};
-			this.customers = await (await fetch("/api/customers/names")).json();
-			o.template = "Invoice";
-		}) || await re.match([this.customers, '[type="number"]'], (_, o) => {
+	tryRender(re) {
+		return super.tryRender(re) || re.match([this.customers, '[type="number"]'], (_, o) => {
 			o.template = "Invoice-customer";
 		});
 	}
 
-	listen = () => {
-		const e = document.querySelector(".Invoice");
-		const f = e.querySelector("form");
+	listen() {
+		if (!this.invoice)
+			this.load().then(() => this.refresh());
+		this.element.addEventListener("submit", this.handleSubmit);
+	}
+
+	async load() {
+		this.invoice = this.id ? await (await fetch(`/api/invoices/${this.id}`)).json() : {};
+		this.customers = await (await fetch("/api/customers/names")).json();
+	}
+
+	refresh() {
+		super.refresh();
+		const f = this.element.querySelector("form");
 		[...new Set(Array.from(f.elements).filter(x => x.matches("input, select")).map(x => x.name))].forEach(x => f[x].value = this.invoice[x]?.toString() ?? "");
-		e.addEventListener("submit", this.handleSubmit);
 	}
 
 	handleSubmit = async e => {
@@ -71,9 +79,9 @@ export default class Invoice {
 			amount: i.amount ? "" : "Please enter an amount greater than $0.",
 			status: i.status ? "" : "Please select an invoice status."
 		};
-		Object.entries(mm).forEach(([k, v]) => document.querySelector(`.Invoice .${k}-error`).innerHTML = v.length ? `<p>${v}</p>` : "");
+		Object.entries(mm).forEach(([k, v]) => this.element.querySelector(`.${k}-error`).innerHTML = v.length ? `<p>${v}</p>` : "");
 		const v = Object.values(mm).every(x => !x.length);
-		document.querySelector(".Invoice .error").innerHTML = v ? "" : `<p>Missing Fields. Failed to ${this.title}.</p>`;
+		this.element.querySelector(".error").innerHTML = v ? "" : `<p>Missing Fields. Failed to ${this.title}.</p>`;
 		if (!v)
 			return;
 		const r = await fetch(this.id ? `/api/invoices/${this.id}` : "/api/invoices", {
@@ -85,7 +93,7 @@ export default class Invoice {
 			dispatchEvent(new CustomEvent("urlchange", { detail: { url: new URL("/dashboard/invoices", location.href) } }));
 		else {
 			const t = await r.text();
-			document.querySelector(".Invoice .error").innerHTML = `<p>${t}</p>`;
+			this.element.querySelector(".error").innerHTML = `<p>${t}</p>`;
 		}
 	}
 }
