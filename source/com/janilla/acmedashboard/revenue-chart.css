@@ -1,0 +1,32 @@
+@import "base.css";
+
+:host {
+	color: rgb(156, 163, 175);
+	display: flex;
+	gap: 1.75rem;
+}
+
+.y {
+	display: flex;
+	flex-direction: column-reverse;
+	height: 350px;
+	justify-content: space-between;
+	margin-bottom: 1.5rem;
+}
+
+.x {
+	align-items: end;
+	display: grid;
+	flex: 1;
+	gap: 0.5rem 1rem;
+	grid: 1fr auto / auto-flow 1fr;
+}
+
+::slotted(div) {
+	background: rgb(147, 197, 253);
+	border-radius: 0.375rem;
+}
+
+::slotted(p) {
+	text-align: center;
+}

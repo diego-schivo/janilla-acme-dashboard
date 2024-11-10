@@ -21,7 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import Component from "./Component.js";
+export default class InvoiceList extends HTMLElement {
 
-export default class Home extends Component {
+	constructor() {
+		super();
+		const sr = this.attachShadow({ mode: "open" });
+		const df = document.getElementById("invoice-list-template").content.cloneNode(true);
+		sr.appendChild(df);
+	}
+
+	set data(data) {
+		const c = this.shadowRoot.querySelector("template").content.firstElementChild;
+		this.append(...data.map(x => {
+			const a = c.cloneNode(true);
+			a.children[0].src = x.customer.imageUrl;
+			a.children[1].textContent = x.customer.name;
+			a.children[2].textContent = x.customer.email;
+			a.children[3].textContent = x.amount;
+			return a;
+		}));
+	}
 }

@@ -1,37 +1,12 @@
 <template id="Dashboard-Layout">
-	<aside data-render="nav"></aside>
+	<aside>
+		<!--
+		<dashboard-nav></dashboard-nav>
+		-->
+	</aside>
 	<main>
 		<div data-render="page"></div>
 	</main>
-</template>
-
-<template id="Dashboard-Nav">
-	<aside class="Nav">
-		<header>
-			<div data-render="logo"></div>
-		</header>
-		<ul>
-			<li data-render="links"></li>
-			<li></li>
-			<li>
-				<form>
-					<button>
-						<svg data-render="icons.power"></svg>
-						Sign Out
-					</button>
-				</form>
-			</li>
-		</ul>
-	</aside>
-</template>
-
-<template id="Dashboard-NavLink">
-	<li>
-		<a href="${path}">
-			<svg data-render="icon"></svg>
-			${text}
-		</a>
-	</li>
 </template>
 
 <template id="Dashboard">
@@ -39,14 +14,23 @@
 		<h1>Dashboard</h1>
 		<div>
 			<article class="cards">
-				<article data-render="cards"></article>
+				<!--
+				<dashboard-card type="collected" title="Collected" value="1"></dashboard-card>
+				<dashboard-card type="pending" title="Pending" value="2"></dashboard-card>
+				<dashboard-card type="invoices" title="Total Invoices" value="3"></dashboard-card>
+				<dashboard-card type="customers" title="Total Customers" value="4"></dashboard-card>
+				-->
 			</article>
 			<article class="revenue">
 				<h2>Recent Revenue</h2>
 				<div>
+					<!--
 					<div data-render="revenueChart"></div>
+					-->
 					<footer>
-						<svg data-render="icons.calendar"></svg>
+						<!--
+						<hero-icon icon-name="calendar"></hero-icon>
+						-->
 						<h3>Last 12 months</h3>
 					</footer>
 				</div>
@@ -55,10 +39,12 @@
 				<h2>Latest Invoices</h2>
 				<div>
 					<div class="list">
+						<!--
 						<article data-render="invoices"></article>
+						-->
 					</div>
 					<footer>
-						<svg data-render="icons.arrow-path"></svg>
+						<hero-icon icon-name="arrow-path"></hero-icon>
 						<h3>Updated just now</h3>
 					</footer>
 				</div>

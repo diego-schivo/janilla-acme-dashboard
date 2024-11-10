@@ -1,0 +1,32 @@
+<template id="dashboard-page-template">
+	<link href="/dashboard-page.css" rel="stylesheet" />
+	<h1>Dashboard</h1>
+	<div>
+		<article class="cards">
+			<dashboard-card type="collected" title="Collected"></dashboard-card>
+			<dashboard-card type="pending" title="Pending"></dashboard-card>
+			<dashboard-card type="invoices" title="Total Invoices"></dashboard-card>
+			<dashboard-card type="customers" title="Total Customers"></dashboard-card>
+		</article>
+		<article class="revenue">
+			<h2>Recent Revenue</h2>
+			<div>
+				<revenue-chart></revenue-chart>
+				<footer>
+					<hero-icon icon-name="calendar"></hero-icon>
+					<h3>Last 12 months</h3>
+				</footer>
+			</div>
+		</article>
+		<article class="invoices">
+			<h2>Latest Invoices</h2>
+			<div>
+				<invoice-list></invoice-list>
+				<footer>
+					<hero-icon icon-name="arrow-path"></hero-icon>
+					<h3>Updated just now</h3>
+				</footer>
+			</div>
+		</article>
+	</div>
+</template>

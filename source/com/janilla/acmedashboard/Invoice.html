@@ -20,7 +20,7 @@
 							<option value="">Select a customer</option>
 							<option data-render="customers"></option>
 						</select>
-						<svg data-render="icons.user-circle"></svg>
+						<hero-icon icon-name="user-circle"></hero-icon>
 					</div>
 					<div class="customerId-error" aria-live="polite" aria-atomic="true"></div>
 				</div>
@@ -28,7 +28,7 @@
 					<label for="amount">Choose an amount</label>
 					<div class="amount-control">
 						<input id="amount" name="amount" type="number" step="0.01" placeholder="Enter USD amount" />
-						<svg data-render="icons.currency-dollar"></svg>
+						<hero-icon icon-name="currency-dollar"></hero-icon>
 					</div>
 					<div class="amount-error" aria-live="polite" aria-atomic="true"></div>
 				</div>
@@ -39,14 +39,14 @@
 							<input id="pending" name="status" type="radio" value="PENDING" />
 							<label for="pending" class="pending-status">
 								Pending
-								<svg data-render="icons.clock"></svg>
+								<hero-icon icon-name="clock"></hero-icon>
 							</label>
 						</li>
 						<li>
 							<input id="paid" name="status" type="radio" value="PAID" />
 							<label for="paid" class="paid-status">
 								Paid
-								<svg data-render="icons.check"></svg>
+								<hero-icon icon-name="check"></hero-icon>
 							</label>
 						</li>
 					</ol>

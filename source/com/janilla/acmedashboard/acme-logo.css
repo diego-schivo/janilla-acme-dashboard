@@ -1,0 +1,18 @@
+@import "base.css";
+
+:host {
+	align-items: center;
+	color: rgb(255, 255, 255);
+	display: flex;
+	font-family: "Lusitana";
+}
+
+hero-icon {
+	height: 3rem;
+	transform: rotate(15deg);
+	width: 3rem;
+}
+
+p {
+	font-size: 44px;
+}

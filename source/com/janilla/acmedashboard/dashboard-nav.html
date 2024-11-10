@@ -1,0 +1,35 @@
+<template id="dashboard-nav-template">
+	<link href="/dashboard-nav.css" rel="stylesheet" />
+	<header>
+		<acme-logo></acme-logo>
+	</header>
+	<ul>
+		<li>
+			<a href="/dashboard">
+				<hero-icon icon-name="home"></hero-icon>
+				Home
+			</a>
+		</li>
+		<li>
+			<a href="/dashboard/invoices">
+				<hero-icon icon-name="document-duplicate"></hero-icon>
+				Invoices
+			</a>
+		</li>
+		<li>
+			<a href="/dashboard/customers">
+				<hero-icon icon-name="user-group"></hero-icon>
+				Customers
+			</a>
+		</li>
+		<li></li>
+		<li>
+			<form>
+				<button>
+					<hero-icon icon-name="power"></hero-icon>
+					Sign Out
+				</button>
+			</form>
+		</li>
+	</ul>
+</template>

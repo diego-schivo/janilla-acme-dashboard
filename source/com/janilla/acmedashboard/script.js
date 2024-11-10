@@ -21,6 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import AcmeDashboard from "./AcmeDashboard.js";
+import AcmeDashboard from "./acme-dashboard.js";
+import AcmeLogo from "./acme-logo.js";
+import DashboardPage from "./dashboard-page.js";
+import DashboardCard from "./dashboard-card.js";
+import DashboardLayout from "./dashboard-layout.js";
+import DashboardNav from "./dashboard-nav.js";
+import HeroIcon from "./hero-icon.js";
+import InvoiceList from "./invoice-list.js";
+import InvoicesPage from "./invoices-page.js";
+import LoginPage from "./login-page.js";
+import PaginationNav from "./pagination-nav.js";
+import RevenueChart from "./revenue-chart.js";
+import WelcomePage from "./welcome-page.js";
 
-new AcmeDashboard().run();
+customElements.define("acme-dashboard", AcmeDashboard);
+customElements.define("acme-logo", AcmeLogo);
+customElements.define("dashboard-page", DashboardPage);
+customElements.define("dashboard-card", DashboardCard);
+customElements.define("dashboard-layout", DashboardLayout);
+customElements.define("dashboard-nav", DashboardNav);
+customElements.define("hero-icon", HeroIcon);
+customElements.define("invoice-list", InvoiceList);
+customElements.define("invoices-page", InvoicesPage);
+customElements.define("login-page", LoginPage);
+customElements.define("pagination-nav", PaginationNav);
+customElements.define("revenue-chart", RevenueChart);
+customElements.define("welcome-page", WelcomePage);

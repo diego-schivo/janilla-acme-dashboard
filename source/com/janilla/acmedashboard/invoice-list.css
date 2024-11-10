@@ -1,0 +1,6 @@
+@import "base.css";
+
+.list {
+	display: flex;
+	flex-direction: column;
+}

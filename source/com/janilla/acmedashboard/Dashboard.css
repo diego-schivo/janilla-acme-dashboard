@@ -1,4 +1,4 @@
-body:has(.Nav) {
+body:has(dashboard-nav) {
 	display: flex;
 	height: 100vh;
 
@@ -12,6 +12,7 @@ body:has(.Nav) {
 	}
 }
 
+/*
 .Nav {
 	display: flex;
 	flex-direction: column;
@@ -78,6 +79,7 @@ body:has(.Nav) {
 		width: 100%;
 	}
 }
+*/
 
 .Dashboard {
 	> div {
@@ -110,6 +112,7 @@ body:has(.Nav) {
 		gap: 1rem;
 	}
 	
+	/*
 	.Card {
 		background: rgb(249, 250, 251);
 		border-radius: 0.75rem;
@@ -137,6 +140,7 @@ body:has(.Nav) {
 			text-align: center;
 		}
 	}
+	*/
 
 	.revenue,
 	.invoices {

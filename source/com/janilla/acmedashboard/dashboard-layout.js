@@ -21,21 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import Component from "./Component.js";
+const childTagNames = {
+	"": "DASHBOARD-PAGE",
+	"invoices": "INVOICES-PAGE",
+	"customers": "CUSTOMERS-PAGE"
+};
 
-export default class Login extends Component {
+export default class DashboardLayout extends HTMLElement {
 
-	listen() {
-		this.element.addEventListener("submit", this.handleSubmit);
+	static get observedAttributes() {
+		return ["content"];
 	}
 
-	handleSubmit = async e => {
-		e.preventDefault();
-		await fetch("/api/authentication", {
-			method: "POST",
-			headers: { "content-type": "application/json" },
-			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
-		});
-		dispatchEvent(new CustomEvent("urlchange", { detail: { url: new URL("/dashboard", location.href) } }));
+	constructor() {
+		super();
+
+		const sr = this.attachShadow({ mode: "open" });
+		const t = document.getElementById("dashboard-layout-template");
+		sr.appendChild(t.content.cloneNode(true));
+	}
+
+	attributeChangedCallback(name, oldValue, newValue) {
+		console.log("DashboardLayout.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+
+		if (newValue !== oldValue)
+			this.update();
+	}
+
+	update() {
+		const tn = childTagNames[this.getAttribute("content")];
+		[...this.children].forEach(x => x.tagName === tn
+			? x.setAttribute("slot", "content")
+			: x.removeAttribute("slot"));
 	}
 }

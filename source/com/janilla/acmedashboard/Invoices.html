@@ -5,11 +5,11 @@
 			<label for="search" class="sr-only">Search</label>
 			<div class="control">
 				<input id="search" type="text" placeholder="Search invoices..." />
-				<svg data-render="icons.magnifying-glass"></svg>
+				<hero-icon icon-name="magnifying-glass"></hero-icon>
 			</div>
 			<a href="/dashboard/invoices/create" class="primary-button">
 				<span>Create Invoice</span>
-				<svg data-render="icons.plus"></svg>
+				<hero-icon icon-name="plus"></hero-icon>
 			</a>
 		</header>
 		<section data-render="table"></section>
@@ -52,13 +52,13 @@
 		<td>
 			<a href="/dashboard/invoices/${id}/edit">
 				<span class="sr-only">Edit</span>
-				<svg data-render="icons.pencil"></svg>
+				<hero-icon icon-name="pencil"></hero-icon>
 			</a>
 			<form>
 				<input type="hidden" name="id" value="${id}" />
 				<button>
 					<span class="sr-only">Delete</span>
-					<svg data-render="icons.trash"></svg>
+					<hero-icon icon-name="trash"></hero-icon>
 				</button>
 			</form>
 		</td>

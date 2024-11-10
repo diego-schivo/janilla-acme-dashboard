@@ -26,17 +26,20 @@ import heroIcons from "./heroIcons.js";
 
 export class Layout extends Component {
 
-	nav = new Nav();
+	// nav = new Nav();
 
 	constructor() {
 		super("Dashboard");
 	}
 
+	/*
 	listen() {
 		this.nav.listen();
 	}
+	*/
 }
 
+/*
 class Nav extends Component {
 
 	links = [
@@ -74,12 +77,13 @@ class Nav extends Component {
 		dispatchEvent(new CustomEvent("urlchange", { detail: { url: new URL("/login", location.href) } }));
 	}
 }
+*/
 
 export default class Dashboard extends Component {
 
 	data;
 
-	cards;
+	// cards;
 
 	revenueChart;
 
@@ -105,12 +109,14 @@ export default class Dashboard extends Component {
 
 	initRender() {
 		if (this.data) {
+			/*
 			this.cards = [
 				new Card("collected", "Collected", this.data.paidAmount),
 				new Card("pending", "Pending", this.data.pendingAmount),
 				new Card("invoices", "Total Invoices", this.data.invoiceCount),
 				new Card("customers", "Total Customers", this.data.customerCount)
 			];
+			*/
 			this.revenueChart = new Chart(this.data.revenue.map(x => ({ label: x.month, value: x.revenue })));
 			this.invoices = this.data.invoices;
 		}
@@ -129,6 +135,7 @@ export default class Dashboard extends Component {
 	}
 }
 
+/*
 class Card extends Component {
 
 	type;
@@ -155,6 +162,7 @@ class Card extends Component {
 		});
 	}
 }
+*/
 
 class Chart extends Component {
 

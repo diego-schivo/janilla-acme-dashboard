@@ -104,17 +104,19 @@ public class AcmeDashboard {
 			persistence = pb.build();
 		}
 		templates = // Stream.of(TemplatesWeb.class.getPackageName(), getClass().getPackageName())
-				Stream.of(getClass().getPackageName()).flatMap(
-						p -> IO.getPackageFiles(p).filter(f -> f.getFileName().toString().endsWith(".html")).map(f -> {
-							return p.replace('.', '/') + "/" + f.getFileName().toString();
-						})).map(x -> {
-							var l = Thread.currentThread().getContextClassLoader();
-							try (var is = l.getResourceAsStream(x)) {
-								return new String(is.readAllBytes());
-							} catch (IOException e) {
-								throw new UncheckedIOException(e);
-							}
-						}).filter(x -> x.contains("<template id=")).toList();
+				Stream.of(getClass().getPackageName()).flatMap(p -> IO.getPackageFiles(p).filter(f -> {
+					var n = f.getFileName().toString();
+					return n.endsWith(".html") && !n.equals("AcmeDashboard-Document.html");
+				}).map(f -> {
+					return p.replace('.', '/') + "/" + f.getFileName().toString();
+				})).map(x -> {
+					var l = Thread.currentThread().getContextClassLoader();
+					try (var is = l.getResourceAsStream(x)) {
+						return new String(is.readAllBytes());
+					} catch (IOException e) {
+						throw new UncheckedIOException(e);
+					}
+				}).filter(x -> x.contains("<template id=")).toList();
 	}
 
 	@Handle(method = "GET", path = "(/[\\w\\d/-]*)")

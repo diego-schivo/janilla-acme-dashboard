@@ -1,0 +1,62 @@
+<template id="invoices-page-template">
+	<link href="/invoices-page.css" rel="stylesheet" />
+
+	<h1>Invoices</h1>
+
+	<header>
+		<label for="search" class="sr-only">Search</label>
+		<div class="control">
+			<input id="search" type="text" placeholder="Search invoices..." />
+			<hero-icon icon-name="magnifying-glass"></hero-icon>
+		</div>
+		<a href="/dashboard/invoices/create" class="primary-button">
+			<span>Create Invoice</span>
+			<hero-icon icon-name="plus"></hero-icon>
+		</a>
+	</header>
+
+	<section class="table">
+		<table>
+			<thead>
+				<tr>
+					<th>Customer</th>
+					<th>Email</th>
+					<th>Amount</th>
+					<th>Date</th>
+					<th>Status</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+
+		<template>
+			<tr>
+				<td>
+					<img loading="lazy" src="${customer.imageUrl}" />
+					${customer.name}
+				</td>
+				<td>${customer.email}</td>
+				<td>${amount}</td>
+				<td>${date}</td>
+				<td>${status}</td>
+				<td>
+					<a href="/dashboard/invoices/${id}/edit">
+						<span class="sr-only">Edit</span>
+						<hero-icon icon-name="pencil"></hero-icon>
+					</a>
+					<form>
+						<input type="hidden" name="id" value="${id}" />
+						<button>
+							<span class="sr-only">Delete</span>
+							<hero-icon icon-name="trash"></hero-icon>
+						</button>
+					</form>
+				</td>
+			</tr>
+		</template>
+	</section>
+
+	<pagination-nav></pagination-nav>
+</template>

@@ -12,7 +12,9 @@
 	border: 0;
 	box-sizing: border-box;
 	color: inherit;
+	/*
 	font-family: inherit;
+	*/
 	font-size: inherit;
 	font-weight: inherit;
 	list-style: none;
@@ -21,7 +23,8 @@
 	text-decoration: none;
 }
 
-body {
+body,
+:host {
 	font-family: "Inter";
 }
 

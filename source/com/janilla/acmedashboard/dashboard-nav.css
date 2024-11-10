@@ -1,0 +1,68 @@
+@import "base.css";
+
+:host {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 1rem 0.5rem;
+	width: 16rem;
+}
+
+header {
+	align-items: flex-end;
+	background-color: rgb(0, 112, 243);
+	border-radius: 0.5rem;
+	display: flex;
+	height: 10rem;
+	padding: 0.75rem;
+}
+
+ul {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	gap: 0.5rem;
+
+	svg {
+		height: 1.5rem;
+	}
+}
+	
+li {
+	background: rgb(249, 250, 251);
+	border-radius: 0.375rem;
+
+	&:empty {
+		flex-grow: 1;
+	}
+	
+	&.active {
+		a {
+			background: rgb(224, 242, 254);
+			color: rgb(47, 111, 235);
+		}
+	}
+}
+
+a,
+button {
+	align-items: center;
+	color: rgb(0, 0, 0);
+	display: flex;
+	gap: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.25rem;
+	height: 48px;
+	padding: 0.5rem 0.75rem;
+
+	&:hover {
+		background: rgb(224, 242, 254);
+		color: rgb(47, 111, 235);
+	}
+}
+
+button {
+	background: transparent;
+	width: 100%;
+}
