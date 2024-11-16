@@ -8,19 +8,20 @@
 	src: url("/fonts/inter/Inter_18pt-Regular.ttf");
 }
 
-* {
-	border: 0;
-	box-sizing: border-box;
+a {
 	color: inherit;
-	/*
-	font-family: inherit;
-	*/
-	font-size: inherit;
-	font-weight: inherit;
-	list-style: none;
-	margin: 0;
-	padding: 0;
 	text-decoration: none;
+}
+
+body,
+h1,
+h2,
+h3,
+ol,
+p,
+ul {
+  margin: 0;
+  padding: 0;
 }
 
 body,
@@ -30,6 +31,8 @@ body,
 
 button {
 	background: transparent;
+	border: none;
+	color: inherit;
 	cursor: pointer;
 }
 
@@ -37,12 +40,18 @@ h1,
 h2 {
 	font-family: "Lusitana";
 	font-size: 1.5rem;
+	font-weight: normal;
 	line-height: 2rem;
 }
 
 img,
 svg {
 	display: block;
+}
+
+ol,
+ul {
+  list-style: none;
 }
 
 select,
@@ -139,13 +148,13 @@ strong {
 [class$="-control"] {
 	position: relative;
 
-	svg {
+	hero-icon {
 		color: rgb(107, 114, 128);
-		height: 18px;
 		left: 0.75rem;
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
+		width: 18px;
 	}
 }
 
@@ -158,26 +167,27 @@ strong {
 	}
 }
 
-[class$="-status"] {
+acme-dashboard:has(login-page[slot]) {
 	align-items: center;
-	border-radius: 9999px;
-	display: inline-flex;
-	font-size: 0.75rem;
-	gap: 0.25rem;
-	line-height: 1rem;
-	padding: 0.25rem 0.5rem;
+	display: flex;
+	height: 100vh;
+	justify-content: center;
+}
 
-	svg {
-		width: 1rem;
+breadcrumb-nav {
+	font-family: "Lusitana";
+	font-size: 1.5rem;
+	line-height: 2rem;
+
+	ol {
+		display: flex;
 	}
-}
-
-.paid-status {
-	background: rgb(34, 197, 94);
-	color: rgb(255, 255, 255);
-}
-
-.pending-status {
-	background: rgb(243, 244, 246);
-	color: rgb(107, 114, 128);
+	
+	a {
+		color: rgb(107, 114, 128);
+	}
+	
+	span {
+		margin: 0 0.75rem;
+	}
 }

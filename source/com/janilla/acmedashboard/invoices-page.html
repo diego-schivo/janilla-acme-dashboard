@@ -1,8 +1,6 @@
 <template id="invoices-page-template">
 	<link href="/invoices-page.css" rel="stylesheet" />
 
-	<h1>Invoices</h1>
-
 	<header>
 		<label for="search" class="sr-only">Search</label>
 		<div class="control">
@@ -38,9 +36,15 @@
 					${customer.name}
 				</td>
 				<td>${customer.email}</td>
-				<td>${amount}</td>
-				<td>${date}</td>
-				<td>${status}</td>
+				<td>
+					<amount-format value="${amount}" />
+				</td>
+				<td>
+					<date-format value="${date}" />
+				</td>
+				<td>
+					<invoice-status value="${status}"></invoice-status>
+				</td>
 				<td>
 					<a href="/dashboard/invoices/${id}/edit">
 						<span class="sr-only">Edit</span>

@@ -23,51 +23,24 @@
  */
 import interpolate from "./interpolate.js";
 
-export default class PaginationNav extends HTMLElement {
-
-	static get observedAttributes() {
-		return ["data-href", "data-page", "data-page-count", "slot"];
+const statuses = {
+	"PAID": {
+		icon: "check",
+		text: "Paid"
+	},
+	"PENDING": {
+		icon: "clock",
+		text: "Pending"
 	}
+};
+
+export default class InvoiceStatus extends HTMLElement {
 
 	constructor() {
 		super();
 
 		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("pagination-nav-template");
-		sr.appendChild(t.content.cloneNode(true));
-	}
-
-	async attributeChangedCallback(name, oldValue, newValue) {
-		console.log("PaginationNav.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue === oldValue)
-			return;
-
-		await this.update();
-	}
-
-	async update() {
-		console.log("PaginationNav.update");
-
-		const n = this.shadowRoot.querySelector("nav");
-		n.innerHTML = "";
-
-		const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount, 10) : 0;
-		if (pc <= 1)
-			return;
-
-		const u = new URL(this.dataset.href, location.href);
-		const t = this.shadowRoot.querySelector("template");
-		n.append(...Array.from({ length: pc }, (_, i) => i + 1)
-			.map(x => {
-				u.searchParams.set("page", x);
-				return {
-					page: x,
-					href: u.pathname + u.search
-				};
-			})
-			.map(x => interpolate(t.content.cloneNode(true), x)));
-		const p = this.dataset.page ? parseInt(this.dataset.page, 10) : 1;
-		n.children[p - 1].classList.add("active");
+		const t = document.getElementById("invoice-status-template");
+		sr.appendChild(interpolate(t.content.cloneNode(true), statuses[this.getAttribute("value")]));
 	}
 }

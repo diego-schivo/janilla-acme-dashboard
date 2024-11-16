@@ -26,15 +26,13 @@ export default class LoginPage extends HTMLElement {
 	constructor() {
 		super();
 		const sr = this.attachShadow({ mode: "open" });
-		const df = document.getElementById("login-page-template").content.cloneNode(true);
-		sr.appendChild(df);
-	}
-
-	connectedCallback() {
-		this.shadowRoot.addEventListener("submit", this.handleSubmit);
+		const t = document.getElementById("login-page-template");
+		sr.appendChild(t.content.cloneNode(true));
+		sr.addEventListener("submit", this.handleSubmit);
 	}
 
 	handleSubmit = async event => {
+		console.log("LoginPage.handleSubmit", event);
 		event.preventDefault();
 		const fd = new FormData(event.target);
 		await fetch("/api/authentication", {
@@ -42,6 +40,7 @@ export default class LoginPage extends HTMLElement {
 			headers: { "content-type": "application/json" },
 			body: JSON.stringify(Object.fromEntries(fd))
 		});
-		dispatchEvent(new CustomEvent("locationchange", { detail: { url: new URL("/dashboard", location.href) } }));
+		history.pushState({}, "", "/dashboard");
+		dispatchEvent(new CustomEvent("popstate"));
 	}
 }

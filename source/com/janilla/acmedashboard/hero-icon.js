@@ -21,38 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+const map = new Map();
+const parser = new DOMParser();
+
 export default class HeroIcon extends HTMLElement {
-
-	/*
-	static get observedAttributes() {
-		return ["icon-name"];
-	}
-	*/
-
-	static parser = new DOMParser();
 
 	constructor() {
 		super();
+
 		const sr = this.attachShadow({ mode: "open" });
-		const df = document.getElementById("hero-icon-template").content.cloneNode(true);
-		sr.appendChild(df);
-		this.updateIcon(this.getAttribute("icon-name"));
-	}
+		const t = document.getElementById("hero-icon-template");
+		sr.appendChild(t.content.cloneNode(true));
 
-	/*
-	attributeChangedCallback(name, oldValue, newValue) {
-		// if (name === "icon-name" && newValue !== oldValue)
-		//	this.updateIcon(newValue);
-	}
-	*/
-
-	async updateIcon(iconName) {
-		this.firstElementChild?.remove();
-		if (iconName?.length) {
-			const r = await fetch(`/images/heroicons/${iconName}.svg`);
-			const s = (await r.text()).replace("#0F172A", "currentColor");
-			const d = HeroIcon.parser.parseFromString(s, "image/svg+xml");
-			this.append(d.firstElementChild);
+		const n = this.getAttribute("icon-name");
+		if (n) {
+			if (!map.has(n))
+				map.set(n, fetch(`/images/heroicons/${n}.svg`).then(x => x.text()).then(x => {
+					x = x.replace("#0F172A", "currentColor");
+					return parser.parseFromString(x, "image/svg+xml");
+				}));
+			map.get(n).then(d => sr.appendChild(d.firstChild.cloneNode(true)));
 		}
 	}
 }

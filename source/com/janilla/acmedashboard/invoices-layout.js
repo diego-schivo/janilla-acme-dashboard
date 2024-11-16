@@ -23,51 +23,25 @@
  */
 import interpolate from "./interpolate.js";
 
-export default class PaginationNav extends HTMLElement {
-
-	static get observedAttributes() {
-		return ["data-href", "data-page", "data-page-count", "slot"];
-	}
+export default class InvoicesLayout extends HTMLElement {
 
 	constructor() {
 		super();
 
 		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("pagination-nav-template");
+		const t = document.getElementById("invoices-layout-template");
 		sr.appendChild(t.content.cloneNode(true));
+		sr.querySelector("slot").addEventListener("slotchange", this.handleSlotchange);
 	}
-
-	async attributeChangedCallback(name, oldValue, newValue) {
-		console.log("PaginationNav.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue === oldValue)
-			return;
-
-		await this.update();
-	}
-
-	async update() {
-		console.log("PaginationNav.update");
-
-		const n = this.shadowRoot.querySelector("nav");
-		n.innerHTML = "";
-
-		const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount, 10) : 0;
-		if (pc <= 1)
-			return;
-
-		const u = new URL(this.dataset.href, location.href);
-		const t = this.shadowRoot.querySelector("template");
-		n.append(...Array.from({ length: pc }, (_, i) => i + 1)
-			.map(x => {
-				u.searchParams.set("page", x);
-				return {
-					page: x,
-					href: u.pathname + u.search
-				};
-			})
-			.map(x => interpolate(t.content.cloneNode(true), x)));
-		const p = this.dataset.page ? parseInt(this.dataset.page, 10) : 1;
-		n.children[p - 1].classList.add("active");
+	
+	handleSlotchange = event => {
+		console.log("InvoicesLayout.handleSlotchange", event);
+		const tt = this.shadowRoot.querySelectorAll("template");
+		const bn = this.shadowRoot.querySelector("breadcrumb-nav");
+		bn.innerHTML = "";
+		const n0 = event.target.assignedNodes()[0];
+		for (let n = n0; n; n = n.previousElementSibling)
+			bn.prepend(interpolate(tt[n === n0 ? 1 : 0].content.cloneNode(true), n.dataset));
+		bn.connectedCallback();
 	}
 }

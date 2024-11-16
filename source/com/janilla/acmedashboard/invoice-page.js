@@ -23,51 +23,45 @@
  */
 import interpolate from "./interpolate.js";
 
-export default class PaginationNav extends HTMLElement {
+export default class InvoicePage extends HTMLElement {
 
 	static get observedAttributes() {
-		return ["data-href", "data-page", "data-page-count", "slot"];
+		return ["data-id", "slot"];
 	}
+	
+	invoice;
 
 	constructor() {
 		super();
 
 		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("pagination-nav-template");
+		const t = document.getElementById("invoice-page-template");
 		sr.appendChild(t.content.cloneNode(true));
 	}
 
 	async attributeChangedCallback(name, oldValue, newValue) {
-		console.log("PaginationNav.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
+		console.log("InvoicePage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+		
 		if (newValue === oldValue)
 			return;
 
-		await this.update();
+		if (name === "data-id" ? newValue != this.invoice?.id : true)
+			await this.update();
 	}
 
 	async update() {
-		console.log("PaginationNav.update");
+		console.log("InvoicePage.update");
 
-		const n = this.shadowRoot.querySelector("nav");
-		n.innerHTML = "";
-
-		const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount, 10) : 0;
-		if (pc <= 1)
+		if (this.slot !== "content")
 			return;
 
-		const u = new URL(this.dataset.href, location.href);
+		const nn = await (await fetch("/api/customers/names")).json();
 		const t = this.shadowRoot.querySelector("template");
-		n.append(...Array.from({ length: pc }, (_, i) => i + 1)
-			.map(x => {
-				u.searchParams.set("page", x);
-				return {
-					page: x,
-					href: u.pathname + u.search
-				};
-			})
-			.map(x => interpolate(t.content.cloneNode(true), x)));
-		const p = this.dataset.page ? parseInt(this.dataset.page, 10) : 1;
-		n.children[p - 1].classList.add("active");
+		this.shadowRoot.querySelector('[name="customerId"]').append(...nn.map(x => interpolate(t.content.cloneNode(true), x)));
+
+		this.invoice = this.dataset.id ? await (await fetch(`/api/invoices/${this.dataset.id}`)).json() : {};
+		const f = this.shadowRoot.querySelector("form");
+		[...new Set(Array.from(f.elements).filter(x => x.matches("input, select")).map(x => x.name))]
+			.forEach(x => f[x].value = this.invoice[x]?.toString() ?? "");
 	}
 }

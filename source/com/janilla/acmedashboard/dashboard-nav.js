@@ -26,14 +26,14 @@ export default class DashboardNav extends HTMLElement {
 	constructor() {
 		super();
 		const sr = this.attachShadow({ mode: "open" });
-		const df = document.getElementById("dashboard-nav-template").content.cloneNode(true);
-		sr.appendChild(df);
+		const t = document.getElementById("dashboard-nav-template");
+		sr.appendChild(t.content.cloneNode(true));
+		this.updateActive();
+		sr.addEventListener("submit", this.handleSubmit);
 	}
 
 	connectedCallback() {
-		this.updateActive();
 		addEventListener("popstate", this.handlePopstate);
-		this.shadowRoot.addEventListener("submit", this.handleSubmit);
 	}
 
 	updateActive() {
@@ -44,12 +44,15 @@ export default class DashboardNav extends HTMLElement {
 	}
 
 	handlePopstate = () => {
+		console.log("DashboardNav.handlePopstate");
 		this.updateActive();
 	}
 
 	handleSubmit = async event => {
+		console.log("DashboardNav.handleSubmit", event);
 		event.preventDefault();
 		await fetch("/api/authentication", { method: "DELETE" });
-		dispatchEvent(new CustomEvent("locationchange", { detail: { url: new URL("/login", location.href) } }));
+		history.pushState({}, "", "/login");
+		dispatchEvent(new CustomEvent("popstate"));
 	}
 }

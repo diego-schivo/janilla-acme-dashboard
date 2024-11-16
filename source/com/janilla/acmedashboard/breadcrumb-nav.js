@@ -23,22 +23,29 @@
  */
 import interpolate from "./interpolate.js";
 
-export default class PaginationNav extends HTMLElement {
+export default class BreadcrumbNav extends HTMLElement {
 
 	static get observedAttributes() {
-		return ["data-href", "data-page", "data-page-count", "slot"];
+		return [];
 	}
 
 	constructor() {
 		super();
 
 		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("pagination-nav-template");
+		const t = document.getElementById("breadcrumb-nav-template");
 		sr.appendChild(t.content.cloneNode(true));
 	}
 
+	connectedCallback() {
+		const tt = this.shadowRoot.querySelectorAll("template");
+		const cc = [...this.children];
+		this.append(interpolate(tt[0].content.cloneNode(true),
+			cc.map((x, i) => interpolate(tt[i === cc.length - 1 ? 2 : 1].content.cloneNode(true), x))));
+	}
+
 	async attributeChangedCallback(name, oldValue, newValue) {
-		console.log("PaginationNav.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+		console.log("BreadcrumbNav.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
 
 		if (newValue === oldValue)
 			return;
@@ -47,27 +54,6 @@ export default class PaginationNav extends HTMLElement {
 	}
 
 	async update() {
-		console.log("PaginationNav.update");
-
-		const n = this.shadowRoot.querySelector("nav");
-		n.innerHTML = "";
-
-		const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount, 10) : 0;
-		if (pc <= 1)
-			return;
-
-		const u = new URL(this.dataset.href, location.href);
-		const t = this.shadowRoot.querySelector("template");
-		n.append(...Array.from({ length: pc }, (_, i) => i + 1)
-			.map(x => {
-				u.searchParams.set("page", x);
-				return {
-					page: x,
-					href: u.pathname + u.search
-				};
-			})
-			.map(x => interpolate(t.content.cloneNode(true), x)));
-		const p = this.dataset.page ? parseInt(this.dataset.page, 10) : 1;
-		n.children[p - 1].classList.add("active");
+		console.log("BreadcrumbNav.update");
 	}
 }

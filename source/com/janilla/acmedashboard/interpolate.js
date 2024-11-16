@@ -27,7 +27,7 @@ export default function interpolate(target, data) {
 			target = target.replace(/\$\{(.*?)\}/g, (_, p) => {
 				let o = data;
 				for (const n of p.split("."))
-					if (o !== undefined)
+					if (o !== undefined && n)
 						o = o[n];
 					else
 						break;
@@ -36,7 +36,9 @@ export default function interpolate(target, data) {
 	} else if (target instanceof Text) {
 		if (target.nodeValue.includes("${"))
 			target.nodeValue = interpolate(target.nodeValue, data);
-	} else {
+	} else if (target instanceof Comment)
+		Array.isArray(data) ? target.replaceWith(...data) : target.replaceWith(data);
+	else {
 		if (target instanceof Element && target.hasAttributes())
 			for (const a of target.attributes)
 				if (a.value.includes("${"))

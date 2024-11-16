@@ -21,14 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import InvoicesPage from "./invoices-page.js";
-
-const childTagNames = {
-	"": "WELCOME-PAGE",
-	"login": "LOGIN-PAGE",
-	"dashboard": "DASHBOARD-LAYOUT"
-};
-
 export default class AcmeDashboard extends HTMLElement {
 
 	constructor() {
@@ -53,25 +45,62 @@ export default class AcmeDashboard extends HTMLElement {
 	}
 
 	update() {
-		const nn = location.pathname.split("/").filter(x => x.length);
-		const tn = childTagNames[nn[0] ?? ""];
-		[...this.children].forEach(x => {
-			x.tagName === tn ? x.setAttribute("slot", "content") : x.removeAttribute("slot");
-			if (x.tagName === "DASHBOARD-LAYOUT")
-				x.tagName === tn ? x.setAttribute("content", nn[1] ?? "") : x.removeAttribute("content");
-		});
-
-		const p = [...this.querySelectorAll('[slot="content"]')].at(-1);
-		if (p instanceof InvoicesPage) {
-			const u = new URL(location.href);
-			const q = u.searchParams.get("query");
-			q ? p.setAttribute("query", q) : p.removeAttribute("query");
+		const lp = location.pathname;
+		{
+			const el = this.querySelector("welcome-page");
+			lp === "/"
+				? el.setAttribute("slot", "content")
+				: el.removeAttribute("slot");
+		}
+		{
+			const el = this.querySelector("login-page");
+			lp === "/login"
+				? el.setAttribute("slot", "content")
+				: el.removeAttribute("slot");
+		}
+		{
+			const el = this.querySelector("dashboard-layout");
+			lp === "/dashboard" || lp.startsWith("/dashboard/")
+				? el.setAttribute("slot", "content")
+				: el.removeAttribute("slot");
+		}
+		{
+			const el = this.querySelector("dashboard-page");
+			lp === "/dashboard"
+				? el.setAttribute("slot", "content")
+				: el.removeAttribute("slot");
+		}
+		{
+			const el = this.querySelector("invoices-layout");
+			lp === "/dashboard/invoices" || lp.startsWith("/dashboard/invoices/")
+				? el.setAttribute("slot", "content")
+				: el.removeAttribute("slot");
+		}
+		{
+			const el = this.querySelector("invoices-page");
+			if (lp === "/dashboard/invoices") {
+				el.setAttribute("slot", "content")
+				const u = new URL(location.href);
+				el.setAttribute("data-query", u.searchParams.get("query") ?? "");
+				el.setAttribute("data-page", u.searchParams.get("page") ?? "");
+			} else
+				el.removeAttribute("slot");
+		}
+		{
+			const el = this.querySelector("invoice-page");
+			const m = lp === "/dashboard/invoices/create" ? [] : lp.match(/\/dashboard\/invoices\/(\d+)\/edit/);
+			if (m) {
+				el.setAttribute("slot", "content");
+				el.setAttribute("data-id", m[1] ?? "");
+				el.setAttribute("data-title", m[1] ? "Edit Invoice" : "Create Invoice");
+			} else
+				el.removeAttribute("slot");
 		}
 	}
 
 	handleClick = event => {
 		console.log("AcmeDashboard.handleClick", event);
-		const a = event.composedPath()[0].closest("a");
+		const a = event.composedPath().find(x => x.tagName === "A");
 		if (!a)
 			return;
 		event.preventDefault();

@@ -21,17 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const childTagNames = {
-	"": "DASHBOARD-PAGE",
-	"invoices": "INVOICES-PAGE",
-	"customers": "CUSTOMERS-PAGE"
-};
-
 export default class DashboardLayout extends HTMLElement {
-
-	static get observedAttributes() {
-		return ["content"];
-	}
 
 	constructor() {
 		super();
@@ -39,19 +29,5 @@ export default class DashboardLayout extends HTMLElement {
 		const sr = this.attachShadow({ mode: "open" });
 		const t = document.getElementById("dashboard-layout-template");
 		sr.appendChild(t.content.cloneNode(true));
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		console.log("DashboardLayout.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue !== oldValue)
-			this.update();
-	}
-
-	update() {
-		const tn = childTagNames[this.getAttribute("content")];
-		[...this.children].forEach(x => x.tagName === tn
-			? x.setAttribute("slot", "content")
-			: x.removeAttribute("slot"));
 	}
 }
