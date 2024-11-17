@@ -37,16 +37,21 @@ export default class PaginationNav extends HTMLElement {
 		sr.appendChild(t.content.cloneNode(true));
 	}
 
-	async attributeChangedCallback(name, oldValue, newValue) {
+	attributeChangedCallback(name, oldValue, newValue) {
 		console.log("PaginationNav.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
 
 		if (newValue === oldValue)
 			return;
 
-		await this.update();
+		if (typeof this.updateTimeout === "number")
+			clearTimeout(this.updateTimeout);
+		this.updateTimeout = setTimeout(() => {
+			this.updateTimeout = undefined;
+			this.update();
+		}, 1);
 	}
 
-	async update() {
+	update() {
 		console.log("PaginationNav.update");
 
 		const n = this.shadowRoot.querySelector("nav");
@@ -57,17 +62,28 @@ export default class PaginationNav extends HTMLElement {
 			return;
 
 		const u = new URL(this.dataset.href, location.href);
-		const t = this.shadowRoot.querySelector("template");
+		const tt = this.shadowRoot.querySelectorAll("template");
 		n.append(...Array.from({ length: pc }, (_, i) => i + 1)
 			.map(x => {
 				u.searchParams.set("page", x);
 				return {
-					page: x,
-					href: u.pathname + u.search
+					href: u.pathname + u.search,
+					content: x
 				};
 			})
-			.map(x => interpolate(t.content.cloneNode(true), x)));
+			.map(x => interpolate(tt[0].content.cloneNode(true), x)));
 		const p = this.dataset.page ? parseInt(this.dataset.page, 10) : 1;
 		n.children[p - 1].classList.add("active");
+
+		u.searchParams.set("page", p - 1);
+		n.prepend(interpolate(tt[0].content.cloneNode(true), {
+			href: p > 1 ? u.pathname + u.search : undefined,
+			content: interpolate(tt[1].content.cloneNode(true), "arrow-left")
+		}));
+		u.searchParams.set("page", p + 1);
+		n.append(interpolate(tt[0].content.cloneNode(true), {
+			href: p < pc ? u.pathname + u.search : undefined,
+			content: interpolate(tt[1].content.cloneNode(true), "arrow-right")
+		}));
 	}
 }

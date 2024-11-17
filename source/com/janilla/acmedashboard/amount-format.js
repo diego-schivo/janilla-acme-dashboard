@@ -21,8 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import interpolate from "./interpolate.js";
-
 const currencyFormatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
 	currency: "USD"
@@ -30,11 +28,18 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 
 export default class AmountFormat extends HTMLElement {
 
+	static get observedAttributes() {
+		return ["data-value"];
+	}
+
 	constructor() {
 		super();
+		this.attachShadow({ mode: "open" });
+	}
 
-		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("amount-format-template");
-		sr.appendChild(interpolate(t.content.cloneNode(true), currencyFormatter.format(this.getAttribute("value"))));
+	attributeChangedCallback(name, oldValue, newValue) {
+		console.log("AmountFormat.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+		if (newValue !== oldValue)
+			this.shadowRoot.textContent = this.dataset.value ? currencyFormatter.format(this.dataset.value) : "";
 	}
 }

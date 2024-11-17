@@ -36,6 +36,11 @@ public class DashboardApi {
 
 	@Handle(method = "GET", path = "/api/dashboard")
 	public Data get() {
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		var ic = persistence.crud(Invoice.class);
 		var rc = persistence.crud(Revenue.class);
 		return new Data(

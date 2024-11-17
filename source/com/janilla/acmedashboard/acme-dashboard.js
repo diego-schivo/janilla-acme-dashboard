@@ -101,7 +101,7 @@ export default class AcmeDashboard extends HTMLElement {
 	handleClick = event => {
 		console.log("AcmeDashboard.handleClick", event);
 		const a = event.composedPath().find(x => x.tagName === "A");
-		if (!a)
+		if (!a?.href)
 			return;
 		event.preventDefault();
 		const u = new URL(a.href);

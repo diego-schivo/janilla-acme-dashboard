@@ -23,27 +23,60 @@
  */
 export default function interpolate(target, data) {
 	if (typeof target === "string") {
-		if (target.includes("${"))
-			target = target.replace(/\$\{(.*?)\}/g, (_, p) => {
+		if (target.includes("${")) {
+			const re = /\$\{(.*?)\}/g;
+			let a, i = 0, t = [];
+			while ((a = re.exec(target)) !== null) {
+				if (a.index > i)
+					t.push(target.substring(i, a.index));
 				let o = data;
-				for (const n of p.split("."))
-					if (o !== undefined && n)
+				for (const n of a[1].split("."))
+					if (o != null && n)
 						o = o[n];
 					else
 						break;
-				return o?.toString() ?? "";
-			});
+				if (o != null)
+					t.push(o);
+				i = re.lastIndex;
+			}
+			if (i < target.length)
+				t.push(target.substring(i));
+			target = !t.length ? undefined : t.every(x => typeof x === "string") ? t.join("") : t;
+		}
 	} else if (target instanceof Text) {
-		if (target.nodeValue.includes("${"))
-			target.nodeValue = interpolate(target.nodeValue, data);
-	} else if (target instanceof Comment)
-		Array.isArray(data) ? target.replaceWith(...data) : target.replaceWith(data);
-	else {
+		if (target.nodeValue.includes("${")) {
+			const r = interpolate(target.nodeValue, data);
+			if (typeof r === "string")
+				target.nodeValue = r;
+			else {
+				const t = r.map(x => typeof x === "string" ? new Text(x) : x);
+				target.replaceWith(...t);
+				target = t;
+			}
+		}
+	} else if (target instanceof Comment) {
+		// Array.isArray(data) ? target.replaceWith(...data) : target.replaceWith(data);
+		if (target.nodeValue.includes("${")) {
+			const r = interpolate(target.nodeValue, data);
+			if (typeof r === "string")
+				target.nodeValue = r;
+			else {
+				const t = r.map(x => typeof x === "string" ? new Comment(x) : x);
+				target.replaceWith(...t);
+				target = t;
+			}
+		}
+	} else {
 		if (target instanceof Element && target.hasAttributes())
 			for (const a of target.attributes)
-				if (a.value.includes("${"))
-					a.value = interpolate(a.value, data);
-		if (target.hasChildNodes)
+				if (a.value.includes("${")) {
+					const r = interpolate(a.value, data);
+					if (typeof r !== "undefined")
+						a.value = r;
+					else
+						target.removeAttribute(a.name);
+				}
+		if (target.hasChildNodes())
 			for (const n of target.childNodes)
 				interpolate(n, data);
 	}

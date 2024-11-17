@@ -28,8 +28,6 @@ export default class InvoicePage extends HTMLElement {
 	static get observedAttributes() {
 		return ["data-id", "slot"];
 	}
-	
-	invoice;
 
 	constructor() {
 		super();
@@ -39,29 +37,33 @@ export default class InvoicePage extends HTMLElement {
 		sr.appendChild(t.content.cloneNode(true));
 	}
 
-	async attributeChangedCallback(name, oldValue, newValue) {
+	attributeChangedCallback(name, oldValue, newValue) {
 		console.log("InvoicePage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-		
+
 		if (newValue === oldValue)
 			return;
 
-		if (name === "data-id" ? newValue != this.invoice?.id : true)
+		if (typeof this.updateTimeout === "number")
+			clearTimeout(this.updateTimeout);
+		this.updateTimeout = setTimeout(async () => {
+			this.updateTimeout = undefined;
 			await this.update();
+		}, 1);
 	}
 
 	async update() {
-		console.log("InvoicePage.update");
+		console.log("InvoicePage.update", "this.slot", this.slot);
 
-		if (this.slot !== "content")
+		if (!this.slot)
 			return;
 
 		const nn = await (await fetch("/api/customers/names")).json();
 		const t = this.shadowRoot.querySelector("template");
 		this.shadowRoot.querySelector('[name="customerId"]').append(...nn.map(x => interpolate(t.content.cloneNode(true), x)));
 
-		this.invoice = this.dataset.id ? await (await fetch(`/api/invoices/${this.dataset.id}`)).json() : {};
+		const i = this.dataset.id ? await (await fetch(`/api/invoices/${this.dataset.id}`)).json() : undefined;
 		const f = this.shadowRoot.querySelector("form");
 		[...new Set(Array.from(f.elements).filter(x => x.matches("input, select")).map(x => x.name))]
-			.forEach(x => f[x].value = this.invoice[x]?.toString() ?? "");
+			.forEach(x => f[x].value = i?.[x] ?? "");
 	}
 }

@@ -33,7 +33,7 @@ export default class HeroIcon extends HTMLElement {
 		const t = document.getElementById("hero-icon-template");
 		sr.appendChild(t.content.cloneNode(true));
 
-		const n = this.getAttribute("icon-name");
+		const n = this.dataset.name;
 		if (n) {
 			if (!map.has(n))
 				map.set(n, fetch(`/images/heroicons/${n}.svg`).then(x => x.text()).then(x => {

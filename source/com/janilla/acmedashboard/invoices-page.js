@@ -39,19 +39,24 @@ export default class InvoicesPage extends HTMLElement {
 		this.addEventListener("input", this.handleInput);
 	}
 
-	async attributeChangedCallback(name, oldValue, newValue) {
+	attributeChangedCallback(name, oldValue, newValue) {
 		console.log("InvoicesPage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
 
 		if (newValue === oldValue)
 			return;
 
-		await this.update();
+		if (typeof this.updateTimeout === "number")
+			clearTimeout(this.updateTimeout);
+		this.updateTimeout = setTimeout(async () => {
+			this.updateTimeout = undefined;
+			await this.update();
+		}, 1);
 	}
 
 	async update() {
-		console.log("InvoicesPage.update");
+		console.log("InvoicesPage.update", "this.slot", this.slot);
 
-		if (this.slot !== "content")
+		if (!this.slot)
 			return;
 
 		const t = this.shadowRoot.querySelector('[type="text"]');

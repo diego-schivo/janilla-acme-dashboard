@@ -21,6 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import interpolate from "./interpolate.js";
+
 const iconNameByType = {
 	collected: "banknotes",
 	pending: "clock",
@@ -32,10 +34,12 @@ export default class DashboardCard extends HTMLElement {
 
 	constructor() {
 		super();
+
 		const sr = this.attachShadow({ mode: "open" });
-		const df = document.getElementById("dashboard-card-template").content.cloneNode(true);
-		df.querySelector("hero-icon").setAttribute("icon-name", iconNameByType[this.getAttribute("type")]);
-		df.querySelector("h3").textContent = this.getAttribute("title");
-		sr.appendChild(df);
+		const t = document.getElementById("dashboard-card-template");
+		sr.appendChild(interpolate(t.content.cloneNode(true), {
+			...this.dataset,
+			icon: iconNameByType[this.dataset.type]
+		}));
 	}
 }
