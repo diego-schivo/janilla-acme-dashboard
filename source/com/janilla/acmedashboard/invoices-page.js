@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate, removeAllChildren } from "./utils.js";
+import { compileNode, loadTemplate, removeAllChildren } from "./utils.js";
 
 export default class InvoicesPage extends HTMLElement {
 
@@ -87,33 +87,34 @@ export default class InvoicesPage extends HTMLElement {
 	async render() {
 		console.log("InvoicesPage.render");
 
-		const t = await loadTemplate("invoices-page");
-		const tt = t.content.querySelectorAll("template");
+		if (!this.interpolate) {
+			const t = await loadTemplate("invoices-page");
+			const c = t.content.cloneNode(true);
+			const cc = [...c.querySelectorAll("template")].map(x => x.content);
+			this.interpolate = [compileNode(c), compileNode(cc[0]), compileNode(cc[1])];
+		}
+
 		const u = new URL("/dashboard/invoices", location.href);
 		const q = this.dataset.query;
 		if (q)
 			u.searchParams.append("query", q);
 		const p = this.dataset.page;
-		const d = {
-			rows: this.state
-				? this.state.items.map(x => interpolate(tt[1].content.cloneNode(true), x))
-				: Array.from({ length: 6 }).map(_ => interpolate(tt[0].content.cloneNode(true))),
+		this.appendChild(this.interpolate[0]({
+			rows: !this.state
+				? Array.from({ length: 6 }).map(_ => this.interpolate[1]().cloneNode(true))
+				: this.state.items.map(x => this.interpolate[2]({
+					...x,
+					href: `/dashboard/invoices/${x.id}/edit`
+				}).cloneNode(true)),
 			pagination: {
 				href: u.pathname + u.search,
 				page: p ?? 1,
 				pageCount: this.state ? Math.ceil(this.state.total / 6) : undefined
 			}
-		};
+		}));
 
-		if (!this.hasChildNodes()) {
-			this.appendChild(interpolate(t.content.cloneNode(true), d));
-			if (q)
-				this.querySelector('[type="text"]').value = q;
-		} else {
-			this.querySelector("tbody").replaceWith(interpolate(t.content.querySelector("tbody").cloneNode(true), d));
-			const pn = this.querySelector("pagination-nav");
-			Object.entries(d.pagination).forEach(([k, v]) => pn.dataset[k] = v);
-		}
+		if (q)
+			this.querySelector('[type="text"]').value = q;
 	}
 
 	handleInput = event => {

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate } from "./utils.js";
+import { compileNode, loadTemplate } from "./utils.js";
 
 const statuses = {
 	"PAID": {
@@ -53,10 +53,8 @@ export default class InvoiceStatus extends HTMLElement {
 	attributeChangedCallback(name, oldValue, newValue) {
 		// console.log("InvoiceStatus.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
 
-		if (newValue === oldValue)
-			return;
-
-		this.requestUpdate();
+		if (newValue !== oldValue)
+			this.requestUpdate();
 	}
 
 	requestUpdate() {
@@ -74,7 +72,13 @@ export default class InvoiceStatus extends HTMLElement {
 	async update() {
 		// console.log("InvoiceStatus.update");
 
-		const t = await loadTemplate("invoice-status");
-		this.appendChild(interpolate(t.content.cloneNode(true), statuses[this.dataset.value]));
+		if (!this.interpolate) {
+			const t = await loadTemplate("invoice-status");
+			const c = t.content.cloneNode(true);
+			this.interpolate = compileNode(c);
+		}
+
+		const k = this.dataset.value;
+		this.appendChild(this.interpolate(k ? statuses[k] : undefined));
 	}
 }

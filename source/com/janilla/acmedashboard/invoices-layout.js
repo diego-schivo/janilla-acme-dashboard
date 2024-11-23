@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate, removeAllChildren } from "./utils.js";
+import { compileNode, loadTemplate, removeAllChildren } from "./utils.js";
 
 export default class InvoicesLayout extends HTMLElement {
 
@@ -34,9 +34,11 @@ export default class InvoicesLayout extends HTMLElement {
 	async connectedCallback() {
 		// console.log("InvoicesLayout.connectedCallback");
 
-		const t = await loadTemplate("invoices-layout");
-		this.shadowRoot.appendChild(t.content.cloneNode(true));
+		const c = (await loadTemplate("invoices-layout")).content.cloneNode(true);
+		const cc = [...c.querySelectorAll("template")].map(x => x.content);
+		this.interpolate = [compileNode(cc[0]), compileNode(cc[1])];
 
+		this.shadowRoot.appendChild(c);
 		this.shadowRoot.querySelector("slot").addEventListener("slotchange", this.handleSlotchange);
 	}
 
@@ -46,9 +48,8 @@ export default class InvoicesLayout extends HTMLElement {
 		const bn = this.shadowRoot.querySelector("breadcrumb-nav");
 		removeAllChildren(bn);
 		const n0 = event.target.assignedNodes()[0];
-		const tt = this.shadowRoot.querySelectorAll("template");
 		for (let n = n0; n; n = n.previousElementSibling)
-			bn.prepend(interpolate(tt[n === n0 ? 1 : 0].content.cloneNode(true), n.dataset));
+			bn.prepend(this.interpolate[n === n0 ? 1 : 0](n.dataset).cloneNode(true));
 		bn.connectedCallback();
 	}
 }

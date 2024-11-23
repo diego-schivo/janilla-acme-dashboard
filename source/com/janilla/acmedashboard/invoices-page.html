@@ -22,7 +22,9 @@
 				<th></th>
 			</tr>
 		</thead>
-		<tbody><!--${rows}--></tbody>
+		<tbody>
+			<!--${rows}-->
+		</tbody>
 	</table>
 
 	<template>
@@ -52,7 +54,7 @@
 		<tr>
 			<td>
 				<img loading="lazy" src="${customer.imageUrl}" />
-				${customer.name}
+				<span>${customer.name}</span>
 			</td>
 			<td>${customer.email}</td>
 			<td>
@@ -65,7 +67,7 @@
 				<invoice-status data-value="${status}"></invoice-status>
 			</td>
 			<td>
-				<a href="/dashboard/invoices/${id}/edit">
+				<a href="${href}">
 					<span class="sr-only">Edit</span>
 					<hero-icon data-name="pencil"></hero-icon>
 				</a>

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate, removeAllChildren } from "./utils.js";
+import { compileNode, loadTemplate, removeAllChildren } from "./utils.js";
 
 export default class InvoicePage extends HTMLElement {
 
@@ -80,15 +80,19 @@ export default class InvoicePage extends HTMLElement {
 	async render() {
 		console.log("InvoicePage.render");
 
-		removeAllChildren(this);
 		if (!this.slot)
 			return;
 
-		const t = await loadTemplate("invoice-page");
-		const tt = t.content.querySelectorAll("template");
-		this.appendChild(interpolate(t.content.cloneNode(true), {
+		if (!this.interpolate) {
+			const t = await loadTemplate("invoice-page");
+			const c = t.content.cloneNode(true);
+			const cc = [...c.querySelectorAll("template")].map(x => x.content);
+			this.interpolate = [compileNode(c), compileNode(cc[0])];
+		}
+
+		this.appendChild(this.interpolate[0]({
 			...this.dataset,
-			customerOptions: this.state?.customers.map(x => interpolate(tt[0].content.cloneNode(true), x))
+			customerOptions: this.state?.customers.map(x => this.interpolate[1](x).cloneNode(true))
 		}));
 
 		const f = this.querySelector("form");

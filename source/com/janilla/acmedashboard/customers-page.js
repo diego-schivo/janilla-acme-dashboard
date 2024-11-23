@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate, removeAllChildren } from "./utils.js";
+import { compileNode, loadTemplate, removeAllChildren } from "./utils.js";
 
 export default class CustomersPage extends HTMLElement {
 
@@ -83,22 +83,22 @@ export default class CustomersPage extends HTMLElement {
 	async render() {
 		console.log("CustomersPage.render");
 
-		const t = await loadTemplate("customers-page");
-		const tt = t.content.querySelectorAll("template");
-		const d = {
-			rows: this.state
-				? this.state.map(x => interpolate(tt[1].content.cloneNode(true), x))
-				: Array.from({ length: 6 }).map(_ => interpolate(tt[0].content.cloneNode(true)))
-		};
+		if (!this.interpolate) {
+			const t = await loadTemplate("customers-page");
+			const c = t.content.cloneNode(true);
+			const cc = [...c.querySelectorAll("template")].map(x => x.content);
+			this.interpolate = [compileNode(c), compileNode(cc[0]), compileNode(cc[1])];
+		}
 
-		if (!this.hasChildNodes()) {
-			this.appendChild(interpolate(t.content.cloneNode(true), d));
-			const q = this.dataset.query;
-			if (q)
-				this.querySelector('[type="text"]').value = q;
-		} else
-			this.querySelector("tbody").replaceWith(
-				interpolate(t.content.querySelector("tbody").cloneNode(true), d));
+		this.appendChild(this.interpolate[0]({
+			rows: !this.state
+				? Array.from({ length: 6 }).map(_ => this.interpolate[1]().cloneNode(true))
+				: this.state.map(x => this.interpolate[2](x).cloneNode(true))
+		}));
+
+		const q = this.dataset.query;
+		if (q)
+			this.querySelector('[type="text"]').value = q;
 	}
 
 	handleInput = event => {

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate, removeAllChildren } from "./utils.js";
+import { compileNode, loadTemplate, removeAllChildren } from "./utils.js";
 
 export default class PaginationNav extends HTMLElement {
 
@@ -59,41 +59,45 @@ export default class PaginationNav extends HTMLElement {
 	async update() {
 		console.log("PaginationNav.update");
 
-		removeAllChildren(this);
+		// removeAllChildren(this);
 
 		const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount, 10) : 0;
 		if (pc <= 1)
 			return;
 
-		const t = await loadTemplate("pagination-nav");
+		if (!this.interpolate) {
+			const c = (await loadTemplate("pagination-nav")).content.cloneNode(true);
+			const cc = [...c.querySelectorAll("template")].map(x => x.content);
+			this.interpolate = [compileNode(c), compileNode(cc[0]), compileNode(cc[1]), compileNode(cc[2])];
+		}
+
 		const u = new URL(this.dataset.href, location.href);
 		const p = this.dataset.page ? parseInt(this.dataset.page, 10) : 1;
-		const tt = t.content.querySelectorAll("template");
-		this.appendChild(interpolate(t.content.cloneNode(true), {
+		this.appendChild(this.interpolate[0]({
 			prevLink: (() => {
 				u.searchParams.set("page", p - 1);
-				return interpolate(tt[0].content.cloneNode(true), {
+				return this.interpolate[1]({
 					href: p > 1 ? u.pathname + u.search : undefined,
-					content: interpolate(tt[1].content.cloneNode(true), "arrow-left")
-				});
+					content: this.interpolate[3]("arrow-left").cloneNode(true)
+				}).cloneNode(true);
 			})(),
 			links: Array.from({ length: pc }, (_, i) => i + 1)
 				.map(x => {
 					u.searchParams.set("page", x);
-					const c = interpolate(tt[0].content.cloneNode(true), {
+					const c = this.interpolate[1]({
 						href: u.pathname + u.search,
-						content: x
-					});
+						content: this.interpolate[2](x).cloneNode(true)
+					}).cloneNode(true);
 					if (x === p)
 						c.querySelector("a").classList.add("active");
 					return c;
 				}),
 			nextLink: (() => {
 				u.searchParams.set("page", p + 1);
-				return interpolate(tt[0].content.cloneNode(true), {
+				return this.interpolate[1]({
 					href: p < pc ? u.pathname + u.search : undefined,
-					content: interpolate(tt[1].content.cloneNode(true), "arrow-right")
-				});
+					content: this.interpolate[3]("arrow-right").cloneNode(true)
+				}).cloneNode(true);
 			})(),
 		}));
 	}

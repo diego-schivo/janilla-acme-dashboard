@@ -19,7 +19,9 @@
 				<th>Total Paid</th>
 			</tr>
 		</thead>
-		<tbody><!--${rows}--></tbody>
+		<tbody>
+			<!--${rows}-->
+		</tbody>
 	</table>
 
 	<template>
@@ -46,7 +48,7 @@
 		<tr>
 			<td>
 				<img loading="lazy" src="${imageUrl}" />
-				${name}
+				<span>${name}</span>
 			</td>
 			<td>${email}</td>
 			<td>${invoiceCount}</td>

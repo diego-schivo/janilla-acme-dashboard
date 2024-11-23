@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate } from "./utils.js";
+import { compileNode, loadTemplate } from "./utils.js";
 
 export default class BreadcrumbNav extends HTMLElement {
 
@@ -35,14 +35,16 @@ export default class BreadcrumbNav extends HTMLElement {
 		// console.log("BreadcrumbNav.connectedCallback");
 
 		const t = await loadTemplate("breadcrumb-nav");
-		this.shadowRoot.appendChild(t.content.cloneNode(true));
+		const c = t.content.cloneNode(true);
+		const cc = [...c.querySelectorAll("template")].map(x => x.content);
+		this.interpolate = [compileNode(cc[0]), compileNode(cc[1]), compileNode(cc[2])];
+
+		this.shadowRoot.appendChild(c);
 
 		if (!this.hasChildNodes())
 			return;
 
-		const tt = this.shadowRoot.querySelectorAll("template");
-		const cc = [...this.children];
-		this.appendChild(interpolate(tt[0].content.cloneNode(true),
-			cc.map((x, i) => interpolate(tt[i === cc.length - 1 ? 2 : 1].content.cloneNode(true), x))));
+		const dd = [...this.children];
+		this.appendChild(this.interpolate[0](dd.map((x, i) => this.interpolate[i === dd.length - 1 ? 2 : 1](x).cloneNode(true))));
 	}
 }
