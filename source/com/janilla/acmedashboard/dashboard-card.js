@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import interpolate from "./interpolate.js";
+import { compileNode, loadTemplate } from "./utils.js";
 
 const iconNameByType = {
 	collected: "banknotes",
@@ -35,9 +35,15 @@ export default class DashboardCard extends HTMLElement {
 	constructor() {
 		super();
 
-		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("dashboard-card-template");
-		sr.appendChild(interpolate(t.content.cloneNode(true), {
+		this.attachShadow({ mode: "open" });
+	}
+
+	async connectedCallback() {
+		// console.log("DashboardCard.connectedCallback");
+
+		const c = (await loadTemplate("dashboard-card")).content.cloneNode(true);
+		const i = compileNode(c);
+		this.shadowRoot.appendChild(i({
 			...this.dataset,
 			icon: iconNameByType[this.dataset.type]
 		}));

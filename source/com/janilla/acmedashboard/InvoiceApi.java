@@ -41,6 +41,11 @@ public class InvoiceApi {
 
 	@Handle(method = "GET", path = "/api/invoices")
 	public Page2 list(@Bind("query") String query, @Bind("page") Integer page) {
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		var p = page != null ? page.intValue() : 1;
 		var ic = persistence.crud(Invoice.class);
 		var s = (p - 1) * 6;

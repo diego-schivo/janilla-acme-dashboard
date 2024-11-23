@@ -1,66 +1,84 @@
-<template id="invoices-page-template">
-	<link href="/invoices-page.css" rel="stylesheet" />
+<header>
+	<label for="search" class="sr-only">Search</label>
+	<div class="control">
+		<input id="search" type="text" placeholder="Search invoices..." />
+		<hero-icon data-name="magnifying-glass"></hero-icon>
+	</div>
+	<a href="/dashboard/invoices/create" class="primary-button">
+		<span>Create Invoice</span>
+		<hero-icon data-name="plus"></hero-icon>
+	</a>
+</header>
 
-	<header>
-		<label for="search" class="sr-only">Search</label>
-		<div class="control">
-			<input id="search" type="text" placeholder="Search invoices..." />
-			<hero-icon data-name="magnifying-glass"></hero-icon>
-		</div>
-		<a href="/dashboard/invoices/create" class="primary-button">
-			<span>Create Invoice</span>
-			<hero-icon data-name="plus"></hero-icon>
-		</a>
-	</header>
-
-	<section class="table">
-		<table>
-			<thead>
-				<tr>
-					<th>Customer</th>
-					<th>Email</th>
-					<th>Amount</th>
-					<th>Date</th>
-					<th>Status</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-
-		<template>
+<section class="table">
+	<table>
+		<thead>
 			<tr>
-				<td>
-					<img loading="lazy" src="${customer.imageUrl}" />
-					${customer.name}
-				</td>
-				<td>${customer.email}</td>
-				<td>
-					<amount-format value="${amount}" />
-				</td>
-				<td>
-					<date-format value="${date}" />
-				</td>
-				<td>
-					<invoice-status value="${status}"></invoice-status>
-				</td>
-				<td>
-					<a href="/dashboard/invoices/${id}/edit">
-						<span class="sr-only">Edit</span>
-						<hero-icon data-name="pencil"></hero-icon>
-					</a>
-					<form>
-						<input type="hidden" name="id" value="${id}" />
-						<button>
-							<span class="sr-only">Delete</span>
-							<hero-icon data-name="trash"></hero-icon>
-						</button>
-					</form>
-				</td>
+				<th>Customer</th>
+				<th>Email</th>
+				<th>Amount</th>
+				<th>Date</th>
+				<th>Status</th>
+				<th></th>
 			</tr>
-		</template>
-	</section>
+		</thead>
+		<tbody><!--${rows}--></tbody>
+	</table>
 
-	<pagination-nav></pagination-nav>
-</template>
+	<template>
+		<tr>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+		</tr>
+	</template>
+
+	<template>
+		<tr>
+			<td>
+				<img loading="lazy" src="${customer.imageUrl}" />
+				${customer.name}
+			</td>
+			<td>${customer.email}</td>
+			<td>
+				<intl-format data-type="amount" data-value="${amount}"></intl-format>
+			</td>
+			<td>
+				<intl-format data-type="date" data-value="${date}"></intl-format>
+			</td>
+			<td>
+				<invoice-status data-value="${status}"></invoice-status>
+			</td>
+			<td>
+				<a href="/dashboard/invoices/${id}/edit">
+					<span class="sr-only">Edit</span>
+					<hero-icon data-name="pencil"></hero-icon>
+				</a>
+				<form>
+					<input type="hidden" name="id" value="${id}" />
+					<button>
+						<span class="sr-only">Delete</span>
+						<hero-icon data-name="trash"></hero-icon>
+					</button>
+				</form>
+			</td>
+		</tr>
+	</template>
+</section>
+
+<pagination-nav data-href="${pagination.href}" data-page="${pagination.page}" data-page-count="${pagination.pageCount}"></pagination-nav>

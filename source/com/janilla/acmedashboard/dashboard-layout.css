@@ -1,4 +1,7 @@
 @import "base.css";
+@import "acme-logo.css";
+@import "dashboard-nav.css";
+@import "hero-icon.css";
 
 :host {
 	display: flex;

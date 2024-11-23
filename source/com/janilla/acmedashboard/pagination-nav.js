@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import interpolate from "./interpolate.js";
+import { loadTemplate, removeAllChildren } from "./utils.js";
 
 export default class PaginationNav extends HTMLElement {
 
@@ -29,61 +29,72 @@ export default class PaginationNav extends HTMLElement {
 		return ["data-href", "data-page", "data-page-count", "slot"];
 	}
 
-	constructor() {
-		super();
+	connectedCallback() {
+		// console.log("PaginationNav.connectedCallback");
 
-		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("pagination-nav-template");
-		sr.appendChild(t.content.cloneNode(true));
+		this.requestUpdate();
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		console.log("PaginationNav.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+		// console.log("PaginationNav.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
 
 		if (newValue === oldValue)
 			return;
 
+		this.requestUpdate();
+	}
+
+	requestUpdate() {
+		// console.log("PaginationNav.requestUpdate");
+
 		if (typeof this.updateTimeout === "number")
 			clearTimeout(this.updateTimeout);
-		this.updateTimeout = setTimeout(() => {
+
+		this.updateTimeout = setTimeout(async () => {
 			this.updateTimeout = undefined;
-			this.update();
+			await this.update();
 		}, 1);
 	}
 
-	update() {
+	async update() {
 		console.log("PaginationNav.update");
 
-		const n = this.shadowRoot.querySelector("nav");
-		n.innerHTML = "";
+		removeAllChildren(this);
 
 		const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount, 10) : 0;
 		if (pc <= 1)
 			return;
 
+		const t = await loadTemplate("pagination-nav");
 		const u = new URL(this.dataset.href, location.href);
-		const tt = this.shadowRoot.querySelectorAll("template");
-		n.append(...Array.from({ length: pc }, (_, i) => i + 1)
-			.map(x => {
-				u.searchParams.set("page", x);
-				return {
-					href: u.pathname + u.search,
-					content: x
-				};
-			})
-			.map(x => interpolate(tt[0].content.cloneNode(true), x)));
 		const p = this.dataset.page ? parseInt(this.dataset.page, 10) : 1;
-		n.children[p - 1].classList.add("active");
-
-		u.searchParams.set("page", p - 1);
-		n.prepend(interpolate(tt[0].content.cloneNode(true), {
-			href: p > 1 ? u.pathname + u.search : undefined,
-			content: interpolate(tt[1].content.cloneNode(true), "arrow-left")
-		}));
-		u.searchParams.set("page", p + 1);
-		n.append(interpolate(tt[0].content.cloneNode(true), {
-			href: p < pc ? u.pathname + u.search : undefined,
-			content: interpolate(tt[1].content.cloneNode(true), "arrow-right")
+		const tt = t.content.querySelectorAll("template");
+		this.appendChild(interpolate(t.content.cloneNode(true), {
+			prevLink: (() => {
+				u.searchParams.set("page", p - 1);
+				return interpolate(tt[0].content.cloneNode(true), {
+					href: p > 1 ? u.pathname + u.search : undefined,
+					content: interpolate(tt[1].content.cloneNode(true), "arrow-left")
+				});
+			})(),
+			links: Array.from({ length: pc }, (_, i) => i + 1)
+				.map(x => {
+					u.searchParams.set("page", x);
+					const c = interpolate(tt[0].content.cloneNode(true), {
+						href: u.pathname + u.search,
+						content: x
+					});
+					if (x === p)
+						c.querySelector("a").classList.add("active");
+					return c;
+				}),
+			nextLink: (() => {
+				u.searchParams.set("page", p + 1);
+				return interpolate(tt[0].content.cloneNode(true), {
+					href: p < pc ? u.pathname + u.search : undefined,
+					content: interpolate(tt[1].content.cloneNode(true), "arrow-right")
+				});
+			})(),
 		}));
 	}
 }

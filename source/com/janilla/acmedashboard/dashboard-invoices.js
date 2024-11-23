@@ -21,46 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate } from "./utils.js";
+import { compileNode, loadTemplate } from "./utils.js";
 
-const statuses = {
-	"PAID": {
-		icon: "check",
-		text: "Paid"
-	},
-	"PENDING": {
-		icon: "clock",
-		text: "Pending"
-	}
-};
-
-export default class InvoiceStatus extends HTMLElement {
-
-	static get observedAttributes() {
-		return ["data-value"];
-	}
+export default class DashboardInvoices extends HTMLElement {
 
 	constructor() {
 		super();
 	}
 
 	connectedCallback() {
-		// console.log("InvoiceStatus.connectedCallback");
-
-		this.requestUpdate();
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("InvoiceStatus.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue === oldValue)
-			return;
+		// console.log("DashboardInvoices.connectedCallback");
 
 		this.requestUpdate();
 	}
 
 	requestUpdate() {
-		// console.log("InvoiceStatus.requestUpdate");
+		// console.log("DashboardInvoices.requestUpdate");
 
 		if (typeof this.updateTimeout === "number")
 			clearTimeout(this.updateTimeout);
@@ -72,9 +48,29 @@ export default class InvoiceStatus extends HTMLElement {
 	}
 
 	async update() {
-		// console.log("InvoiceStatus.update");
+		console.log("DashboardInvoices.update");
 
-		const t = await loadTemplate("invoice-status");
-		this.appendChild(interpolate(t.content.cloneNode(true), statuses[this.dataset.value]));
+		await this.render();
+		if (this.state)
+			return;
+
+		this.state = await (await fetch("/api/dashboard/invoices")).json();
+		await this.render();
+	}
+
+	async render() {
+		console.log("DashboardInvoices.render");
+
+		if (!this.interpolate) {
+			const c = (await loadTemplate("dashboard-invoices")).content.cloneNode(true);
+			const cc = [...c.querySelectorAll("template")].map(x => x.content);
+			this.interpolate = [compileNode(c), compileNode(cc[0]), compileNode(cc[1])];
+		}
+
+		this.appendChild(this.interpolate[0]({
+			content: !this.state
+				? Array.from({ length: 6 }).map(_ => this.interpolate[1]().cloneNode(true))
+				: this.state.map(x => this.interpolate[2](x).cloneNode(true))
+		}));
 	}
 }

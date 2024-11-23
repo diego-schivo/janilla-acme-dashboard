@@ -89,6 +89,11 @@ select {
 strong {
 	font-weight: bolder;
 }
+	
+table {
+	border-collapse: collapse;
+	display: table;
+}
 
 [type="email"],
 [type="number"],

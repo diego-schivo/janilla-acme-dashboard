@@ -54,7 +54,7 @@ export default class Component {
 	}
 
 	refresh() {
-		this.element.innerHTML = "";
+		removeAllChildren(this.element);
 		this.element.append(...this.renderEngine.render({ value: this }));
 		this.listen();
 	}

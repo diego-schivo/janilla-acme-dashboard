@@ -21,39 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import interpolate from "./interpolate.js";
+import { loadTemplate } from "./utils.js";
 
 export default class BreadcrumbNav extends HTMLElement {
-
-	static get observedAttributes() {
-		return [];
-	}
 
 	constructor() {
 		super();
 
-		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("breadcrumb-nav-template");
-		sr.appendChild(t.content.cloneNode(true));
+		this.attachShadow({ mode: "open" });
 	}
 
-	connectedCallback() {
-		const tt = this.shadowRoot.querySelectorAll("template");
-		const cc = [...this.children];
-		this.append(interpolate(tt[0].content.cloneNode(true),
-			cc.map((x, i) => interpolate(tt[i === cc.length - 1 ? 2 : 1].content.cloneNode(true), x))));
-	}
+	async connectedCallback() {
+		// console.log("BreadcrumbNav.connectedCallback");
 
-	async attributeChangedCallback(name, oldValue, newValue) {
-		console.log("BreadcrumbNav.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+		const t = await loadTemplate("breadcrumb-nav");
+		this.shadowRoot.appendChild(t.content.cloneNode(true));
 
-		if (newValue === oldValue)
+		if (!this.hasChildNodes())
 			return;
 
-		await this.update();
-	}
-
-	async update() {
-		console.log("BreadcrumbNav.update");
+		const tt = this.shadowRoot.querySelectorAll("template");
+		const cc = [...this.children];
+		this.appendChild(interpolate(tt[0].content.cloneNode(true),
+			cc.map((x, i) => interpolate(tt[i === cc.length - 1 ? 2 : 1].content.cloneNode(true), x))));
 	}
 }

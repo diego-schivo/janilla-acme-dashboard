@@ -21,21 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import interpolate from "./interpolate.js";
+import { compileNode, loadTemplate } from "./utils.js";
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-	day: "numeric",
-	month: "short",
-	year: "numeric",
-});
-
-export default class DateFormat extends HTMLElement {
+export default class DashboardCards extends HTMLElement {
 
 	constructor() {
 		super();
+	}
 
-		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("date-format-template");
-		sr.appendChild(interpolate(t.content.cloneNode(true), dateFormatter.format(new Date(this.getAttribute("value")))));
+	connectedCallback() {
+		// console.log("DashboardCards.connectedCallback");
+
+		this.requestUpdate();
+	}
+
+	requestUpdate() {
+		// console.log("DashboardCards.requestUpdate");
+
+		if (typeof this.updateTimeout === "number")
+			clearTimeout(this.updateTimeout);
+
+		this.updateTimeout = setTimeout(async () => {
+			this.updateTimeout = undefined;
+			await this.update();
+		}, 1);
+	}
+
+	async update() {
+		console.log("DashboardCards.update");
+
+		await this.render();
+		if (this.state)
+			return;
+
+		this.state = await (await fetch("/api/dashboard/cards")).json();
+		await this.render();
+	}
+
+	async render() {
+		console.log("DashboardCards.render");
+
+		if (!this.interpolate) {
+			const c = (await loadTemplate("dashboard-cards")).content.cloneNode(true);
+			this.interpolate = compileNode(c);
+		}
+		this.appendChild(this.interpolate(this.state));
 	}
 }

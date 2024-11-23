@@ -4,12 +4,11 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>Acme Dashboard</title>
-	<meta name="description" content="The official Next.js Learn Dashboard built with App Router.">
+	<meta name="description" content="Porting of Next.js Learn Dashboard to Janilla.">
 	<link href="/style.css" rel="stylesheet" />
 	<script src="/script.js" type="module"></script>
 </head>
 <body>
-	<{templates}>
 	<acme-dashboard>
 		<welcome-page></welcome-page>
 		<login-page></login-page>
@@ -19,6 +18,7 @@
 				<invoices-page data-title="Invoices" data-href="/dashboard/invoices"></invoices-page>
 				<invoice-page></invoice-page>
 			</invoices-layout>
+			<customers-page></customers-page>
 		</dashboard-layout>
 	</acme-dashboard>
 </body>

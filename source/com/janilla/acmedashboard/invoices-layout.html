@@ -1,13 +1,12 @@
-<template id="invoices-layout-template">
-	<link href="/invoices-layout.css" rel="stylesheet" />
-	<breadcrumb-nav></breadcrumb-nav>
-	<slot name="content"></slot>
-	
-	<template>
-		<a href="${href}">${title}</a>
-	</template>
-	
-	<template>
-		<h1>${title}</h1>
-	</template>
+<link href="/invoices-layout.css" rel="stylesheet" />
+
+<breadcrumb-nav></breadcrumb-nav>
+<slot name="content"></slot>
+
+<template>
+	<a href="${href}">${title}</a>
+</template>
+
+<template>
+	<h1>${title}</h1>
 </template>

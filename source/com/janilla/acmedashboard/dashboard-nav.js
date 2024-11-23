@@ -21,23 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import { loadTemplate } from "./utils.js";
+
 export default class DashboardNav extends HTMLElement {
 
 	constructor() {
 		super();
-		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("dashboard-nav-template");
-		sr.appendChild(t.content.cloneNode(true));
-		this.updateActive();
-		sr.addEventListener("submit", this.handleSubmit);
 	}
 
-	connectedCallback() {
+	async connectedCallback() {
+		// console.log("DashboardNav.connectedCallback");
+
+		const t = await loadTemplate("dashboard-nav");
+		this.appendChild(t.content.cloneNode(true));
+		this.updateActive();
+
 		addEventListener("popstate", this.handlePopstate);
+		this.addEventListener("submit", this.handleSubmit);
+	}
+
+	disconnectedCallback() {
+		// console.log("DashboardNav.disconnectedCallback");
+
+		removeEventListener("popstate", this.handlePopstate);
 	}
 
 	updateActive() {
-		this.shadowRoot.querySelectorAll("a").forEach(x => {
+		console.log("DashboardNav.updateActive");
+
+		this.querySelectorAll("a").forEach(x => {
 			const a = x.getAttribute("href") === document.location.pathname;
 			x.parentElement.classList[a ? "add" : "remove"]("active");
 		});
@@ -45,11 +57,13 @@ export default class DashboardNav extends HTMLElement {
 
 	handlePopstate = () => {
 		console.log("DashboardNav.handlePopstate");
+
 		this.updateActive();
 	}
 
 	handleSubmit = async event => {
 		console.log("DashboardNav.handleSubmit", event);
+
 		event.preventDefault();
 		await fetch("/api/authentication", { method: "DELETE" });
 		history.pushState({}, "", "/login");

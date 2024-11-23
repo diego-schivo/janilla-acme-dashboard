@@ -1,6 +1,4 @@
-@import "base.css";
-
-:host {
+dashboard-nav {
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
@@ -8,55 +6,55 @@
 	height: 100%;
 	padding: 1rem 0.5rem;
 	width: 16rem;
-}
 
-header {
-	align-items: flex-end;
-	background-color: rgb(0, 112, 243);
-	border-radius: 0.5rem;
-	box-sizing: border-box;
-	display: flex;
-	height: 10rem;
-	padding: 0.75rem;
-}
-
-ul {
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	gap: 0.5rem;
-}
+	header {
+		align-items: flex-end;
+		background-color: rgb(0, 112, 243);
+		border-radius: 0.5rem;
+		box-sizing: border-box;
+		display: flex;
+		height: 10rem;
+		padding: 0.75rem;
+	}
 	
-li {
-	background: rgb(249, 250, 251);
-	border-radius: 0.375rem;
-	color: rgb(0, 0, 0);
-
-	&:empty {
+	ul {
+		display: flex;
+		flex-direction: column;
 		flex-grow: 1;
+		gap: 0.5rem;
+	}
+		
+	li {
+		background: rgb(249, 250, 251);
+		border-radius: 0.375rem;
+		color: rgb(0, 0, 0);
+	
+		&:empty {
+			flex-grow: 1;
+		}
+		
+		&.active,
+		&:hover {
+			background: rgb(224, 242, 254);
+			color: rgb(47, 111, 235);
+		}
 	}
 	
-	&.active,
-	&:hover {
-		background: rgb(224, 242, 254);
-		color: rgb(47, 111, 235);
+	a,
+	button {
+		align-items: center;
+		box-sizing: border-box;
+		display: flex;
+		gap: 0.5rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		line-height: 1.25rem;
+		height: 48px;
+		padding: 0.5rem 0.75rem;
 	}
-}
-
-a,
-button {
-	align-items: center;
-	box-sizing: border-box;
-	display: flex;
-	gap: 0.5rem;
-	font-size: 0.875rem;
-	font-weight: 500;
-	line-height: 1.25rem;
-	height: 48px;
-	padding: 0.5rem 0.75rem;
-}
-
-button {
-	background: transparent;
-	width: 100%;
+	
+	button {
+		background: transparent;
+		width: 100%;
+	}
 }

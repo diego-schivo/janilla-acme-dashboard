@@ -28,19 +28,20 @@ export default class HeroIcon extends HTMLElement {
 
 	constructor() {
 		super();
+	}
 
-		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("hero-icon-template");
-		sr.appendChild(t.content.cloneNode(true));
+	async connectedCallback() {
+		// console.log("HeroIcon.connectedCallback");
 
 		const n = this.dataset.name;
-		if (n) {
-			if (!map.has(n))
-				map.set(n, fetch(`/images/heroicons/${n}.svg`).then(x => x.text()).then(x => {
-					x = x.replace("#0F172A", "currentColor");
-					return parser.parseFromString(x, "image/svg+xml");
-				}));
-			map.get(n).then(d => sr.appendChild(d.firstChild.cloneNode(true)));
-		}
+		if (!n)
+			return;
+
+		if (!map.has(n))
+			map.set(n, fetch(`/images/heroicons/${n}.svg`).then(x => x.text()).then(x => {
+				x = x.replace("#0F172A", "currentColor");
+				return parser.parseFromString(x, "image/svg+xml");
+			}));
+		map.get(n).then(d => this.appendChild(d.firstChild.cloneNode(true)));
 	}
 }

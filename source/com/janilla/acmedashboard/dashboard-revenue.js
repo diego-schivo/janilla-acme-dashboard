@@ -21,46 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate } from "./utils.js";
+import { compileNode, loadTemplate } from "./utils.js";
 
-const statuses = {
-	"PAID": {
-		icon: "check",
-		text: "Paid"
-	},
-	"PENDING": {
-		icon: "clock",
-		text: "Pending"
-	}
-};
-
-export default class InvoiceStatus extends HTMLElement {
-
-	static get observedAttributes() {
-		return ["data-value"];
-	}
+export default class DashboardRevenue extends HTMLElement {
 
 	constructor() {
 		super();
 	}
 
 	connectedCallback() {
-		// console.log("InvoiceStatus.connectedCallback");
-
-		this.requestUpdate();
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("InvoiceStatus.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue === oldValue)
-			return;
+		// console.log("DashboardRevenue.connectedCallback");
 
 		this.requestUpdate();
 	}
 
 	requestUpdate() {
-		// console.log("InvoiceStatus.requestUpdate");
+		// console.log("DashboardRevenue.requestUpdate");
 
 		if (typeof this.updateTimeout === "number")
 			clearTimeout(this.updateTimeout);
@@ -72,9 +48,32 @@ export default class InvoiceStatus extends HTMLElement {
 	}
 
 	async update() {
-		// console.log("InvoiceStatus.update");
+		console.log("DashboardRevenue.update");
 
-		const t = await loadTemplate("invoice-status");
-		this.appendChild(interpolate(t.content.cloneNode(true), statuses[this.dataset.value]));
+		await this.render();
+		if (this.state)
+			return;
+
+		this.state = await (await fetch("/api/dashboard/revenue")).json();
+		await this.render();
+	}
+
+	async render() {
+		console.log("DashboardRevenue.render");
+
+		if (!this.interpolate) {
+			const c = (await loadTemplate("dashboard-revenue")).content.cloneNode(true);
+			const cc = [...c.querySelectorAll("template")].map(x => x.content);
+			this.interpolate = [compileNode(c), compileNode(cc[0])];
+		}
+
+		const k = this.state?.length ? Math.ceil(Math.max(...this.state.map(x => x.revenue)) / 1000) : undefined;
+		this.appendChild(this.interpolate[0]({
+			k,
+			content: this.state?.flatMap(x => this.interpolate[1]({
+				...x,
+				style: `height: ${x.revenue / (1000 * k) * 100}%`,
+			}).cloneNode(true))
+		}));
 	}
 }

@@ -23,10 +23,10 @@
  */
 import { loadTemplate, removeAllChildren } from "./utils.js";
 
-export default class InvoicesPage extends HTMLElement {
+export default class CustomersPage extends HTMLElement {
 
 	static get observedAttributes() {
-		return ["data-page", "data-query", "slot"];
+		return ["data-query", "slot"];
 	}
 
 	constructor() {
@@ -34,22 +34,21 @@ export default class InvoicesPage extends HTMLElement {
 	}
 
 	connectedCallback() {
-		// console.log("InvoicesPage.connectedCallback");
+		// console.log("CustomersPage.connectedCallback");
 
 		this.addEventListener("input", this.handleInput);
-		this.addEventListener("submit", this.handleSubmit);
 		this.requestUpdate();
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("InvoicesPage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+		// console.log("CustomersPage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
 
 		if (newValue !== oldValue)
 			this.requestUpdate();
 	}
 
 	requestUpdate() {
-		// console.log("InvoicesPage.requestUpdate");
+		// console.log("CustomersPage.requestUpdate");
 
 		if (typeof this.updateTimeout === "number")
 			clearTimeout(this.updateTimeout);
@@ -61,7 +60,7 @@ export default class InvoicesPage extends HTMLElement {
 	}
 
 	async update() {
-		console.log("InvoicesPage.update");
+		console.log("CustomersPage.update");
 
 		if (!this.slot) {
 			removeAllChildren(this);
@@ -72,52 +71,38 @@ export default class InvoicesPage extends HTMLElement {
 		if (this.state)
 			return;
 
-		const u = new URL("/api/invoices", location.href);
+		const u = new URL("/api/customers", location.href);
 		const q = this.dataset.query;
 		if (q)
 			u.searchParams.append("query", q);
-		const p = this.dataset.page;
-		if (p)
-			u.searchParams.append("page", p);
 		this.state = await (await fetch(u)).json();
 		history.replaceState(this.state, "");
 		await this.render();
 	}
 
 	async render() {
-		console.log("InvoicesPage.render");
+		console.log("CustomersPage.render");
 
-		const t = await loadTemplate("invoices-page");
+		const t = await loadTemplate("customers-page");
 		const tt = t.content.querySelectorAll("template");
-		const u = new URL("/dashboard/invoices", location.href);
-		const q = this.dataset.query;
-		if (q)
-			u.searchParams.append("query", q);
-		const p = this.dataset.page;
 		const d = {
 			rows: this.state
-				? this.state.items.map(x => interpolate(tt[1].content.cloneNode(true), x))
-				: Array.from({ length: 6 }).map(_ => interpolate(tt[0].content.cloneNode(true))),
-			pagination: {
-				href: u.pathname + u.search,
-				page: p ?? 1,
-				pageCount: this.state ? Math.ceil(this.state.total / 6) : undefined
-			}
+				? this.state.map(x => interpolate(tt[1].content.cloneNode(true), x))
+				: Array.from({ length: 6 }).map(_ => interpolate(tt[0].content.cloneNode(true)))
 		};
 
 		if (!this.hasChildNodes()) {
 			this.appendChild(interpolate(t.content.cloneNode(true), d));
+			const q = this.dataset.query;
 			if (q)
 				this.querySelector('[type="text"]').value = q;
-		} else {
-			this.querySelector("tbody").replaceWith(interpolate(t.content.querySelector("tbody").cloneNode(true), d));
-			const pn = this.querySelector("pagination-nav");
-			Object.entries(d.pagination).forEach(([k, v]) => pn.dataset[k] = v);
-		}
+		} else
+			this.querySelector("tbody").replaceWith(
+				interpolate(t.content.querySelector("tbody").cloneNode(true), d));
 	}
 
 	handleInput = event => {
-		console.log("InvoicesPage.handleInput", event);
+		console.log("CustomersPage.handleInput", event);
 
 		if (typeof this.inputTimeout === "number")
 			clearTimeout(this.inputTimeout);
@@ -125,25 +110,11 @@ export default class InvoicesPage extends HTMLElement {
 		const q = event.target.value;
 		this.inputTimeout = setTimeout(() => {
 			this.inputTimeout = undefined;
-			const u = new URL("/dashboard/invoices", location.href);
+			const u = new URL("/dashboard/customers", location.href);
 			if (q)
 				u.searchParams.append("query", q);
 			history.pushState({}, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
-	}
-
-	handleSubmit = async event => {
-		console.log("InvoicesPage.handleSubmit", event);
-
-		event.preventDefault();
-		const fd = new FormData(event.target);
-		const r = await fetch(`/api/invoices/${fd.get("id")}`, { method: "DELETE" });
-		if (r.ok)
-			await this.update();
-		else {
-			const t = await r.text();
-			alert(t);
-		}
 	}
 }

@@ -1,11 +1,9 @@
-@import "base.css";
-
-:host {
+hero-icon {
 	display: block;
 	width: 1.5rem;
-}
 
-svg {
-	height: 100%;
-	width: 100%;
+	svg {
+		height: 100%;
+		width: 100%;
+	}
 }

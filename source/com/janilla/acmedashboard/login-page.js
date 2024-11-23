@@ -21,14 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import { loadTemplate } from "./utils.js";
+
 export default class LoginPage extends HTMLElement {
 
 	constructor() {
 		super();
-		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("login-page-template");
-		sr.appendChild(t.content.cloneNode(true));
-		sr.addEventListener("submit", this.handleSubmit);
+	}
+
+	async connectedCallback() {
+		// console.log("LoginPage.connectedCallback");
+
+		const t = await loadTemplate("login-page");
+		this.appendChild(t.content.cloneNode(true));
+
+		this.addEventListener("submit", this.handleSubmit);
 	}
 
 	handleSubmit = async event => {

@@ -21,12 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import { loadTemplate } from "./utils.js";
+
 export default class WelcomePage extends HTMLElement {
 
 	constructor() {
 		super();
-		const sr = this.attachShadow({ mode: "open" });
-		const df = document.getElementById("welcome-page-template").content.cloneNode(true);
-		sr.appendChild(df);
+	}
+
+	async connectedCallback() {
+		// console.log("WelcomePage.connectedCallback");
+
+		const t = await loadTemplate("welcome-page");
+		this.appendChild(t.content.cloneNode(true));
 	}
 }

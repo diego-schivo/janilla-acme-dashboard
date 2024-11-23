@@ -1,45 +1,8 @@
-<template id="dashboard-page-template">
-	<link href="/dashboard-page.css" rel="stylesheet" />
+<article>
 	<h1>Dashboard</h1>
 	<div>
-		<article class="cards">
-			<dashboard-card data-type="collected" data-title="Collected">
-				<amount-format></amount-format>
-			</dashboard-card>
-			<dashboard-card data-type="pending" data-title="Pending">
-				<amount-format></amount-format>
-			</dashboard-card>
-			<dashboard-card data-type="invoices" data-title="Total Invoices"></dashboard-card>
-			<dashboard-card data-type="customers" data-title="Total Customers"></dashboard-card>
-		</article>
-		<article class="revenue">
-			<h2>Recent Revenue</h2>
-			<div>
-				<revenue-chart></revenue-chart>
-				<footer>
-					<hero-icon data-name="calendar"></hero-icon>
-					<h3>Last 12 months</h3>
-				</footer>
-			</div>
-		</article>
-		<article class="invoices">
-			<h2>Latest Invoices</h2>
-			<div>
-				<article class="invoice-list">
-				</article>
-				<template>
-					<article>
-						<img loading="lazy" src="${customer.imageUrl}" />
-						<p>${customer.name}</p>
-						<p>${customer.email}</p>
-						<amount-format data-value="${amount}"></amount-format>
-					</article>
-				</template>
-				<footer>
-					<hero-icon data-name="arrow-path"></hero-icon>
-					<h3>Updated just now</h3>
-				</footer>
-			</div>
-		</article>
+		<dashboard-cards></dashboard-cards>
+		<dashboard-revenue></dashboard-revenue>
+		<dashboard-invoices></dashboard-invoices>
 	</div>
-</template>
+</article>

@@ -21,25 +21,71 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-	style: "currency",
-	currency: "USD"
-});
-
-export default class AmountFormat extends HTMLElement {
+export default class IntlFormat extends HTMLElement {
 
 	static get observedAttributes() {
-		return ["data-value"];
+		return ["data-type", "data-value"];
 	}
 
 	constructor() {
 		super();
-		this.attachShadow({ mode: "open" });
+	}
+
+	connectedCallback() {
+		// console.log("IntlFormat.connectedCallback");
+
+		this.requestUpdate();
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		console.log("AmountFormat.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+		// console.log("IntlFormat.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+
 		if (newValue !== oldValue)
-			this.shadowRoot.textContent = this.dataset.value ? currencyFormatter.format(this.dataset.value) : "";
+			this.requestUpdate();
+	}
+
+	requestUpdate() {
+		// console.log("IntlFormat.requestUpdate");
+
+		if (typeof this.updateTimeout === "number")
+			clearTimeout(this.updateTimeout);
+
+		this.updateTimeout = setTimeout(async () => {
+			this.updateTimeout = undefined;
+			await this.update();
+		}, 1);
+	}
+
+	async update() {
+		console.log("IntlFormat.update");
+
+		if (!this.dataset.value) {
+			this.textContent = "";
+			return;
+		}
+
+		const f = this.dataset.type ? formatters[this.dataset.type] : undefined;
+		if (!f) {
+			this.textContent = this.dataset.value;
+			return;
+		}
+
+		this.textContent = f(this.dataset.value);
 	}
 }
+
+const amountFormatter = new Intl.NumberFormat("en-US", {
+	style: "currency",
+	currency: "USD"
+});
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+	day: "numeric",
+	month: "short",
+	year: "numeric",
+});
+
+const formatters = {
+	amount: x => amountFormatter.format(x),
+	date: x => dateFormatter.format(new Date(x))
+};

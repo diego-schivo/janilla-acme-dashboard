@@ -1,13 +1,9 @@
-<template id="pagination-nav-template">
-	<link href="/pagination-nav.css" rel="stylesheet" />
+<nav>${prevLink}${links}${nextLink}</nav>
 
-	<nav></nav>
+<template>
+	<a href="${href}">${content}</a>
+</template>
 
-	<template>
-		<a href="${href}">${content}</a>
-	</template>
-
-	<template>
-		<hero-icon data-name="${}"></hero-icon>
-	</template>
+<template>
+	<hero-icon data-name="${}"></hero-icon>
 </template>

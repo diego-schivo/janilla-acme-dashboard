@@ -1,17 +1,15 @@
-@import "base.css";
-
-:host {
+acme-logo {
 	align-items: center;
 	color: rgb(255, 255, 255);
 	display: flex;
 	font-family: "Lusitana";
-}
 
-hero-icon {
-	transform: rotate(15deg);
-	width: 3rem;
-}
-
-p {
-	font-size: 44px;
+	hero-icon {
+		transform: rotate(15deg);
+		width: 3rem;
+	}
+	
+	p {
+		font-size: 44px;
+	}
 }

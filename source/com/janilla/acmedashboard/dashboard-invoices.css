@@ -1,0 +1,79 @@
+dashboard-invoices {
+	section {
+		padding: 0 1.5rem !important;
+	
+		article {
+			align-items: center;
+			column-gap: 1rem;
+			display: grid;
+			grid-template:
+				"a b d"
+				"a c d" / auto 1fr auto;
+			padding: 1rem 0;
+			
+			&:not(:last-child) {
+				border-bottom: 1px solid rgb(229, 231, 235);
+			}
+
+			:first-child {
+				grid-area: a;
+			}
+
+			:nth-child(2) {
+				grid-area: b;
+			}
+
+			:nth-child(3) {
+				grid-area: c;
+			}
+
+			:nth-child(4) {
+				grid-area: d;
+			}
+
+			&.skeleton * {
+				background: rgb(243, 244, 246);
+				border-radius: 0.25rem;
+				height: 1rem;
+				width: 3rem;
+
+				&:first-child {
+					border-radius: 9999px;
+					height: 2rem;
+					width: 2rem;
+				}
+	
+				&:nth-child(2) {
+					height: 1.25rem;
+					width: 10rem;
+				}
+			}
+		}
+	}
+
+	img {
+		border-radius: 9999px;
+		height: 2rem;
+		width: 2rem;
+	}
+
+	p:first-of-type,
+	amount-format {
+		font-size: 1rem;
+		line-height: 1.5rem;
+	}
+
+	p {
+		&:first-of-type {
+			font-weight: 600;
+		}
+		
+		&:nth-of-type(2) {
+			color: rgb(107, 114, 128);
+		}
+	}
+	
+	amount-format {
+		font-family: "Lusitana";
+	}
+}

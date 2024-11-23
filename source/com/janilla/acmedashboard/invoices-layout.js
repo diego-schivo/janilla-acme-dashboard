@@ -21,25 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import interpolate from "./interpolate.js";
+import { loadTemplate, removeAllChildren } from "./utils.js";
 
 export default class InvoicesLayout extends HTMLElement {
 
 	constructor() {
 		super();
 
-		const sr = this.attachShadow({ mode: "open" });
-		const t = document.getElementById("invoices-layout-template");
-		sr.appendChild(t.content.cloneNode(true));
-		sr.querySelector("slot").addEventListener("slotchange", this.handleSlotchange);
+		this.attachShadow({ mode: "open" });
 	}
-	
+
+	async connectedCallback() {
+		// console.log("InvoicesLayout.connectedCallback");
+
+		const t = await loadTemplate("invoices-layout");
+		this.shadowRoot.appendChild(t.content.cloneNode(true));
+
+		this.shadowRoot.querySelector("slot").addEventListener("slotchange", this.handleSlotchange);
+	}
+
 	handleSlotchange = event => {
 		console.log("InvoicesLayout.handleSlotchange", event);
-		const tt = this.shadowRoot.querySelectorAll("template");
+
 		const bn = this.shadowRoot.querySelector("breadcrumb-nav");
-		bn.innerHTML = "";
+		removeAllChildren(bn);
 		const n0 = event.target.assignedNodes()[0];
+		const tt = this.shadowRoot.querySelectorAll("template");
 		for (let n = n0; n; n = n.previousElementSibling)
 			bn.prepend(interpolate(tt[n === n0 ? 1 : 0].content.cloneNode(true), n.dataset));
 		bn.connectedCallback();
