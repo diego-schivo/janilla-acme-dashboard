@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { compileNode, loadTemplate, removeAllChildren } from "./utils.js";
+import { compileNode, loadTemplate } from "./utils.js";
 
 export default class CustomersPage extends HTMLElement {
 
@@ -62,13 +62,10 @@ export default class CustomersPage extends HTMLElement {
 	async update() {
 		console.log("CustomersPage.update");
 
-		if (!this.slot) {
-			removeAllChildren(this);
-			return;
-		}
-
+		if (!this.slot)
+			delete this.state;
 		await this.render();
-		if (this.state)
+		if (!this.slot || this.state)
 			return;
 
 		const u = new URL("/api/customers", location.href);

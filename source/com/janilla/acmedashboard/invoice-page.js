@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { compileNode, loadTemplate, removeAllChildren } from "./utils.js";
+import { compileNode, loadTemplate } from "./utils.js";
 
 export default class InvoicePage extends HTMLElement {
 
@@ -62,19 +62,22 @@ export default class InvoicePage extends HTMLElement {
 	async update() {
 		console.log("InvoicePage.update");
 
+		if (!this.slot)
+			delete this.state;
 		await this.render();
-		if (this.slot && !this.state) {
-			const [nn, i] = await Promise.all([
-				fetch("/api/customers/names").then(x => x.json()),
-				this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
-			]);
-			this.state = {
-				customers: nn,
-				...i
-			}
-			await this.render();
-			history.replaceState(this.state, "");
+		if (!this.slot || this.state)
+			return;
+
+		const [nn, i] = await Promise.all([
+			fetch("/api/customers/names").then(x => x.json()),
+			this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
+		]);
+		this.state = {
+			customers: nn,
+			...i
 		}
+		history.replaceState(this.state, "");
+		await this.render();
 	}
 
 	async render() {

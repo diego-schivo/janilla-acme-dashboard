@@ -29,29 +29,30 @@ export default class DashboardCards extends HTMLElement {
 		super();
 	}
 
+	get state() {
+		return this.dashboardPage.state?.cards;
+	}
+
+	set state(x) {
+		if (x != null && !this.dashboardPage.state)
+			this.dashboardPage.state = {};
+		if (x != null || this.dashboardPage.state)
+			this.dashboardPage.state.cards = x;
+	}
+
 	connectedCallback() {
 		// console.log("DashboardCards.connectedCallback");
 
-		this.requestUpdate();
-	}
-
-	requestUpdate() {
-		// console.log("DashboardCards.requestUpdate");
-
-		if (typeof this.updateTimeout === "number")
-			clearTimeout(this.updateTimeout);
-
-		this.updateTimeout = setTimeout(async () => {
-			this.updateTimeout = undefined;
-			await this.update();
-		}, 1);
+		this.dashboardPage = this.closest("dashboard-page");
 	}
 
 	async update() {
 		console.log("DashboardCards.update");
 
+		if (!this.dashboardPage.slot)
+			this.state = undefined;
 		await this.render();
-		if (this.state)
+		if (!this.dashboardPage.slot || this.state)
 			return;
 
 		this.state = await (await fetch("/api/dashboard/cards")).json();
