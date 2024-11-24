@@ -28,6 +28,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.janilla.http.HeaderField;
 import com.janilla.http.Http;
@@ -46,9 +47,8 @@ public class CustomExchange extends HttpExchange {
 
 	protected Supplier<String> sessionEmail = Lazy.of(() -> {
 		var hh = getRequest().getHeaders();
-		var h = hh != null
-				? hh.stream().filter(x -> x.name().equals("cookie")).map(HeaderField::value).findFirst().orElse(null)
-				: null;
+		var h = hh != null ? hh.stream().filter(x -> x.name().equals("cookie")).map(HeaderField::value)
+				.collect(Collectors.joining("; ")) : null;
 		var cc = h != null ? Http.parseCookieHeader(h) : null;
 		var t = cc != null ? cc.get("session") : null;
 		Map<String, ?> p;

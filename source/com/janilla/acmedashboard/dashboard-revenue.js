@@ -63,16 +63,17 @@ export default class DashboardRevenue extends HTMLElement {
 	async render() {
 		console.log("DashboardRevenue.render");
 
-		if (!this.interpolate) {
-			const c = (await loadTemplate("dashboard-revenue")).content.cloneNode(true);
+		this.interpolators ??= loadTemplate("dashboard-revenue").then(t => {
+			const c = t.content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0])];
-		}
+			return [buildInterpolator(c), buildInterpolator(cc[0])];
+		});
+		const ii = await this.interpolators;
 
 		const k = this.state?.length ? Math.ceil(Math.max(...this.state.map(x => x.revenue)) / 1000) : undefined;
-		this.appendChild(this.interpolate[0]({
+		this.appendChild(ii[0]({
 			k,
-			content: this.state?.flatMap(x => this.interpolate[1]({
+			content: this.state?.flatMap(x => ii[1]({
 				...x,
 				style: `height: ${x.revenue / (1000 * k) * 100}%`,
 			}).cloneNode(true))

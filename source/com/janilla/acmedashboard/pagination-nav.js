@@ -64,28 +64,29 @@ export default class PaginationNav extends HTMLElement {
 		if (pc <= 1)
 			return;
 
-		if (!this.interpolate) {
-			const c = (await loadTemplate("pagination-nav")).content.cloneNode(true);
+		this.interpolators ??= loadTemplate("pagination-nav").then(t => {
+			const c = t.content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1]), buildInterpolator(cc[2])];
-		}
+			return [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1]), buildInterpolator(cc[2])];
+		});
+		const ii = await this.interpolators;
 
 		const u = new URL(this.dataset.href, location.href);
 		const p = this.dataset.page ? parseInt(this.dataset.page, 10) : 1;
-		this.appendChild(this.interpolate[0]({
+		this.appendChild(ii[0]({
 			prevLink: (() => {
 				u.searchParams.set("page", p - 1);
-				return this.interpolate[1]({
+				return ii[1]({
 					href: p > 1 ? u.pathname + u.search : undefined,
-					content: this.interpolate[3]("arrow-left").cloneNode(true)
+					content: ii[3]("arrow-left").cloneNode(true)
 				}).cloneNode(true);
 			})(),
 			links: Array.from({ length: pc }, (_, i) => i + 1)
 				.map(x => {
 					u.searchParams.set("page", x);
-					const c = this.interpolate[1]({
+					const c = ii[1]({
 						href: u.pathname + u.search,
-						content: this.interpolate[2](x).cloneNode(true)
+						content: ii[2](x).cloneNode(true)
 					}).cloneNode(true);
 					if (x === p)
 						c.querySelector("a").classList.add("active");
@@ -93,9 +94,9 @@ export default class PaginationNav extends HTMLElement {
 				}),
 			nextLink: (() => {
 				u.searchParams.set("page", p + 1);
-				return this.interpolate[1]({
+				return ii[1]({
 					href: p < pc ? u.pathname + u.search : undefined,
-					content: this.interpolate[3]("arrow-right").cloneNode(true)
+					content: ii[3]("arrow-right").cloneNode(true)
 				}).cloneNode(true);
 			})(),
 		}));

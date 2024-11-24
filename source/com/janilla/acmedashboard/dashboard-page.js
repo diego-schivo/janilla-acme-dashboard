@@ -21,9 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import { buildInterpolator } from "./dom.js";
+import { SlottableElement } from "./web-components.js";
 import { loadTemplate } from "./utils.js";
 
-export default class DashboardPage extends HTMLElement {
+export default class DashboardPage extends SlottableElement {
 
 	static get observedAttributes() {
 		return ["slot"];
@@ -33,43 +35,22 @@ export default class DashboardPage extends HTMLElement {
 		super();
 	}
 
-	connectedCallback() {
-		// console.log("DashboardPage.connectedCallback");
-
-		this.requestUpdate();
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("DashboardPage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue !== oldValue)
-			this.requestUpdate();
-	}
-
-	requestUpdate() {
-		// console.log("DashboardPage.requestUpdate");
-
-		if (typeof this.updateTimeout === "number")
-			clearTimeout(this.updateTimeout);
-
-		this.updateTimeout = setTimeout(async () => {
-			this.updateTimeout = undefined;
-			await this.update();
-		}, 1);
-	}
-
 	async update() {
 		console.log("DashboardPage.update");
-
-		if (!this.hasChildNodes()) {
-			if (!this.slot)
-				return;
-			const t = await loadTemplate("dashboard-page");
-			const c = t.content.cloneNode(true);
-			this.appendChild(c);
-		}
+		await super.update();
 
 		const cri = this.querySelectorAll("dashboard-cards, dashboard-revenue, dashboard-invoices");
 		await Promise.all([...cri].map(x => x.update()));
+	}
+
+	async render() {
+		console.log("DashboardPage.render");
+
+		this.interpolator ??= loadTemplate("dashboard-page").then(t => {
+			const c = t.content.cloneNode(true);
+			return buildInterpolator(c);
+		});
+		const i = await this.interpolator;
+		this.appendChild(i());
 	}
 }

@@ -73,13 +73,13 @@ export default class InvoiceStatus extends HTMLElement {
 	async update() {
 		// console.log("InvoiceStatus.update");
 
-		if (!this.interpolate) {
-			const t = await loadTemplate("invoice-status");
+		this.interpolator ??= loadTemplate("invoice-status").then(t => {
 			const c = t.content.cloneNode(true);
-			this.interpolate = buildInterpolator(c);
-		}
+			return buildInterpolator(c);
+		});
+		const i = await this.interpolator;
 
 		const k = this.dataset.value;
-		this.appendChild(this.interpolate(k ? statuses[k] : undefined));
+		this.appendChild(i(k ? statuses[k] : undefined));
 	}
 }

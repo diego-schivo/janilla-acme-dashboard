@@ -21,9 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import { buildInterpolator } from "./dom.js";
+import { SlottableElement } from "./web-components.js";
 import { loadTemplate } from "./utils.js";
 
-export default class LoginPage extends HTMLElement {
+export default class LoginPage extends SlottableElement {
+
+	static get observedAttributes() {
+		return ["slot"];
+	}
 
 	constructor() {
 		super();
@@ -31,11 +37,21 @@ export default class LoginPage extends HTMLElement {
 
 	async connectedCallback() {
 		// console.log("LoginPage.connectedCallback");
-
-		const t = await loadTemplate("login-page");
-		this.appendChild(t.content.cloneNode(true));
+		super.connectedCallback();
 
 		this.addEventListener("submit", this.handleSubmit);
+	}
+
+	async render() {
+		console.log("LoginPage.render");
+
+		this.interpolator ??= loadTemplate("login-page").then(t => {
+			const c = t.content.cloneNode(true);
+			return buildInterpolator(c);
+		});
+		const i = await this.interpolator;
+
+		this.appendChild(i());
 	}
 
 	handleSubmit = async event => {

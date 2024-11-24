@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 import { buildInterpolator } from "./dom.js";
+import { SlottableElement } from "./web-components.js";
 import { loadTemplate } from "./utils.js";
 
-export default class InvoicePage extends HTMLElement {
+export default class InvoicePage extends SlottableElement {
 
 	static get observedAttributes() {
 		return ["data-id", "slot"];
@@ -36,38 +37,13 @@ export default class InvoicePage extends HTMLElement {
 
 	connectedCallback() {
 		// console.log("InvoicePage.connectedCallback");
+		super.connectedCallback();
 
 		this.addEventListener("submit", this.handleSubmit);
-		this.requestUpdate();
 	}
 
-	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("InvoicePage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue !== oldValue)
-			this.requestUpdate();
-	}
-
-	requestUpdate() {
-		// console.log("InvoicePage.requestUpdate");
-
-		if (typeof this.updateTimeout === "number")
-			clearTimeout(this.updateTimeout);
-
-		this.updateTimeout = setTimeout(async () => {
-			this.updateTimeout = undefined;
-			await this.update();
-		}, 1);
-	}
-
-	async update() {
-		console.log("InvoicePage.update");
-
-		if (!this.slot)
-			delete this.state;
-		await this.render();
-		if (!this.slot || this.state)
-			return;
+	async computeState() {
+		console.log("InvoicePage.computeState");
 
 		const [nn, i] = await Promise.all([
 			fetch("/api/customers/names").then(x => x.json()),
@@ -78,25 +54,21 @@ export default class InvoicePage extends HTMLElement {
 			...i
 		}
 		history.replaceState(this.state, "");
-		await this.render();
 	}
 
 	async render() {
 		console.log("InvoicePage.render");
 
-		if (!this.slot)
-			return;
-
-		if (!this.interpolate) {
-			const t = await loadTemplate("invoice-page");
+		this.interpolators ??= loadTemplate("invoice-page").then(t => {
 			const c = t.content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0])];
-		}
+			return [buildInterpolator(c), buildInterpolator(cc[0])];
+		});
+		const ii = await this.interpolators;
 
-		this.appendChild(this.interpolate[0]({
+		this.appendChild(ii[0]({
 			...this.dataset,
-			customerOptions: this.state?.customers.map(x => this.interpolate[1](x).cloneNode(true))
+			customerOptions: this.state?.customers.map(x => ii[1](x).cloneNode(true))
 		}));
 
 		const f = this.querySelector("form");

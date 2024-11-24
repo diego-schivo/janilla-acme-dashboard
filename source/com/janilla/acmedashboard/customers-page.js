@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 import { buildInterpolator } from "./dom.js";
+import { SlottableElement } from "./web-components.js";
 import { loadTemplate } from "./utils.js";
 
-export default class CustomersPage extends HTMLElement {
+export default class CustomersPage extends SlottableElement {
 
 	static get observedAttributes() {
 		return ["data-query", "slot"];
@@ -36,38 +37,13 @@ export default class CustomersPage extends HTMLElement {
 
 	connectedCallback() {
 		// console.log("CustomersPage.connectedCallback");
+		super.connectedCallback();
 
 		this.addEventListener("input", this.handleInput);
-		this.requestUpdate();
 	}
 
-	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("CustomersPage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue !== oldValue)
-			this.requestUpdate();
-	}
-
-	requestUpdate() {
-		// console.log("CustomersPage.requestUpdate");
-
-		if (typeof this.updateTimeout === "number")
-			clearTimeout(this.updateTimeout);
-
-		this.updateTimeout = setTimeout(async () => {
-			this.updateTimeout = undefined;
-			await this.update();
-		}, 1);
-	}
-
-	async update() {
-		console.log("CustomersPage.update");
-
-		if (!this.slot)
-			delete this.state;
-		await this.render();
-		if (!this.slot || this.state)
-			return;
+	async computeState() {
+		console.log("CustomersPage.computeState");
 
 		const u = new URL("/api/customers", location.href);
 		const q = this.dataset.query;
@@ -75,23 +51,22 @@ export default class CustomersPage extends HTMLElement {
 			u.searchParams.append("query", q);
 		this.state = await (await fetch(u)).json();
 		history.replaceState(this.state, "");
-		await this.render();
 	}
 
 	async render() {
 		console.log("CustomersPage.render");
 
-		if (!this.interpolate) {
-			const t = await loadTemplate("customers-page");
+		this.interpolators ??= loadTemplate("customers-page").then(t => {
 			const c = t.content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
-		}
+			return [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
+		});
+		const ii = await this.interpolators;
 
-		this.appendChild(this.interpolate[0]({
+		this.appendChild(ii[0]({
 			rows: !this.state
-				? Array.from({ length: 6 }).map(_ => this.interpolate[1]().cloneNode(true))
-				: this.state.map(x => this.interpolate[2](x).cloneNode(true))
+				? Array.from({ length: 6 }).map(_ => ii[1]().cloneNode(true))
+				: this.state.map(x => ii[2](x).cloneNode(true))
 		}));
 
 		const q = this.dataset.query;

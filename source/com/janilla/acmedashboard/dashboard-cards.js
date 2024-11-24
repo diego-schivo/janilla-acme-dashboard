@@ -63,10 +63,11 @@ export default class DashboardCards extends HTMLElement {
 	async render() {
 		console.log("DashboardCards.render");
 
-		if (!this.interpolate) {
-			const c = (await loadTemplate("dashboard-cards")).content.cloneNode(true);
-			this.interpolate = buildInterpolator(c);
-		}
-		this.appendChild(this.interpolate(this.state));
+		this.interpolator ??= loadTemplate("dashboard-cards").then(t => {
+			const c = t.content.cloneNode(true);
+			return buildInterpolator(c);
+		});
+		const i = await this.interpolator;
+		this.appendChild(i(this.state));
 	}
 }

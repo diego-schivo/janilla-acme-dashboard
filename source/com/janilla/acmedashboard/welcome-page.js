@@ -21,9 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import { buildInterpolator } from "./dom.js";
+import { SlottableElement } from "./web-components.js";
 import { loadTemplate } from "./utils.js";
 
-export default class WelcomePage extends HTMLElement {
+export default class WelcomePage extends SlottableElement {
 
 	static get observedAttributes() {
 		return ["slot"];
@@ -33,47 +35,15 @@ export default class WelcomePage extends HTMLElement {
 		super();
 	}
 
-	connectedCallback() {
-		console.log("WelcomePage.connectedCallback");
-
-		this.requestUpdate();
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("WelcomePage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue !== oldValue)
-			this.requestUpdate();
-	}
-
-	requestUpdate() {
-		console.log("WelcomePage.requestUpdate");
-
-		if (typeof this.updateTimeout === "number")
-			clearTimeout(this.updateTimeout);
-
-		this.updateTimeout = setTimeout(async () => {
-			this.updateTimeout = undefined;
-			await this.update();
-		}, 1);
-	}
-
-	async update() {
-		console.log("WelcomePage.update");
-
-		if (this.slot)
-			await this.render();
-	}
-
 	async render() {
 		console.log("WelcomePage.render");
 
-		if (!this.interpolate) {
-			const t = await loadTemplate("welcome-page");
+		this.interpolator ??= loadTemplate("welcome-page").then(t => {
 			const c = t.content.cloneNode(true);
-			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
-		}
+			return buildInterpolator(c);
+		});
+		const i = await this.interpolator;
 
-		this.appendChild(this.interpolate[0]());
+		this.appendChild(i());
 	}
 }

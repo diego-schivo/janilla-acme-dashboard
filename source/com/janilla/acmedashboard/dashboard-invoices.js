@@ -63,16 +63,17 @@ export default class DashboardInvoices extends HTMLElement {
 	async render() {
 		console.log("DashboardInvoices.render");
 
-		if (!this.interpolate) {
-			const c = (await loadTemplate("dashboard-invoices")).content.cloneNode(true);
+		this.interpolators ??= loadTemplate("dashboard-invoices").then(t => {
+			const c = t.content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
-		}
+			return [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
+		});
+		const ii = await this.interpolators;
 
-		this.appendChild(this.interpolate[0]({
+		this.appendChild(ii[0]({
 			content: !this.state
-				? Array.from({ length: 6 }).map(_ => this.interpolate[1]().cloneNode(true))
-				: this.state.map(x => this.interpolate[2](x).cloneNode(true))
+				? Array.from({ length: 6 }).map(_ => ii[1]().cloneNode(true))
+				: this.state.map(x => ii[2](x).cloneNode(true))
 		}));
 	}
 }
