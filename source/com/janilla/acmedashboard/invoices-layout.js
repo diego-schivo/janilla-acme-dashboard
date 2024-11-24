@@ -21,7 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { compileNode, loadTemplate, removeAllChildren } from "./utils.js";
+import { buildInterpolator } from "./dom.js";
+import { loadTemplate, removeAllChildren } from "./utils.js";
 
 export default class InvoicesLayout extends HTMLElement {
 
@@ -36,7 +37,7 @@ export default class InvoicesLayout extends HTMLElement {
 
 		const c = (await loadTemplate("invoices-layout")).content.cloneNode(true);
 		const cc = [...c.querySelectorAll("template")].map(x => x.content);
-		this.interpolate = [compileNode(cc[0]), compileNode(cc[1])];
+		this.interpolate = [buildInterpolator(cc[0]), buildInterpolator(cc[1])];
 
 		this.shadowRoot.appendChild(c);
 		this.shadowRoot.querySelector("slot").addEventListener("slotchange", this.handleSlotchange);

@@ -21,7 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { compileNode, loadTemplate } from "./utils.js";
+import { buildInterpolator } from "./dom.js";
+import { loadTemplate } from "./utils.js";
 
 export default class BreadcrumbNav extends HTMLElement {
 
@@ -37,7 +38,7 @@ export default class BreadcrumbNav extends HTMLElement {
 		const t = await loadTemplate("breadcrumb-nav");
 		const c = t.content.cloneNode(true);
 		const cc = [...c.querySelectorAll("template")].map(x => x.content);
-		this.interpolate = [compileNode(cc[0]), compileNode(cc[1]), compileNode(cc[2])];
+		this.interpolate = [buildInterpolator(cc[0]), buildInterpolator(cc[1]), buildInterpolator(cc[2])];
 
 		this.shadowRoot.appendChild(c);
 

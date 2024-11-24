@@ -183,13 +183,6 @@ table {
 	}
 }
 
-acme-dashboard:has(login-page[slot]) {
-	align-items: center;
-	display: flex;
-	height: 100vh;
-	justify-content: center;
-}
-
 breadcrumb-nav {
 	font-family: "Lusitana";
 	font-size: 1.5rem;

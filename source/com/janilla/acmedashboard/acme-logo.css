@@ -3,6 +3,7 @@ acme-logo {
 	color: rgb(255, 255, 255);
 	display: flex;
 	font-family: "Lusitana";
+	line-height: 1;
 
 	hero-icon {
 		transform: rotate(15deg);

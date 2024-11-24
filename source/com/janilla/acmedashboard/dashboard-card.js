@@ -21,7 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { compileNode, loadTemplate } from "./utils.js";
+import { buildInterpolator } from "./dom.js";
+import { loadTemplate } from "./utils.js";
 
 const iconNameByType = {
 	collected: "banknotes",
@@ -42,7 +43,7 @@ export default class DashboardCard extends HTMLElement {
 		// console.log("DashboardCard.connectedCallback");
 
 		const c = (await loadTemplate("dashboard-card")).content.cloneNode(true);
-		const i = compileNode(c);
+		const i = buildInterpolator(c);
 		this.shadowRoot.appendChild(i({
 			...this.dataset,
 			icon: iconNameByType[this.dataset.type]

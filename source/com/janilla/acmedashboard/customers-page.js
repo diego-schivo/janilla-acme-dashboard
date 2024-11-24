@@ -21,7 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { compileNode, loadTemplate } from "./utils.js";
+import { buildInterpolator } from "./dom.js";
+import { loadTemplate } from "./utils.js";
 
 export default class CustomersPage extends HTMLElement {
 
@@ -84,7 +85,7 @@ export default class CustomersPage extends HTMLElement {
 			const t = await loadTemplate("customers-page");
 			const c = t.content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			this.interpolate = [compileNode(c), compileNode(cc[0]), compileNode(cc[1])];
+			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
 		}
 
 		this.appendChild(this.interpolate[0]({

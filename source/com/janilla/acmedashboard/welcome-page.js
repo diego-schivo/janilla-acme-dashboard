@@ -25,14 +25,55 @@ import { loadTemplate } from "./utils.js";
 
 export default class WelcomePage extends HTMLElement {
 
+	static get observedAttributes() {
+		return ["slot"];
+	}
+
 	constructor() {
 		super();
 	}
 
-	async connectedCallback() {
-		// console.log("WelcomePage.connectedCallback");
+	connectedCallback() {
+		console.log("WelcomePage.connectedCallback");
 
-		const t = await loadTemplate("welcome-page");
-		this.appendChild(t.content.cloneNode(true));
+		this.requestUpdate();
+	}
+
+	attributeChangedCallback(name, oldValue, newValue) {
+		// console.log("WelcomePage.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
+
+		if (newValue !== oldValue)
+			this.requestUpdate();
+	}
+
+	requestUpdate() {
+		console.log("WelcomePage.requestUpdate");
+
+		if (typeof this.updateTimeout === "number")
+			clearTimeout(this.updateTimeout);
+
+		this.updateTimeout = setTimeout(async () => {
+			this.updateTimeout = undefined;
+			await this.update();
+		}, 1);
+	}
+
+	async update() {
+		console.log("WelcomePage.update");
+
+		if (this.slot)
+			await this.render();
+	}
+
+	async render() {
+		console.log("WelcomePage.render");
+
+		if (!this.interpolate) {
+			const t = await loadTemplate("welcome-page");
+			const c = t.content.cloneNode(true);
+			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
+		}
+
+		this.appendChild(this.interpolate[0]());
 	}
 }

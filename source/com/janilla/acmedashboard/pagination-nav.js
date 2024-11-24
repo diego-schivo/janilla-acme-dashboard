@@ -21,7 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { compileNode, loadTemplate, removeAllChildren } from "./utils.js";
+import { buildInterpolator } from "./dom.js";
+import { loadTemplate, removeAllChildren } from "./utils.js";
 
 export default class PaginationNav extends HTMLElement {
 
@@ -59,8 +60,6 @@ export default class PaginationNav extends HTMLElement {
 	async update() {
 		console.log("PaginationNav.update");
 
-		// removeAllChildren(this);
-
 		const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount, 10) : 0;
 		if (pc <= 1)
 			return;
@@ -68,7 +67,7 @@ export default class PaginationNav extends HTMLElement {
 		if (!this.interpolate) {
 			const c = (await loadTemplate("pagination-nav")).content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			this.interpolate = [compileNode(c), compileNode(cc[0]), compileNode(cc[1]), compileNode(cc[2])];
+			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1]), buildInterpolator(cc[2])];
 		}
 
 		const u = new URL(this.dataset.href, location.href);

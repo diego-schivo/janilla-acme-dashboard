@@ -21,7 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { compileNode, loadTemplate } from "./utils.js";
+import { buildInterpolator } from "./dom.js";
+import { loadTemplate } from "./utils.js";
 
 const statuses = {
 	"PAID": {
@@ -75,7 +76,7 @@ export default class InvoiceStatus extends HTMLElement {
 		if (!this.interpolate) {
 			const t = await loadTemplate("invoice-status");
 			const c = t.content.cloneNode(true);
-			this.interpolate = compileNode(c);
+			this.interpolate = buildInterpolator(c);
 		}
 
 		const k = this.dataset.value;

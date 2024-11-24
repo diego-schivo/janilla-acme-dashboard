@@ -21,7 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { compileNode, loadTemplate } from "./utils.js";
+import { buildInterpolator } from "./dom.js";
+import { loadTemplate } from "./utils.js";
 
 export default class DashboardRevenue extends HTMLElement {
 
@@ -65,7 +66,7 @@ export default class DashboardRevenue extends HTMLElement {
 		if (!this.interpolate) {
 			const c = (await loadTemplate("dashboard-revenue")).content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			this.interpolate = [compileNode(c), compileNode(cc[0])];
+			this.interpolate = [buildInterpolator(c), buildInterpolator(cc[0])];
 		}
 
 		const k = this.state?.length ? Math.ceil(Math.max(...this.state.map(x => x.revenue)) / 1000) : undefined;

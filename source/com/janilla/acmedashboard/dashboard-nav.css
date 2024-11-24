@@ -5,7 +5,6 @@ dashboard-nav {
 	gap: 0.5rem;
 	height: 100%;
 	padding: 1rem 0.5rem;
-	width: 16rem;
 
 	header {
 		align-items: flex-end;
@@ -13,24 +12,40 @@ dashboard-nav {
 		border-radius: 0.5rem;
 		box-sizing: border-box;
 		display: flex;
-		height: 10rem;
+		height: 5rem;
 		padding: 0.75rem;
+
+		@media (min-width: 768px) {
+			height: 10rem;
+		}
 	}
 	
 	ul {
 		display: flex;
-		flex-direction: column;
 		flex-grow: 1;
 		gap: 0.5rem;
+
+		@media (min-width: 768px) {
+			flex-direction: column;
+		}
 	}
 		
 	li {
 		background: rgb(249, 250, 251);
 		border-radius: 0.375rem;
 		color: rgb(0, 0, 0);
-	
-		&:empty {
+
+		&:not(:last-child) {
 			flex-grow: 1;
+		}
+
+		&:empty {
+			display: none;
+
+			@media (min-width: 768px) {
+				display: block;
+				flex-grow: 1;
+			}
 		}
 		
 		&.active,
@@ -48,9 +63,18 @@ dashboard-nav {
 		gap: 0.5rem;
 		font-size: 0.875rem;
 		font-weight: 500;
+		justify-content: center;
 		line-height: 1.25rem;
 		height: 48px;
 		padding: 0.5rem 0.75rem;
+	}
+
+	span {
+		display: none;
+
+		@media (min-width: 768px) {
+			display: inline;
+		}
 	}
 	
 	button {
