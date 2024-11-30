@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const map = new Map();
+const documents = {};
 const parser = new DOMParser();
 
 export default class HeroIcon extends HTMLElement {
@@ -30,18 +30,17 @@ export default class HeroIcon extends HTMLElement {
 		super();
 	}
 
-	async connectedCallback() {
+	connectedCallback() {
 		// console.log("HeroIcon.connectedCallback");
 
 		const n = this.dataset.name;
 		if (!n)
 			return;
 
-		if (!map.has(n))
-			map.set(n, fetch(`/images/heroicons/${n}.svg`).then(x => x.text()).then(x => {
-				x = x.replace("#0F172A", "currentColor");
-				return parser.parseFromString(x, "image/svg+xml");
-			}));
-		map.get(n).then(d => this.appendChild(d.firstChild.cloneNode(true)));
+		documents[n] ??= fetch(`/images/heroicons/${n}.svg`).then(x => x.text()).then(x => {
+			x = x.replace("#0F172A", "currentColor");
+			return parser.parseFromString(x, "image/svg+xml");
+		});
+		documents[n].then(d => this.appendChild(d.firstChild.cloneNode(true)));
 	}
 }

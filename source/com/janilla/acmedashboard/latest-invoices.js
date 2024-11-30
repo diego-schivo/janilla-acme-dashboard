@@ -24,7 +24,7 @@
 import { buildInterpolator } from "./dom.js";
 import { loadTemplate } from "./utils.js";
 
-export default class DashboardInvoices extends HTMLElement {
+export default class LatestInvoices extends HTMLElement {
 
 	constructor() {
 		super();
@@ -42,13 +42,13 @@ export default class DashboardInvoices extends HTMLElement {
 	}
 
 	connectedCallback() {
-		// console.log("DashboardInvoices.connectedCallback");
+		// console.log("LatestInvoices.connectedCallback");
 
 		this.dashboardPage = this.closest("dashboard-page");
 	}
 
 	async update() {
-		console.log("DashboardInvoices.update");
+		console.log("LatestInvoices.update");
 
 		if (!this.dashboardPage.slot)
 			this.state = undefined;
@@ -61,9 +61,9 @@ export default class DashboardInvoices extends HTMLElement {
 	}
 
 	async render() {
-		console.log("DashboardInvoices.render");
+		console.log("LatestInvoices.render");
 
-		this.interpolators ??= loadTemplate("dashboard-invoices").then(t => {
+		this.interpolators ??= loadTemplate("latest-invoices").then(t => {
 			const c = t.content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
 			return [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];

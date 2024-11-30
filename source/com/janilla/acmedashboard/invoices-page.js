@@ -63,7 +63,7 @@ export default class InvoicesPage extends SlottableElement {
 		this.interpolators ??= loadTemplate("invoices-page").then(t => {
 			const c = t.content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			return [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
+			return [buildInterpolator(c), ...cc.map(x => buildInterpolator(x))];
 		});
 		const ii = await this.interpolators;
 
@@ -73,12 +73,18 @@ export default class InvoicesPage extends SlottableElement {
 			u.searchParams.append("query", q);
 		const p = this.dataset.page;
 		this.appendChild(ii[0]({
-			rows: !this.state
-				? Array.from({ length: 6 }).map(_ => ii[1]().cloneNode(true))
-				: this.state.items.map(x => ii[2]({
+			articles: this.state
+				? this.state.items.map(x => ii[1]({
 					...x,
 					href: `/dashboard/invoices/${x.id}/edit`
-				}).cloneNode(true)),
+				}).cloneNode(true))
+				: Array.from({ length: 6 }).map(_ => ii[2]().cloneNode(true)),
+			rows: this.state
+				? this.state.items.map(x => ii[3]({
+					...x,
+					href: `/dashboard/invoices/${x.id}/edit`
+				}).cloneNode(true))
+				: Array.from({ length: 6 }).map(_ => ii[4]().cloneNode(true)),
 			pagination: {
 				href: u.pathname + u.search,
 				page: p ?? 1,
@@ -109,15 +115,23 @@ export default class InvoicesPage extends SlottableElement {
 
 	handleSubmit = async event => {
 		console.log("InvoicesPage.handleSubmit", event);
-
 		event.preventDefault();
-		const fd = new FormData(event.target);
-		const r = await fetch(`/api/invoices/${fd.get("id")}`, { method: "DELETE" });
-		if (r.ok)
-			await this.update();
-		else {
-			const t = await r.text();
-			alert(t);
+
+		if (event.submitter.getAttribute("aria-disabled") === "true")
+			return;
+		event.submitter.setAttribute("aria-disabled", "true");
+
+		try {
+			const fd = new FormData(event.target);
+			const r = await fetch(`/api/invoices/${fd.get("id")}`, { method: "DELETE" });
+			if (r.ok)
+				await this.update();
+			else {
+				const t = await r.text();
+				alert(t);
+			}
+		} finally {
+			event.submitter.setAttribute("aria-disabled", "false");
 		}
 	}
 }

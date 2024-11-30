@@ -34,35 +34,8 @@ public class DashboardApi {
 
 	public Persistence persistence;
 
-//	@Handle(method = "GET", path = "/api/dashboard")
-//	public Data get() {
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		var ic = persistence.crud(Invoice.class);
-//		var rc = persistence.crud(Revenue.class);
-//		return new Data(
-//				ic.read(ic.filter("status", Invoice.Status.PAID)).map(Invoice::amount).reduce(BigDecimal.ZERO,
-//						BigDecimal::add),
-//				ic.read(ic.filter("status", Invoice.Status.PENDING)).map(Invoice::amount).reduce(BigDecimal.ZERO,
-//						BigDecimal::add),
-//				ic.count(), persistence.crud(Customer.class).count(), rc.read(rc.list()).toList(),
-//				ic.read(ic.list(0, 5).ids()).map(x -> Invoice2.of(x, persistence)).toList());
-//	}
-//
-//	public record Data(BigDecimal paidAmount, BigDecimal pendingAmount, long invoiceCount, long customerCount,
-//			List<Revenue> revenue, List<Invoice2> invoices) {
-//	}
-
 	@Handle(method = "GET", path = "/api/dashboard/cards")
 	public Cards getCards() {
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
 		var ic = persistence.crud(Invoice.class);
 		return new Cards(
 				ic.read(ic.filter("status", Invoice.Status.PAID)).map(Invoice::amount).reduce(BigDecimal.ZERO,
@@ -77,24 +50,13 @@ public class DashboardApi {
 
 	@Handle(method = "GET", path = "/api/dashboard/revenue")
 	public List<Revenue> getRevenue() {
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
 		var rc = persistence.crud(Revenue.class);
 		return rc.read(rc.list()).toList();
 	}
 
 	@Handle(method = "GET", path = "/api/dashboard/invoices")
 	public List<Invoice2> getInvoices() {
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
 		var ic = persistence.crud(Invoice.class);
-		var rc = persistence.crud(Revenue.class);
 		return ic.read(ic.list(0, 5).ids()).map(x -> Invoice2.of(x, persistence)).toList();
 	}
 }

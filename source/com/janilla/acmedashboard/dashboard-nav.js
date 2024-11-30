@@ -63,10 +63,18 @@ export default class DashboardNav extends HTMLElement {
 
 	handleSubmit = async event => {
 		console.log("DashboardNav.handleSubmit", event);
-
 		event.preventDefault();
-		await fetch("/api/authentication", { method: "DELETE" });
-		history.pushState({}, "", "/login");
-		dispatchEvent(new CustomEvent("popstate"));
+
+		if (event.submitter.getAttribute("aria-disabled") === "true")
+			return;
+		event.submitter.setAttribute("aria-disabled", "true");
+
+		try {
+			await fetch("/api/authentication", { method: "DELETE" });
+			history.pushState({}, "", "/login");
+			dispatchEvent(new CustomEvent("popstate"));
+		} finally {
+			event.submitter.setAttribute("aria-disabled", "false");
+		}
 	}
 }

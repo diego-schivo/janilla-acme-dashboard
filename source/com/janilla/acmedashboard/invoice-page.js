@@ -78,31 +78,40 @@ export default class InvoicePage extends SlottableElement {
 
 	handleSubmit = async event => {
 		console.log("InvoicePage.handleSubmit", event);
-
 		event.preventDefault();
-		const i = Object.fromEntries(new FormData(event.target));
-		const mm = {
-			customerId: i.customerId ? "" : "Please select a customer.",
-			amount: i.amount ? "" : "Please enter an amount greater than $0.",
-			status: i.status ? "" : "Please select an invoice status."
-		};
-		Object.entries(mm).forEach(([k, v]) => this.querySelector(`.${k}-error`).innerHTML = v.length ? `<p>${v}</p>` : "");
-		const v = Object.values(mm).every(x => !x.length);
-		this.querySelector(".error").innerHTML = v ? "" : `<p>Missing Fields. Failed to ${this.dataset.title}.</p>`;
-		if (!v)
-			return;
 
-		const r = await fetch(this.dataset.id ? `/api/invoices/${this.dataset.id}` : "/api/invoices", {
-			method: this.dataset.id ? "PUT" : "POST",
-			headers: { "content-type": "application/json" },
-			body: JSON.stringify(i)
-		});
-		if (r.ok) {
-			history.pushState({}, "", "/dashboard/invoices");
-			dispatchEvent(new CustomEvent("popstate"));
-		} else {
-			const t = await r.text();
-			this.querySelector(".error").innerHTML = `<p>${t}</p>`;
+		if (event.submitter.getAttribute("aria-disabled") === "true")
+			return;
+		event.submitter.setAttribute("aria-disabled", "true");
+
+		try {
+			const d = Object.fromEntries(new FormData(event.target));
+			const mm = {
+				customerId: d.customerId ? "" : "Please select a customer.",
+				amount: d.amount ? "" : "Please enter an amount greater than $0.",
+				status: d.status ? "" : "Please select an invoice status."
+			};
+			Object.entries(mm).forEach(([k, v]) => this.querySelector(`.${k}-error`).innerHTML = v.length ? `<p>${v}</p>` : "");
+			const v = Object.values(mm).every(x => !x.length);
+			this.querySelector(".error").innerHTML = v ? "" : `<p>Missing Fields. Failed to ${this.dataset.title}.</p>`;
+			if (!v)
+				return;
+
+			const r = await fetch(this.dataset.id ? `/api/invoices/${this.dataset.id}` : "/api/invoices", {
+				method: this.dataset.id ? "PUT" : "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify(d)
+			});
+
+			if (r.ok) {
+				history.pushState({}, "", "/dashboard/invoices");
+				dispatchEvent(new CustomEvent("popstate"));
+			} else {
+				const t = await r.text();
+				this.querySelector(".error").innerHTML = `<p>${t}</p>`;
+			}
+		} finally {
+			event.submitter.setAttribute("aria-disabled", "false");
 		}
 	}
 }

@@ -39,7 +39,7 @@ export default class DashboardPage extends SlottableElement {
 		console.log("DashboardPage.update");
 		await super.update();
 
-		const cri = this.querySelectorAll("dashboard-cards, dashboard-revenue, dashboard-invoices");
+		const cri = this.querySelectorAll("card-wrapper, revenue-chart, latest-invoices");
 		await Promise.all([...cri].map(x => x.update()));
 	}
 

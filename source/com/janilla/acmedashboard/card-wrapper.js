@@ -24,31 +24,31 @@
 import { buildInterpolator } from "./dom.js";
 import { loadTemplate } from "./utils.js";
 
-export default class DashboardRevenue extends HTMLElement {
+export default class CardWrapper extends HTMLElement {
 
 	constructor() {
 		super();
 	}
 
 	get state() {
-		return this.dashboardPage.state?.revenue;
+		return this.dashboardPage.state?.cards;
 	}
 
 	set state(x) {
 		if (x != null && !this.dashboardPage.state)
 			this.dashboardPage.state = {};
 		if (x != null || this.dashboardPage.state)
-			this.dashboardPage.state.revenue = x;
+			this.dashboardPage.state.cards = x;
 	}
 
 	connectedCallback() {
-		// console.log("DashboardRevenue.connectedCallback");
+		// console.log("CardWrapper.connectedCallback");
 
 		this.dashboardPage = this.closest("dashboard-page");
 	}
 
 	async update() {
-		console.log("DashboardRevenue.update");
+		console.log("CardWrapper.update");
 
 		if (!this.dashboardPage.slot)
 			this.state = undefined;
@@ -56,27 +56,18 @@ export default class DashboardRevenue extends HTMLElement {
 		if (!this.dashboardPage.slot || this.state)
 			return;
 
-		this.state = await (await fetch("/api/dashboard/revenue")).json();
+		this.state = await (await fetch("/api/dashboard/cards")).json();
 		await this.render();
 	}
 
 	async render() {
-		console.log("DashboardRevenue.render");
+		console.log("CardWrapper.render");
 
-		this.interpolators ??= loadTemplate("dashboard-revenue").then(t => {
+		this.interpolator ??= loadTemplate("card-wrapper").then(t => {
 			const c = t.content.cloneNode(true);
-			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			return [buildInterpolator(c), buildInterpolator(cc[0])];
+			return buildInterpolator(c);
 		});
-		const ii = await this.interpolators;
-
-		const k = this.state?.length ? Math.ceil(Math.max(...this.state.map(x => x.revenue)) / 1000) : undefined;
-		this.appendChild(ii[0]({
-			k,
-			content: this.state?.flatMap(x => ii[1]({
-				...x,
-				style: `height: ${x.revenue / (1000 * k) * 100}%`,
-			}).cloneNode(true))
-		}));
+		const i = await this.interpolator;
+		this.appendChild(i(this.state));
 	}
 }

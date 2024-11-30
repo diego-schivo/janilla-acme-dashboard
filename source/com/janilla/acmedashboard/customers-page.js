@@ -59,14 +59,17 @@ export default class CustomersPage extends SlottableElement {
 		this.interpolators ??= loadTemplate("customers-page").then(t => {
 			const c = t.content.cloneNode(true);
 			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			return [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
+			return [buildInterpolator(c), ...cc.map(x => buildInterpolator(x))];
 		});
 		const ii = await this.interpolators;
 
 		this.appendChild(ii[0]({
-			rows: !this.state
-				? Array.from({ length: 6 }).map(_ => ii[1]().cloneNode(true))
-				: this.state.map(x => ii[2](x).cloneNode(true))
+			articles: this.state
+				? this.state.map(x => ii[1](x).cloneNode(true))
+				: Array.from({ length: 6 }).map(_ => ii[2]().cloneNode(true)),
+			rows: this.state
+				? this.state.map(x => ii[3](x).cloneNode(true))
+				: Array.from({ length: 6 }).map(_ => ii[4]().cloneNode(true))
 		}));
 
 		const q = this.dataset.query;

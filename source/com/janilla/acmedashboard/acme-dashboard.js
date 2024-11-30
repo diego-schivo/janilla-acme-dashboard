@@ -23,6 +23,16 @@
  */
 import { loadTemplate } from "./utils.js";
 
+function updateElement(element, active, more) {
+	if (active)
+		element.setAttribute("slot", "content");
+	else
+		element.removeAttribute("slot");
+
+	if (more)
+		more(element, active);
+}
+
 export default class AcmeDashboard extends HTMLElement {
 
 	constructor() {
@@ -63,46 +73,42 @@ export default class AcmeDashboard extends HTMLElement {
 		updateElement(this.querySelector("login-page"), lp === "/login");
 		updateElement(this.querySelector("dashboard-layout"), lp === "/dashboard" || lp.startsWith("/dashboard/"));
 		updateElement(this.querySelector("dashboard-page"), lp === "/dashboard", (el, a) => {
-			if (a)
-				el.state = state;
-			else
-				delete el.state;
+			el.state = a ? state : undefined;
 		});
 		updateElement(this.querySelector("invoices-layout"), lp === "/dashboard/invoices" || lp.startsWith("/dashboard/invoices/"));
 		updateElement(this.querySelector("invoices-page"), lp === "/dashboard/invoices", (el, a) => {
+			el.state = a ? state : undefined;
 			if (a) {
-				el.state = state;
 				const u = new URL(location.href);
 				el.setAttribute("data-query", u.searchParams.get("query") ?? "");
 				el.setAttribute("data-page", u.searchParams.get("page") ?? "");
 			} else {
-				delete el.state;
 				el.removeAttribute("data-query");
 				el.removeAttribute("data-page");
 			}
 		});
 		const m = lp === "/dashboard/invoices/create" ? [] : lp.match(/\/dashboard\/invoices\/(\d+)\/edit/);
 		updateElement(this.querySelector("invoice-page"), !!m, (el, a) => {
+			el.state = a ? state : undefined;
 			if (a) {
-				el.state = state;
-				el.setAttribute("data-id", m[1] ?? "");
 				el.setAttribute("data-title", m[1] ? "Edit Invoice" : "Create Invoice");
+				el.setAttribute("data-id", m[1] ?? "");
 			} else {
-				delete el.state;
-				el.removeAttribute("data-id");
 				el.removeAttribute("data-title");
+				el.removeAttribute("data-id");
 			}
 		});
 		updateElement(this.querySelector("customers-page"), lp === "/dashboard/customers", (el, a) => {
-		if (a) {
-			el.state = state;
-			const u = new URL(location.href);
-			el.setAttribute("data-query", u.searchParams.get("query") ?? "");
-		} else {
-			delete el.state;
-			el.removeAttribute("data-query");
-		}
+			el.state = a ? state : undefined;
+			if (a) {
+				const u = new URL(location.href);
+				el.setAttribute("data-query", u.searchParams.get("query") ?? "");
+			} else {
+				el.removeAttribute("data-query");
+			}
 		});
+
+		document.title = [this.querySelector("[slot][data-title]"), this].filter(x => x).map(x => x.dataset.title).join(" | ");
 	}
 
 	handleClick = event => {
@@ -123,14 +129,4 @@ export default class AcmeDashboard extends HTMLElement {
 
 		this.updateContent(event.state);
 	}
-}
-
-function updateElement(element, active, more) {
-	if (active)
-		element.setAttribute("slot", "content");
-	else
-		element.removeAttribute("slot");
-
-	if (more)
-		more(element, active);
 }

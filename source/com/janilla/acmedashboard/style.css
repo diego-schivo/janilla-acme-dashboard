@@ -1,14 +1,14 @@
 @import "base.css";
 @import "acme-logo.css";
+@import "card-wrapper.css";
 @import "customers-page.css";
-@import "dashboard-cards.css";
-@import "dashboard-invoices.css";
 @import "dashboard-page.css";
-@import "dashboard-revenue.css";
 @import "hero-icon.css";
 @import "invoice-page.css";
 @import "invoice-status.css";
 @import "invoices-page.css";
+@import "latest-invoices.css";
 @import "login-page.css";
 @import "pagination-nav.css";
+@import "revenue-chart.css";
 @import "welcome-page.css";

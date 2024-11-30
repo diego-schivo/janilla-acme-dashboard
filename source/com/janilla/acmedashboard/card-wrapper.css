@@ -1,0 +1,20 @@
+card-wrapper {
+	> article {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+
+		@media (min-width: 768px) {
+			flex-direction: row;
+			gap: 1rem;
+		}
+	}
+
+	single-card intl-format:empty {
+		background: rgb(243, 244, 246);
+		border-radius: 0.25rem;
+		display: inline-block;
+		height: 1.5rem;
+		width: 4rem;
+	}
+}

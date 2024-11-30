@@ -37,15 +37,16 @@ public class AuthenticationApi {
 	public Persistence persistence;
 
 	@Handle(method = "POST", path = "/api/authentication")
-	public void create(User user, CustomExchange exchange) {
+	public User create(User user, CustomExchange exchange) {
 		var uc = persistence.crud(User.class);
 		var u = uc.read(uc.find("email", user.email()));
 		if (!u.password().equals(user.password()))
-			throw new RuntimeException();
+			return null;
 		var h = Map.of("alg", "HS256", "typ", "JWT");
 		var p = Map.of("loggedInAs", u.email());
 		var t = Jwt.generateToken(h, p, configuration.getProperty("acmedashboard.jwt.key"));
 		exchange.setSessionCookie(t);
+		return u;
 	}
 
 	@Handle(method = "GET", path = "/api/authentication")

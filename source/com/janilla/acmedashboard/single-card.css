@@ -1,4 +1,5 @@
 @import "base.css";
+@import "hero-icon.css";
 
 :host {
 	background: rgb(249, 250, 251);

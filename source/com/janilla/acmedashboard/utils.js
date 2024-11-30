@@ -21,19 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const templates = new Map();
+const templates = {};
 
 export async function loadTemplate(name) {
-	if (!templates.has(name))
-		templates.set(name, fetch(`/${name}.html`).then(x => x.text()).then(x => {
-			const t = document.createElement("template");
-			t.innerHTML = x;
-			return t;
-		}));
-	return await templates.get(name);
+	templates[name] ??= fetch(`/${name}.html`).then(x => x.text()).then(x => {
+		const t = document.createElement("template");
+		t.innerHTML = x;
+		return t;
+	});
+	return await templates[name];
 }
 
 export function removeAllChildren(element) {
 	while (element.firstChild)
-		element.removeChild(element.firstChild);
+		element.removeChild(element.lastChild);
 }

@@ -9,6 +9,74 @@
 </header>
 
 <section>
+	<!--${articles}-->
+
+	<template>
+		<article>
+			<ul>
+				<li>
+					<img loading="lazy" src="${imageUrl}" />
+					<span>${name}</span>
+					<span>${email}</span>
+				</li>
+				<li>
+					<dl>
+						<div>
+							<dt>Pending:</dt>
+							<dd>
+								<intl-format data-type="amount" data-value="${pendingAmount}"></intl-format>
+							</dd>
+						</div>
+						<div>
+							<dt>Paid:</dt>
+							<dd>
+								<intl-format data-type="amount" data-value="${paidAmount}"></intl-format>
+							</dd>
+						</div>
+					</dl>
+				</li>
+				<li>
+					<p>
+						<span>${invoiceCount}</span> invoices
+					</p>
+				</li>
+			</ul>
+		</article>
+	</template>
+
+	<template>
+		<article class="skeleton">
+			<ul>
+				<li>
+					<div></div>
+					<div></div>
+					<div></div>
+				</li>
+				<li>
+					<dl>
+						<div>
+							<dd>
+								<div></div>
+							</dd>
+						</div>
+						<div>
+							<dd>
+								<div></div>
+							</dd>
+						</div>
+					</dl>
+				</li>
+				<li>
+					<p>
+						<div></div>
+					</p>
+				</li>
+			</ul>
+		</article>
+	</template>
+</section>
+
+<section>
 	<table>
 		<thead>
 			<tr>
@@ -27,26 +95,6 @@
 	<template>
 		<tr>
 			<td>
-				<div></div>
-			</td>
-			<td>
-				<div></div>
-			</td>
-			<td>
-				<div></div>
-			</td>
-			<td>
-				<div></div>
-			</td>
-			<td>
-				<div></div>
-			</td>
-		</tr>
-	</template>
-
-	<template>
-		<tr>
-			<td>
 				<img loading="lazy" src="${imageUrl}" />
 				<span>${name}</span>
 			</td>
@@ -57,6 +105,26 @@
 			</td>
 			<td>
 				<intl-format data-type="amount" data-value="${paidAmount}"></intl-format>
+			</td>
+		</tr>
+	</template>
+
+	<template>
+		<tr>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
 			</td>
 		</tr>
 	</template>

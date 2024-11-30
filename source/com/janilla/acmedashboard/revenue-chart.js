@@ -21,62 +21,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate, removeAllChildren } from "./utils.js";
+import { buildInterpolator } from "./dom.js";
+import { loadTemplate } from "./utils.js";
 
 export default class RevenueChart extends HTMLElement {
 
-	static get observedAttributes() {
-		return ["data-k"];
-	}
-
 	constructor() {
 		super();
-
-		this.attachShadow({ mode: "open" });
 	}
 
-	async connectedCallback() {
+	get state() {
+		return this.dashboardPage.state?.revenue;
+	}
+
+	set state(x) {
+		if (x != null && !this.dashboardPage.state)
+			this.dashboardPage.state = {};
+		if (x != null || this.dashboardPage.state)
+			this.dashboardPage.state.revenue = x;
+	}
+
+	connectedCallback() {
 		// console.log("RevenueChart.connectedCallback");
 
-		const t = await loadTemplate("revenue-chart");
-		this.shadowRoot.appendChild(t.content.cloneNode(true));
-
-		this.requestUpdate();
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("RevenueChart.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue === oldValue)
-			return;
-
-		this.requestUpdate();
-	}
-
-	requestUpdate() {
-		// console.log("RevenueChart.requestUpdate");
-
-		if (typeof this.updateTimeout === "number")
-			clearTimeout(this.updateTimeout);
-
-		this.updateTimeout = setTimeout(async () => {
-			this.updateTimeout = undefined;
-			await this.update();
-		}, 1);
+		this.dashboardPage = this.closest("dashboard-page");
 	}
 
 	async update() {
 		console.log("RevenueChart.update");
 
-		const y = this.shadowRoot.querySelector(".y");
-		if (!y)
+		if (!this.dashboardPage.slot)
+			this.state = undefined;
+		await this.render();
+		if (!this.dashboardPage.slot || this.state)
 			return;
 
-		removeAllChildren(y);
-		y.append(...Array.from({ length: parseInt(this.dataset.k, 10) + 1 }, (_, i) => {
-			const p = document.createElement("p");
-			p.textContent = `$${i}K`;
-			return p;
+		this.state = await (await fetch("/api/dashboard/revenue")).json();
+		await this.render();
+	}
+
+	async render() {
+		console.log("RevenueChart.render");
+
+		this.interpolators ??= loadTemplate("revenue-chart").then(t => {
+			const c = t.content.cloneNode(true);
+			const cc = [...c.querySelectorAll("template")].map(x => x.content);
+			return [buildInterpolator(c), ...cc.map(x => buildInterpolator(x))];
+		});
+		const ii = await this.interpolators;
+
+		const k = this.state?.length ? Math.ceil(Math.max(...this.state.map(x => x.revenue)) / 1000) : undefined;
+		this.appendChild(ii[0]({
+			y: Array.from({ length: k + 1 }, (_, i) => ii[1](`$${i}K`).cloneNode(true)),
+			x: this.state?.flatMap(x => ii[2]({
+				...x,
+				style: `height: ${x.revenue / (1000 * k) * 100}%`,
+			}).cloneNode(true))
 		}));
 	}
 }

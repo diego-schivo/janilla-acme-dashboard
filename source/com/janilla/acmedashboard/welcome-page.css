@@ -36,6 +36,7 @@ welcome-page {
 			
 			&:first-child {
 				background-color: rgb(249, 250, 251);
+				border-radius: 0.5rem;
 				padding: 2.5rem 1.5rem;
 
 				@media (min-width: 768px) {

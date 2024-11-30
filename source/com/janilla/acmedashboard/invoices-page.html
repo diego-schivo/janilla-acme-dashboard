@@ -10,7 +10,54 @@
 	</a>
 </header>
 
-<section class="table">
+<section>
+	<!--${articles}-->
+
+	<template>
+		<article>
+			<div>
+				<img loading="lazy" src="${customer.imageUrl}" />
+				<span>${customer.name}</span>
+				<span>${customer.email}</span>
+				<invoice-status data-value="${status}"></invoice-status>
+			</div>
+			<div>
+				<intl-format data-type="amount" data-value="${amount}"></intl-format>
+				<intl-format data-type="date" data-value="${date}"></intl-format>
+				<a href="${href}">
+					<span class="sr-only">Edit</span>
+					<hero-icon data-name="pencil"></hero-icon>
+				</a>
+				<form>
+					<input type="hidden" name="id" value="${id}" />
+					<button>
+						<span class="sr-only">Delete</span>
+						<hero-icon data-name="trash"></hero-icon>
+					</button>
+				</form>
+			</div>
+		</article>
+	</template>
+
+	<template>
+		<article class="skeleton">
+			<div>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+			<div>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</article>
+	</template>
+</section>
+
+<section>
 	<table>
 		<thead>
 			<tr>
@@ -26,29 +73,6 @@
 			<!--${rows}-->
 		</tbody>
 	</table>
-
-	<template>
-		<tr>
-			<td>
-				<div></div>
-			</td>
-			<td>
-				<div></div>
-			</td>
-			<td>
-				<div></div>
-			</td>
-			<td>
-				<div></div>
-			</td>
-			<td>
-				<div></div>
-			</td>
-			<td>
-				<div></div>
-			</td>
-		</tr>
-	</template>
 
 	<template>
 		<tr>
@@ -78,6 +102,29 @@
 						<hero-icon data-name="trash"></hero-icon>
 					</button>
 				</form>
+			</td>
+		</tr>
+	</template>
+
+	<template>
+		<tr>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
+			</td>
+			<td>
+				<div></div>
 			</td>
 		</tr>
 	</template>

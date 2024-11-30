@@ -14,6 +14,7 @@ a {
 }
 
 body,
+dd,
 fieldset,
 h1,
 h2,
@@ -39,14 +40,23 @@ button {
 	background: transparent;
 	color: inherit;
 	cursor: pointer;
+	
+	&[aria-disabled="true"] {
+		opacity: 0.5;
+	}
 }
 
 h1,
 h2 {
 	font-family: "Lusitana";
-	font-size: 1.5rem;
+	font-size: 1.25rem;
 	font-weight: normal;
-	line-height: 2rem;
+	line-height: 1.75rem;
+
+	@media (min-width: 768px) {
+		font-size: 1.5rem;
+		line-height: 2rem;
+	}
 }
 
 h3 {

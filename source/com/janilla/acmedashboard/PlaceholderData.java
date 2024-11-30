@@ -36,7 +36,7 @@ public record PlaceholderData(List<Customer> customers, List<Invoice> invoices, 
 	public static PlaceholderData INSTANCE;
 
 	static {
-		try (var is = PlaceholderData.class.getResourceAsStream(PlaceholderData.class.getSimpleName() + ".json")) {
+		try (var is = PlaceholderData.class.getResourceAsStream("placeholder-data.json")) {
 			INSTANCE = (PlaceholderData) new Converter().convert(Json.parse(new String(is.readAllBytes())),
 					PlaceholderData.class);
 		} catch (IOException e) {

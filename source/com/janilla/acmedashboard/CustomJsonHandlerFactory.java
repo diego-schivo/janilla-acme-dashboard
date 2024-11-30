@@ -21,53 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { loadTemplate } from "./utils.js";
+package com.janilla.acmedashboard;
 
-export default class DashboardCards extends HTMLElement {
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
-	constructor() {
-		super();
-	}
+import com.janilla.http.HttpExchange;
+import com.janilla.json.JsonToken;
+import com.janilla.json.ReflectionJsonIterator;
+import com.janilla.persistence.Persistence;
+import com.janilla.web.JsonHandlerFactory;
 
-	get state() {
-		return this.dashboardPage.state?.cards;
-	}
+public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 
-	set state(x) {
-		if (x != null && !this.dashboardPage.state)
-			this.dashboardPage.state = {};
-		if (x != null || this.dashboardPage.state)
-			this.dashboardPage.state.cards = x;
-	}
+	public Properties configuration;
 
-	connectedCallback() {
-		// console.log("DashboardCards.connectedCallback");
+	public Persistence persistence;
 
-		this.dashboardPage = this.closest("dashboard-page");
-	}
+	@Override
+	protected Iterator<JsonToken<?>> buildJsonIterator(Object object, HttpExchange exchange) {
+		var i = new ReflectionJsonIterator() {
 
-	async update() {
-		console.log("DashboardCards.update");
-
-		if (!this.dashboardPage.slot)
-			this.state = undefined;
-		await this.render();
-		if (!this.dashboardPage.slot || this.state)
-			return;
-
-		this.state = await (await fetch("/api/dashboard/cards")).json();
-		await this.render();
-	}
-
-	async render() {
-		console.log("DashboardCards.render");
-
-		this.interpolator ??= loadTemplate("dashboard-cards").then(t => {
-			const c = t.content.cloneNode(true);
-			return buildInterpolator(c);
-		});
-		const i = await this.interpolator;
-		this.appendChild(i(this.state));
+			@Override
+			public Iterator<JsonToken<?>> buildValueIterator(Object object) {
+				var o = getStack().peek();
+				if (o instanceof Map.Entry me && me.getKey().equals("password")) {
+					object = "******";
+				}
+				return super.buildValueIterator(object);
+			}
+		};
+		i.setObject(object);
+		return i;
 	}
 }

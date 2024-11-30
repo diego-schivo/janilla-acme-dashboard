@@ -31,7 +31,7 @@ const iconNameByType = {
 	customers: "user-group"
 };
 
-export default class DashboardCard extends HTMLElement {
+export default class SingleCard extends HTMLElement {
 
 	constructor() {
 		super();
@@ -40,9 +40,10 @@ export default class DashboardCard extends HTMLElement {
 	}
 
 	async connectedCallback() {
-		// console.log("DashboardCard.connectedCallback");
+		// console.log("SingleCard.connectedCallback");
 
-		const c = (await loadTemplate("dashboard-card")).content.cloneNode(true);
+		const t = await loadTemplate("single-card");
+		const c = t.content.cloneNode(true);
 		const i = buildInterpolator(c);
 		this.shadowRoot.appendChild(i({
 			...this.dataset,

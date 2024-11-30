@@ -51,19 +51,32 @@ export default class LoginPage extends SlottableElement {
 		});
 		const i = await this.interpolator;
 
-		this.appendChild(i());
+		this.appendChild(i(this));
 	}
 
 	handleSubmit = async event => {
 		console.log("LoginPage.handleSubmit", event);
 		event.preventDefault();
-		const fd = new FormData(event.target);
-		await fetch("/api/authentication", {
-			method: "POST",
-			headers: { "content-type": "application/json" },
-			body: JSON.stringify(Object.fromEntries(fd))
-		});
-		history.pushState({}, "", "/dashboard");
-		dispatchEvent(new CustomEvent("popstate"));
+
+		if (event.submitter.getAttribute("aria-disabled") === "true")
+			return;
+		event.submitter.setAttribute("aria-disabled", "true");
+
+		try {
+			const fd = new FormData(event.target);
+			const u = await (await fetch("/api/authentication", {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify(Object.fromEntries(fd))
+			})).json();
+			this.querySelector(".error").innerHTML = u ? "" : "Invalid credentials.";
+
+			if (u) {
+				history.pushState({}, "", "/dashboard");
+				dispatchEvent(new CustomEvent("popstate"));
+			}
+		} finally {
+			event.submitter.setAttribute("aria-disabled", "false");
+		}
 	}
 }

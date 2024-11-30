@@ -41,6 +41,14 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 						throw new HandleException(new MethodBlockedException());
 		if (rq.getPath().startsWith("/api") && !rq.getPath().equals("/api/authentication"))
 			((CustomExchange) exchange).requireSessionEmail();
+
+//		if (rq.getPath().startsWith("/api"))
+//			try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+
 		super.handle(invocation, exchange);
 	}
 }

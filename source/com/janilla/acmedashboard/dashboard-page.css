@@ -5,22 +5,28 @@ dashboard-page {
 		gap: 1rem;
 	
 		> div {
-			display: grid;
+			display: flex;
+			flex-direction: column;
 			gap: 1.5rem;
-			grid-template:
-				"a a"
-				"b c" / 1fr 1fr;
-	
-			> :first-child {
-				grid-area: a;
-			}
-	
-			> :nth-child(2) {
-				grid-area: b;
-			}
-	
-			> :nth-child(3) {
-				grid-area: c;
+
+			@media (min-width: 768px) {
+				display: grid;
+				gap: 1.5rem;
+				grid-template:
+					"a a"
+					"b c" / 1fr 1fr;
+		
+				> :first-child {
+					grid-area: a;
+				}
+		
+				> :nth-child(2) {
+					grid-area: b;
+				}
+		
+				> :nth-child(3) {
+					grid-area: c;
+				}
 			}
 		}
 	}
@@ -29,8 +35,8 @@ dashboard-page {
 		width: 1.25rem;
 	}
 	
-	dashboard-revenue,
-	dashboard-invoices {
+	revenue-chart,
+	latest-invoices {
 		> article {
 			display: flex;
 			flex-direction: column;

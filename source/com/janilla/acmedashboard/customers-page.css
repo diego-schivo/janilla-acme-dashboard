@@ -15,7 +15,110 @@ customers-page {
 	section {
 		background: rgb(249, 250, 251);
 		border-radius: 0.5rem;
-		padding: 0 0.5rem 0.5rem;
+		padding: 0.5rem;
+
+		&:first-of-type {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+
+			@media (min-width: 768px) {
+				display: none;
+			}
+		}
+	
+		&:nth-of-type(2) {
+			padding-bottom: 0;
+			padding-top: 0;
+
+			@media (max-width: 767px) {
+				display: none;
+			}
+		}
+
+		article {
+			background: rgb(255, 255, 255);
+			border-radius: 0.375rem;
+			padding: 1rem;
+
+			&.skeleton {
+				div:empty {
+					background: rgb(243, 244, 246);
+					border-radius: 0.25rem;
+					height: 1.5rem;
+					width: 6rem;
+				}
+
+				li:first-child {
+					> :first-child {
+						border-radius: 9999px;
+						height: 1.75rem;
+						width: 1.75rem;
+					}
+
+					> :nth-child(3) {
+						width: 8rem;
+					}
+				}
+				
+				dd {
+					div:empty {
+						height: 2rem;
+						width: 4rem;
+					}
+				}
+			}
+		}
+
+		li {
+			&:first-child {
+				align-items: center;
+				display: grid;
+				gap: 0.5rem;
+				grid-template:
+					"a b"
+					"c c" / auto 1fr;
+		
+				> :first-child {
+					grid-area: a;
+				}
+		
+				> :nth-child(2) {
+					grid-area: b;
+				}
+		
+				> :nth-child(3) {
+					color: rgb(107, 114, 128);
+					font-size: 0.875rem;
+					grid-area: c;
+					line-height: 1.25rem;
+				}
+			}
+
+			&:not(:first-child) {
+				border-top: 1px solid rgb(229, 231, 235);
+				margin-top: 1rem;
+				padding-top: 1rem;
+			}
+		}
+
+		dl {
+			display: flex;
+
+			div {
+				flex: 1;
+			}
+		}
+
+		dt {
+			font-size: 0.75rem;
+			line-height: 1rem;
+		}
+
+		p {
+			font-size: 0.875rem;
+			line-height: 1.25rem;
+		}
 	
 		table {
 			font-size: 0.875rem;
@@ -94,8 +197,13 @@ customers-page {
 	
 		img {
 			border-radius: 9999px;
-			height: 2rem;
-			width: 2rem;
+			height: 1.75rem;
+			width: 1.75rem;
+
+			@media (min-width: 768px) {
+				height: 2rem;
+				width: 2rem;
+			}
 		}
 	}
 }
