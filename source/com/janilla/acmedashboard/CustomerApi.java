@@ -59,13 +59,10 @@ public class CustomerApi {
 			BigDecimal paidAmount) {
 
 		public static Customer2 of(Customer customer, Persistence persistence) {
-			var ic = persistence.crud(Invoice.class);
-			var ii = ic.read(ic.filter("customerId", customer.id())).toList();
-			return new Customer2(customer, ii.size(),
-					ii.stream().filter(x -> x.status() == Invoice.Status.PENDING).map(x -> x.amount())
-							.reduce(BigDecimal.ZERO, BigDecimal::add),
-					ii.stream().filter(x -> x.status() == Invoice.Status.PAID).map(x -> x.amount())
-							.reduce(BigDecimal.ZERO, BigDecimal::add));
+			var ic = (InvoiceCrud) persistence.crud(Invoice.class);
+			return new Customer2(customer, ic.count("customerId", customer.id()),
+					ic.getAmount(customer.id(), Invoice.Status.PENDING),
+					ic.getAmount(customer.id(), Invoice.Status.PAID));
 		}
 	}
 }

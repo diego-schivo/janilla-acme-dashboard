@@ -23,36 +23,18 @@
  */
 package com.janilla.acmedashboard;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import com.janilla.acmedashboard.InvoiceApi.Invoice2;
+import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
 
-public class DashboardApi {
+public class CustomPersistence extends Persistence {
 
-	public Persistence persistence;
-
-	@Handle(method = "GET", path = "/api/dashboard/cards")
-	public Cards getCards() {
-		var ic = (InvoiceCrud) persistence.crud(Invoice.class);
-		return new Cards(ic.getAmount(Invoice.Status.PAID), ic.getAmount(Invoice.Status.PENDING), ic.count(),
-				persistence.crud(Customer.class).count());
-	}
-
-	public record Cards(BigDecimal paidAmount, BigDecimal pendingAmount, long invoiceCount, long customerCount) {
-	}
-
-	@Handle(method = "GET", path = "/api/dashboard/revenue")
-	public List<Revenue> getRevenue() {
-		var rc = persistence.crud(Revenue.class);
-		return rc.read(rc.list()).toList();
-	}
-
-	@Handle(method = "GET", path = "/api/dashboard/invoices")
-	public List<Invoice2> getInvoices() {
-		var ic = persistence.crud(Invoice.class);
-		return ic.read(ic.list(0, 5).ids()).map(x -> Invoice2.of(x, persistence)).toList();
+	@Override
+	protected <E> Crud<E> createCrud(Class<E> type) {
+		if (type == Invoice.class) {
+			@SuppressWarnings("unchecked")
+			var c = (Crud<E>) new InvoiceCrud();
+			return c;
+		}
+		return super.createCrud(type);
 	}
 }
