@@ -194,19 +194,7 @@ table {
 }
 
 breadcrumb-nav {
-	font-family: "Lusitana";
-	font-size: 1.5rem;
-	line-height: 2rem;
-
-	ol {
-		display: flex;
-	}
-	
 	a {
 		color: rgb(107, 114, 128);
-	}
-	
-	span {
-		margin: 0 0.75rem;
 	}
 }

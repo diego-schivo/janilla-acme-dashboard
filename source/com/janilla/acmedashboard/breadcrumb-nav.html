@@ -1,24 +1,19 @@
 <link href="/breadcrumb-nav.css" rel="stylesheet" />
-
 <nav aria-label="Breadcrumb">
-	<slot></slot>
+	<ol>
+		<!--${items}-->
+	</ol>
 </nav>
 
-<template>
-	<ol>
-		<!--${}-->
-	</ol>
-</template>
-
-<template>
+<template id="item">
 	<li>
-		<!--${}-->
+		<slot name="${slot}"></slot>
 		<span>/</span>
 	</li>
 </template>
 
-<template>
+<template id="last-item">
 	<li aria-current="true">
-		<!--${}-->
+		<slot name="${slot}"></slot>
 	</li>
 </template>

@@ -21,31 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class BreadcrumbNav extends HTMLElement {
+export default class BreadcrumbNav extends FlexibleElement {
+
+	static get templateName() {
+		return "breadcrumb-nav";
+	}
 
 	constructor() {
 		super();
-
 		this.attachShadow({ mode: "open" });
 	}
 
-	async connectedCallback() {
-		// console.log("BreadcrumbNav.connectedCallback");
-
-		const t = await loadTemplate("breadcrumb-nav");
-		const c = t.content.cloneNode(true);
-		const cc = [...c.querySelectorAll("template")].map(x => x.content);
-		this.interpolate = [buildInterpolator(cc[0]), buildInterpolator(cc[1]), buildInterpolator(cc[2])];
-
-		this.shadowRoot.appendChild(c);
-
-		if (!this.hasChildNodes())
-			return;
-
-		const dd = [...this.children];
-		this.appendChild(this.interpolate[0](dd.map((x, i) => this.interpolate[i === dd.length - 1 ? 2 : 1](x).cloneNode(true))));
+	async updateDisplay() {
+		// console.log("BreadcrumbNav.updateDisplay");
+		await super.updateDisplay();
+		this.interpolate ??= this.createInterpolateDom();
+		this.shadowRoot.appendChild(this.interpolate({
+			items: (() => {
+				const l = this.children.length;
+				if (this.interpolateItems?.length !== l)
+					this.interpolateItems = Array.from({ length: l }, (_, i) => this.createInterpolateDom(i < l - 1 ? "item" : "last-item"));
+				return this.interpolateItems.map((x, i) => x({ slot: `item-${i}` }));
+			})()
+		}));
 	}
 }

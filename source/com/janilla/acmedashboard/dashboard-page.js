@@ -21,9 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { SlottableElement } from "./web-components.js";
-import { loadTemplate } from "./utils.js";
+import { SlottableElement } from "./slottable-element.js";
 
 export default class DashboardPage extends SlottableElement {
 
@@ -31,26 +29,23 @@ export default class DashboardPage extends SlottableElement {
 		return ["slot"];
 	}
 
+	static get templateName() {
+		return "dashboard-page";
+	}
+
 	constructor() {
 		super();
 	}
 
-	async update() {
-		console.log("DashboardPage.update");
-		await super.update();
-
-		const cri = this.querySelectorAll("card-wrapper, revenue-chart, latest-invoices");
-		await Promise.all([...cri].map(x => x.update()));
+	async updateDisplay() {
+		// console.log("DashboardPage.updateDisplay");
+		await super.updateDisplay();
+		this.querySelectorAll("card-wrapper, revenue-chart, latest-invoices").forEach(x => x.requestUpdate());
 	}
 
-	async render() {
-		console.log("DashboardPage.render");
-
-		this.interpolator ??= loadTemplate("dashboard-page").then(t => {
-			const c = t.content.cloneNode(true);
-			return buildInterpolator(c);
-		});
-		const i = await this.interpolator;
-		this.appendChild(i());
+	renderState() {
+		// console.log("DashboardPage.renderState");
+		this.interpolate ??= this.createInterpolateDom();
+		this.appendChild(this.interpolate());
 	}
 }

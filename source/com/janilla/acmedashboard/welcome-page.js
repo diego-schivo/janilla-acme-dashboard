@@ -21,9 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { SlottableElement } from "./web-components.js";
-import { loadTemplate } from "./utils.js";
+import { SlottableElement } from "./slottable-element.js";
 
 export default class WelcomePage extends SlottableElement {
 
@@ -31,19 +29,22 @@ export default class WelcomePage extends SlottableElement {
 		return ["slot"];
 	}
 
+	static get templateName() {
+		return "welcome-page";
+	}
+
 	constructor() {
 		super();
 	}
 
-	async render() {
-		console.log("WelcomePage.render");
+	async computeState() {
+		// console.log("WelcomePage.computeState");
+		return {};
+	}
 
-		this.interpolator ??= loadTemplate("welcome-page").then(t => {
-			const c = t.content.cloneNode(true);
-			return buildInterpolator(c);
-		});
-		const i = await this.interpolator;
-
-		this.appendChild(i());
+	renderState() {
+		// console.log("WelcomePage.renderState");
+		this.interpolate ??= this.createInterpolateDom();
+		this.appendChild(this.interpolate());
 	}
 }

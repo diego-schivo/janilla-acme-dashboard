@@ -21,14 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { SlottableElement } from "./web-components.js";
-import { loadTemplate } from "./utils.js";
+import { SlottableElement } from "./slottable-element.js";
 
 export default class InvoicePage extends SlottableElement {
 
 	static get observedAttributes() {
 		return ["data-id", "slot"];
+	}
+
+	static get templateName() {
+		return "invoice-page";
 	}
 
 	constructor() {
@@ -38,46 +40,16 @@ export default class InvoicePage extends SlottableElement {
 	connectedCallback() {
 		// console.log("InvoicePage.connectedCallback");
 		super.connectedCallback();
-
 		this.addEventListener("submit", this.handleSubmit);
 	}
 
-	async computeState() {
-		console.log("InvoicePage.computeState");
-
-		const [nn, i] = await Promise.all([
-			fetch("/api/customers/names").then(x => x.json()),
-			this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
-		]);
-		this.state = {
-			customers: nn,
-			...i
-		}
-		history.replaceState(this.state, "");
-	}
-
-	async render() {
-		console.log("InvoicePage.render");
-
-		this.interpolators ??= loadTemplate("invoice-page").then(t => {
-			const c = t.content.cloneNode(true);
-			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			return [buildInterpolator(c), buildInterpolator(cc[0])];
-		});
-		const ii = await this.interpolators;
-
-		this.appendChild(ii[0]({
-			...this.dataset,
-			customerOptions: this.state?.customers.map(x => ii[1](x).cloneNode(true))
-		}));
-
-		const f = this.querySelector("form");
-		[...new Set(Array.from(f.elements).filter(x => x.matches("input, select")).map(x => x.name))]
-			.forEach(x => f[x].value = this.state?.[x] ?? "");
+	disconnectedCallback() {
+		// console.log("InvoicePage.disconnectedCallback");
+		this.removeEventListener("submit", this.handleSubmit);
 	}
 
 	handleSubmit = async event => {
-		console.log("InvoicePage.handleSubmit", event);
+		// console.log("InvoicePage.handleSubmit", event);
 		event.preventDefault();
 
 		if (event.submitter.getAttribute("aria-disabled") === "true")
@@ -113,5 +85,36 @@ export default class InvoicePage extends SlottableElement {
 		} finally {
 			event.submitter.setAttribute("aria-disabled", "false");
 		}
+	}
+
+	async computeState() {
+		// console.log("InvoicePage.computeState");
+		const [nn, i] = await Promise.all([
+			fetch("/api/customers/names").then(x => x.json()),
+			this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
+		]);
+		const s = {
+			customers: nn,
+			...i
+		}
+		history.replaceState(s, "");
+		return s;
+	}
+
+	renderState() {
+		// console.log("InvoicePage.renderState");
+		this.interpolate ??= this.createInterpolateDom();
+		this.appendChild(this.interpolate({
+			...this.dataset,
+			customerOptions: (() => {
+				const cc = this.state?.customers;
+				if (this.interpolateCustomerOptions?.length !== cc?.length)
+					this.interpolateCustomerOptions = cc?.map(() => this.createInterpolateDom("customer-option"));
+				return cc?.map((x, i) => this.interpolateCustomerOptions[i](x));
+			})()
+		}));
+		const f = this.querySelector("form");
+		[...new Set(Array.from(f.elements).filter(x => x.matches("input, select")).map(x => x.name))]
+			.forEach(x => f[x].value = this.state?.[x] ?? "");
 	}
 }

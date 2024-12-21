@@ -21,8 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
 const statuses = {
 	"PAID": {
@@ -35,51 +34,25 @@ const statuses = {
 	}
 };
 
-export default class InvoiceStatus extends HTMLElement {
+export default class InvoiceStatus extends FlexibleElement {
 
 	static get observedAttributes() {
 		return ["data-value"];
+	}
+
+	static get templateName() {
+		return "invoice-status";
 	}
 
 	constructor() {
 		super();
 	}
 
-	connectedCallback() {
-		// console.log("InvoiceStatus.connectedCallback");
-
-		this.requestUpdate();
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("InvoiceStatus.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue !== oldValue)
-			this.requestUpdate();
-	}
-
-	requestUpdate() {
-		// console.log("InvoiceStatus.requestUpdate");
-
-		if (typeof this.updateTimeout === "number")
-			clearTimeout(this.updateTimeout);
-
-		this.updateTimeout = setTimeout(async () => {
-			this.updateTimeout = undefined;
-			await this.update();
-		}, 1);
-	}
-
-	async update() {
-		// console.log("InvoiceStatus.update");
-
-		this.interpolator ??= loadTemplate("invoice-status").then(t => {
-			const c = t.content.cloneNode(true);
-			return buildInterpolator(c);
-		});
-		const i = await this.interpolator;
-
-		const k = this.dataset.value;
-		this.appendChild(i(k ? statuses[k] : undefined));
+	async updateDisplay() {
+		// console.log("InvoiceStatus.updateDisplay");
+		await super.updateDisplay();
+		this.interpolate ??= this.createInterpolateDom();
+		const v = this.dataset.value;
+		this.appendChild(this.interpolate(v ? statuses[v] : undefined));
 	}
 }

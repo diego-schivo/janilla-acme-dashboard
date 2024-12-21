@@ -21,58 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-export default class IntlFormat extends HTMLElement {
-
-	static get observedAttributes() {
-		return ["data-type", "data-value"];
-	}
-
-	constructor() {
-		super();
-	}
-
-	connectedCallback() {
-		// console.log("IntlFormat.connectedCallback");
-
-		this.requestUpdate();
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		// console.log("IntlFormat.attributeChangedCallback", "name", name, "oldValue", oldValue, "newValue", newValue);
-
-		if (newValue !== oldValue)
-			this.requestUpdate();
-	}
-
-	requestUpdate() {
-		// console.log("IntlFormat.requestUpdate");
-
-		if (typeof this.updateTimeout === "number")
-			clearTimeout(this.updateTimeout);
-
-		this.updateTimeout = setTimeout(async () => {
-			this.updateTimeout = undefined;
-			await this.update();
-		}, 1);
-	}
-
-	async update() {
-		console.log("IntlFormat.update");
-
-		if (!this.dataset.value) {
-			this.textContent = "";
-			return;
-		}
-
-		const f = this.dataset.type ? formatters[this.dataset.type] : undefined;
-		if (!f) {
-			this.textContent = this.dataset.value;
-			return;
-		}
-
-		this.textContent = f(this.dataset.value);
-	}
-}
+import { UpdatableElement } from "./updatable-element.js";
 
 const amountFormatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
@@ -89,3 +38,24 @@ const formatters = {
 	amount: x => amountFormatter.format(x),
 	date: x => dateFormatter.format(new Date(x))
 };
+
+export default class IntlFormat extends UpdatableElement {
+
+	static get observedAttributes() {
+		return ["data-type", "data-value"];
+	}
+
+	constructor() {
+		super();
+	}
+
+	async updateDisplay() {
+		// console.log("IntlFormat.updateDisplay");
+		if (!this.dataset.value) {
+			this.textContent = "";
+			return;
+		}
+		const f = this.dataset.type ? formatters[this.dataset.type] : undefined;
+		this.textContent = f ? f(this.dataset.value) : this.dataset.value;
+	}
+}

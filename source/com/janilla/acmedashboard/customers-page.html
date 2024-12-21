@@ -1,17 +1,15 @@
 <h1>Customers</h1>
-
 <header>
 	<label for="search" class="sr-only">Search</label>
 	<div class="control">
-		<input id="search" type="text" placeholder="Search customers..." />
+		<input id="search" type="text" value="${query}" placeholder="Search customers..." />
 		<hero-icon data-name="magnifying-glass"></hero-icon>
 	</div>
 </header>
-
 <section>
 	<!--${articles}-->
 
-	<template>
+	<template id="article">
 		<article>
 			<ul>
 				<li>
@@ -44,7 +42,7 @@
 		</article>
 	</template>
 
-	<template>
+	<template id="article-skeleton">
 		<article class="skeleton">
 			<ul>
 				<li>
@@ -75,7 +73,6 @@
 		</article>
 	</template>
 </section>
-
 <section>
 	<table>
 		<thead>
@@ -92,7 +89,7 @@
 		</tbody>
 	</table>
 
-	<template>
+	<template id="row">
 		<tr>
 			<td>
 				<img loading="lazy" src="${imageUrl}" />
@@ -109,7 +106,7 @@
 		</tr>
 	</template>
 
-	<template>
+	<template id="row-skeleton">
 		<tr>
 			<td>
 				<div></div>

@@ -21,14 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { SlottableElement } from "./web-components.js";
-import { loadTemplate } from "./utils.js";
+import { SlottableElement } from "./slottable-element.js";
 
 export default class InvoicesPage extends SlottableElement {
 
 	static get observedAttributes() {
 		return ["data-page", "data-query", "slot"];
+	}
+
+	static get templateName() {
+		return "invoices-page";
 	}
 
 	constructor() {
@@ -38,70 +40,20 @@ export default class InvoicesPage extends SlottableElement {
 	connectedCallback() {
 		// console.log("InvoicesPage.connectedCallback");
 		super.connectedCallback();
-
 		this.addEventListener("input", this.handleInput);
 		this.addEventListener("submit", this.handleSubmit);
 	}
 
-	async computeState() {
-		console.log("InvoicesPage.computeState");
-
-		const u = new URL("/api/invoices", location.href);
-		const q = this.dataset.query;
-		if (q)
-			u.searchParams.append("query", q);
-		const p = this.dataset.page;
-		if (p)
-			u.searchParams.append("page", p);
-		this.state = await (await fetch(u)).json();
-		history.replaceState(this.state, "");
-	}
-
-	async render() {
-		console.log("InvoicesPage.render");
-
-		this.interpolators ??= loadTemplate("invoices-page").then(t => {
-			const c = t.content.cloneNode(true);
-			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			return [buildInterpolator(c), ...cc.map(x => buildInterpolator(x))];
-		});
-		const ii = await this.interpolators;
-
-		const u = new URL("/dashboard/invoices", location.href);
-		const q = this.dataset.query;
-		if (q)
-			u.searchParams.append("query", q);
-		const p = this.dataset.page;
-		this.appendChild(ii[0]({
-			articles: this.state
-				? this.state.items.map(x => ii[1]({
-					...x,
-					href: `/dashboard/invoices/${x.id}/edit`
-				}).cloneNode(true))
-				: Array.from({ length: 6 }).map(_ => ii[2]().cloneNode(true)),
-			rows: this.state
-				? this.state.items.map(x => ii[3]({
-					...x,
-					href: `/dashboard/invoices/${x.id}/edit`
-				}).cloneNode(true))
-				: Array.from({ length: 6 }).map(_ => ii[4]().cloneNode(true)),
-			pagination: {
-				href: u.pathname + u.search,
-				page: p ?? 1,
-				pageCount: this.state ? Math.ceil(this.state.total / 6) : undefined
-			}
-		}));
-
-		if (q)
-			this.querySelector('[type="text"]').value = q;
+	disconnectedCallback() {
+		// console.log("InvoicesPage.disconnectedCallback");
+		this.removeEventListener("input", this.handleInput);
+		this.removeEventListener("submit", this.handleSubmit);
 	}
 
 	handleInput = event => {
-		console.log("InvoicesPage.handleInput", event);
-
+		// console.log("InvoicesPage.handleInput", event);
 		if (typeof this.inputTimeout === "number")
 			clearTimeout(this.inputTimeout);
-
 		const q = event.target.value;
 		this.inputTimeout = setTimeout(() => {
 			this.inputTimeout = undefined;
@@ -114,18 +66,16 @@ export default class InvoicesPage extends SlottableElement {
 	}
 
 	handleSubmit = async event => {
-		console.log("InvoicesPage.handleSubmit", event);
+		// console.log("InvoicesPage.handleSubmit", event);
 		event.preventDefault();
-
 		if (event.submitter.getAttribute("aria-disabled") === "true")
 			return;
 		event.submitter.setAttribute("aria-disabled", "true");
-
 		try {
 			const fd = new FormData(event.target);
 			const r = await fetch(`/api/invoices/${fd.get("id")}`, { method: "DELETE" });
 			if (r.ok)
-				await this.update();
+				await this.updateDisplay();
 			else {
 				const t = await r.text();
 				alert(t);
@@ -133,5 +83,63 @@ export default class InvoicesPage extends SlottableElement {
 		} finally {
 			event.submitter.setAttribute("aria-disabled", "false");
 		}
+	}
+
+	async computeState() {
+		// console.log("InvoicesPage.computeState");
+		const u = new URL("/api/invoices", location.href);
+		const q = this.dataset.query;
+		if (q)
+			u.searchParams.append("query", q);
+		const p = this.dataset.page;
+		if (p)
+			u.searchParams.append("page", p);
+		const s = await (await fetch(u)).json();
+		history.replaceState(s, "");
+		return s;
+	}
+
+	renderState() {
+		// console.log("InvoicesPage.renderState");
+		this.interpolate ??= this.createInterpolateDom();
+		const u = new URL("/dashboard/invoices", location.href);
+		const q = this.dataset.query;
+		if (q)
+			u.searchParams.append("query", q);
+		const p = this.dataset.page;
+		this.appendChild(this.interpolate({
+			...this.dataset,
+			articles: this.state ? (() => {
+				const ii = this.state.items;
+				if (this.interpolateArticles?.length !== ii.length)
+					this.interpolateArticles = ii.map(() => this.createInterpolateDom("article"));
+				return ii.map((x, i) => this.interpolateArticles[i]({
+					...x,
+					href: `/dashboard/invoices/${x.id}/edit`
+				}));
+			})() : (() => {
+				this.articleSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("article-skeleton")());
+				return this.articleSkeletons;
+			})(),
+			rows: this.state ? (() => {
+				const ii = this.state.items;
+				if (this.interpolateRows?.length !== ii.length)
+					this.interpolateRows = ii.map(() => this.createInterpolateDom("row"));
+				return ii.map((x, i) => this.interpolateRows[i]({
+					...x,
+					href: `/dashboard/invoices/${x.id}/edit`
+				}));
+			})() : (() => {
+				this.rowSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("row-skeleton")());
+				return this.rowSkeletons;
+			})(),
+			pagination: {
+				href: u.pathname + u.search,
+				page: p ?? 1,
+				pageCount: this.state ? Math.ceil(this.state.total / 6) : undefined
+			}
+		}));
+		// if (q)
+		// this.querySelector('[type="text"]').value = q;
 	}
 }

@@ -2,19 +2,9 @@
 	<h2>Latest Invoices</h2>
 	<div>
 		<section>
-			<!--${content}-->
+			<!--${articles}-->
 		</section>
-
-		<template>
-			<article class="skeleton">
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-			</article>
-		</template>
-
-		<template>
+		<template id="article">
 			<article>
 				<img loading="lazy" src="${customer.imageUrl}" />
 				<p>${customer.name}</p>
@@ -22,7 +12,14 @@
 				<intl-format data-type="amount" data-value="${amount}"></intl-format>
 			</article>
 		</template>
-
+		<template id="article-skeleton">
+			<article class="skeleton">
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</article>
+		</template>
 		<footer>
 			<hero-icon data-name="arrow-path"></hero-icon>
 			<h3>Updated just now</h3>

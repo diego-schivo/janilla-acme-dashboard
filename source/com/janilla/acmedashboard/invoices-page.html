@@ -1,7 +1,7 @@
 <header>
 	<label for="search" class="sr-only">Search</label>
 	<div class="control">
-		<input id="search" type="text" placeholder="Search invoices..." />
+		<input id="search" type="text" value="${query}" placeholder="Search invoices..." />
 		<hero-icon data-name="magnifying-glass"></hero-icon>
 	</div>
 	<a href="/dashboard/invoices/create" class="primary-button">
@@ -9,11 +9,10 @@
 		<hero-icon data-name="plus"></hero-icon>
 	</a>
 </header>
-
 <section>
 	<!--${articles}-->
 
-	<template>
+	<template id="article">
 		<article>
 			<div>
 				<img loading="lazy" src="${customer.imageUrl}" />
@@ -39,7 +38,7 @@
 		</article>
 	</template>
 
-	<template>
+	<template id="article-skeleton">
 		<article class="skeleton">
 			<div>
 				<span></span>
@@ -56,7 +55,6 @@
 		</article>
 	</template>
 </section>
-
 <section>
 	<table>
 		<thead>
@@ -74,7 +72,7 @@
 		</tbody>
 	</table>
 
-	<template>
+	<template id="row">
 		<tr>
 			<td>
 				<img loading="lazy" src="${customer.imageUrl}" />
@@ -106,7 +104,7 @@
 		</tr>
 	</template>
 
-	<template>
+	<template id="row-skeleton">
 		<tr>
 			<td>
 				<div></div>
@@ -129,5 +127,4 @@
 		</tr>
 	</template>
 </section>
-
 <pagination-nav data-href="${pagination.href}" data-page="${pagination.page}" data-page-count="${pagination.pageCount}"></pagination-nav>

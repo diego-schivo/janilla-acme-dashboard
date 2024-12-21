@@ -102,7 +102,7 @@ public class AcmeDashboard {
 	}
 
 	@Handle(method = "GET", path = "(/[\\w\\d/-]*)")
-	public AcmeDashboard getApplication() {
+	public AcmeDashboard application() {
 		return this;
 	}
 }

@@ -21,35 +21,66 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-function updateElement(element, active, more) {
-	if (active)
+const updateElement = (element, active, more) => {
+	if (active) {
+		// console.log("AcmeDashboard.updateElement", element);
 		element.setAttribute("slot", "content");
-	else
-		element.removeAttribute("slot");
+	}
 
 	if (more)
 		more(element, active);
 }
 
-export default class AcmeDashboard extends HTMLElement {
+export default class AcmeDashboard extends FlexibleElement {
+
+	static get templateName() {
+		return "acme-dashboard";
+	}
 
 	constructor() {
 		super();
-
 		this.attachShadow({ mode: "open" });
 	}
 
-	async connectedCallback() {
+	connectedCallback() {
 		// console.log("AcmeDashboard.connectedCallback");
-
-		const t = await loadTemplate("acme-dashboard");
-		this.shadowRoot.appendChild(t.content.cloneNode(true));
-
-		addEventListener("popstate", this.handlePopstate);
+		super.connectedCallback();
+		addEventListener("popstate", this.handlePopState);
 		this.addEventListener("click", this.handleClick);
+	}
 
+	disconnectedCallback() {
+		// console.log("AcmeDashboard.disconnectedCallback");
+		removeEventListener("popstate", this.handlePopState);
+		this.removeEventListener("click", this.handleClick);
+	}
+
+	handleClick = event => {
+		// console.log("AcmeDashboard.handleClick", event);
+
+		const a = event.composedPath().find(x => x.tagName?.toLowerCase() === "a");
+		if (!a?.href)
+			return;
+
+		event.preventDefault();
+		const u = new URL(a.href);
+		history.pushState({}, "", u.pathname + u.search);
+		dispatchEvent(new CustomEvent("popstate"));
+	}
+
+	handlePopState = event => {
+		// console.log("AcmeDashboard.handlePopState", event);
+
+		this.updateContent(event.state);
+	}
+
+	async updateDisplay() {
+		// console.log("AcmeDashboard.updateDisplay");
+		await super.updateDisplay();
+		this.interpolate ??= this.createInterpolateDom();
+		this.shadowRoot.appendChild(this.interpolate());
 		const p1 = location.pathname;
 		const p2 = p1 === "/" ? (await (await fetch("/api/authentication")).json() ? "/dashboard" : "/") : p1;
 		if (p2 !== p1) {
@@ -59,14 +90,11 @@ export default class AcmeDashboard extends HTMLElement {
 			this.updateContent();
 	}
 
-	disconnectedCallback() {
-		// console.log("AcmeDashboard.disconnectedCallback");
-
-		removeEventListener("popstate", this.handlePopstate);
-	}
-
 	updateContent(state) {
-		console.log("AcmeDashboard.updateContent");
+		// console.log("AcmeDashboard.updateContent");
+		const cc = this.querySelectorAll("*");
+		if (cc)
+			Array.prototype.forEach.call(cc, x => x.removeAttribute("slot"));
 
 		const lp = location.pathname;
 		updateElement(this.querySelector("welcome-page"), lp === "/");
@@ -109,24 +137,5 @@ export default class AcmeDashboard extends HTMLElement {
 		});
 
 		document.title = [this.querySelector("[slot][data-title]"), this].filter(x => x).map(x => x.dataset.title).join(" | ");
-	}
-
-	handleClick = event => {
-		console.log("AcmeDashboard.handleClick", event);
-
-		const a = event.composedPath().find(x => x.tagName === "A");
-		if (!a?.href)
-			return;
-
-		event.preventDefault();
-		const u = new URL(a.href);
-		history.pushState({}, "", u.pathname + u.search);
-		dispatchEvent(new CustomEvent("popstate"));
-	}
-
-	handlePopstate = event => {
-		console.log("AcmeDashboard.handlePopstate", event);
-
-		this.updateContent(event.state);
 	}
 }

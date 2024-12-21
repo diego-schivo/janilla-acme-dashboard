@@ -21,20 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class DashboardLayout extends HTMLElement {
+export default class DashboardLayout extends FlexibleElement {
+
+	static get templateName() {
+		return "dashboard-layout";
+	}
 
 	constructor() {
 		super();
-
 		this.attachShadow({ mode: "open" });
 	}
 
-	async connectedCallback() {
-		// console.log("DashboardLayout.connectedCallback");
-
-		const t = await loadTemplate("dashboard-layout");
-		this.shadowRoot.appendChild(t.content.cloneNode(true));
+	async updateDisplay() {
+		// console.log("DashboardLayout.updateDisplay");
+		await super.updateDisplay();
+		this.interpolate ??= this.createInterpolateDom();
+		this.shadowRoot.appendChild(this.interpolate(this.state));
 	}
 }

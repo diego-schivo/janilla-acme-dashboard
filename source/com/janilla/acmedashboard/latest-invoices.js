@@ -21,10 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class LatestInvoices extends HTMLElement {
+export default class LatestInvoices extends FlexibleElement {
+
+	static get templateName() {
+		return "latest-invoices";
+	}
 
 	constructor() {
 		super();
@@ -43,37 +46,34 @@ export default class LatestInvoices extends HTMLElement {
 
 	connectedCallback() {
 		// console.log("LatestInvoices.connectedCallback");
-
+		super.connectedCallback();
 		this.dashboardPage = this.closest("dashboard-page");
 	}
 
-	async update() {
-		console.log("LatestInvoices.update");
-
+	async updateDisplay() {
+		// console.log("LatestInvoices.updateDisplay");
+		await super.updateDisplay();
 		if (!this.dashboardPage.slot)
-			this.state = undefined;
-		await this.render();
-		if (!this.dashboardPage.slot || this.state)
-			return;
-
-		this.state = await (await fetch("/api/dashboard/invoices")).json();
-		await this.render();
+			this.state = null;
+		this.renderState();
+		if (this.dashboardPage.slot && !this.state) {
+			this.state = await (await fetch("/api/dashboard/invoices")).json();
+			this.renderState();
+		}
 	}
 
-	async render() {
-		console.log("LatestInvoices.render");
-
-		this.interpolators ??= loadTemplate("latest-invoices").then(t => {
-			const c = t.content.cloneNode(true);
-			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			return [buildInterpolator(c), buildInterpolator(cc[0]), buildInterpolator(cc[1])];
-		});
-		const ii = await this.interpolators;
-
-		this.appendChild(ii[0]({
-			content: !this.state
-				? Array.from({ length: 6 }).map(_ => ii[1]().cloneNode(true))
-				: this.state.map(x => ii[2](x).cloneNode(true))
+	renderState() {
+		// console.log("LatestInvoices.renderState");
+		this.interpolate ??= this.createInterpolateDom();
+		this.appendChild(this.interpolate({
+			articles: this.state ? (() => {
+				if (this.interpolateArticles?.length != this.state.length)
+					this.interpolateArticles = this.state.map(() => this.createInterpolateDom("article"));
+				return this.state.map((x, i) => this.interpolateArticles[i](x));
+			})() : (() => {
+				this.articleSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("article-skeleton")());
+				return this.articleSkeletons;
+			})()
 		}));
 	}
 }

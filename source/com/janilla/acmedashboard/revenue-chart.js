@@ -21,10 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class RevenueChart extends HTMLElement {
+export default class RevenueChart extends FlexibleElement {
+
+	static get templateName() {
+		return "revenue-chart";
+	}
 
 	constructor() {
 		super();
@@ -43,40 +46,40 @@ export default class RevenueChart extends HTMLElement {
 
 	connectedCallback() {
 		// console.log("RevenueChart.connectedCallback");
-
+		super.connectedCallback();
 		this.dashboardPage = this.closest("dashboard-page");
 	}
 
-	async update() {
-		console.log("RevenueChart.update");
-
+	async updateDisplay() {
+		// console.log("RevenueChart.updateDisplay");
+		await super.updateDisplay();
 		if (!this.dashboardPage.slot)
-			this.state = undefined;
-		await this.render();
-		if (!this.dashboardPage.slot || this.state)
-			return;
-
-		this.state = await (await fetch("/api/dashboard/revenue")).json();
-		await this.render();
+			this.state = null;
+		this.renderState();
+		if (this.dashboardPage.slot && !this.state) {
+			this.state = await (await fetch("/api/dashboard/revenue")).json();
+			this.renderState();
+		}
 	}
 
-	async render() {
-		console.log("RevenueChart.render");
-
-		this.interpolators ??= loadTemplate("revenue-chart").then(t => {
-			const c = t.content.cloneNode(true);
-			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			return [buildInterpolator(c), ...cc.map(x => buildInterpolator(x))];
-		});
-		const ii = await this.interpolators;
-
-		const k = this.state?.length ? Math.ceil(Math.max(...this.state.map(x => x.revenue)) / 1000) : undefined;
-		this.appendChild(ii[0]({
-			y: Array.from({ length: k + 1 }, (_, i) => ii[1](`$${i}K`).cloneNode(true)),
-			x: this.state?.flatMap(x => ii[2]({
-				...x,
-				style: `height: ${x.revenue / (1000 * k) * 100}%`,
-			}).cloneNode(true))
+	renderState() {
+		// console.log("RevenueChart.renderState");
+		this.interpolate ??= this.createInterpolateDom();
+		var k = !this.state ? 0 : Math.ceil(Math.max(...this.state.map(x => x.revenue)) / 1000);
+		this.appendChild(this.interpolate({
+			y: !this.state ? null : (() => {
+				if (this.interpolateY?.length !== k + 1)
+					this.interpolateY = Array.from({ length: k + 1 }, () => this.createInterpolateDom("y"));
+				return this.interpolateY.map((x, i) => x(`$${i}K`));
+			})(),
+			x: !this.state ? null : (() => {
+				if (this.interpolateX?.length !== this.state.length)
+					this.interpolateX = this.state.map(() => this.createInterpolateDom("x"));
+				return this.state.map((x, i) => this.interpolateX[i]({
+					...x,
+					style: `height: ${x.revenue / (1000 * k) * 100}%`
+				}));
+			})()
 		}));
 	}
 }

@@ -21,10 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class CardWrapper extends HTMLElement {
+export default class CardWrapper extends FlexibleElement {
+
+	static get templateName() {
+		return "card-wrapper";
+	}
 
 	constructor() {
 		super();
@@ -43,31 +46,20 @@ export default class CardWrapper extends HTMLElement {
 
 	connectedCallback() {
 		// console.log("CardWrapper.connectedCallback");
-
+		super.connectedCallback();
 		this.dashboardPage = this.closest("dashboard-page");
 	}
 
-	async update() {
-		console.log("CardWrapper.update");
-
+	async updateDisplay() {
+		// console.log("CardWrapper.updateDisplay");
+		await super.updateDisplay();
+		this.interpolate ??= this.createInterpolateDom();
 		if (!this.dashboardPage.slot)
-			this.state = undefined;
-		await this.render();
-		if (!this.dashboardPage.slot || this.state)
-			return;
-
-		this.state = await (await fetch("/api/dashboard/cards")).json();
-		await this.render();
-	}
-
-	async render() {
-		console.log("CardWrapper.render");
-
-		this.interpolator ??= loadTemplate("card-wrapper").then(t => {
-			const c = t.content.cloneNode(true);
-			return buildInterpolator(c);
-		});
-		const i = await this.interpolator;
-		this.appendChild(i(this.state));
+			this.state = null;
+		this.appendChild(this.interpolate(this.state));
+		if (this.dashboardPage.slot && !this.state) {
+			this.state = await (await fetch("/api/dashboard/cards")).json();
+			this.appendChild(this.interpolate(this.state));
+		}
 	}
 }

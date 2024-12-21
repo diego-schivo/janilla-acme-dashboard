@@ -21,9 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { SlottableElement } from "./web-components.js";
-import { loadTemplate } from "./utils.js";
+import { SlottableElement } from "./slottable-element.js";
 
 export default class LoginPage extends SlottableElement {
 
@@ -31,31 +29,27 @@ export default class LoginPage extends SlottableElement {
 		return ["slot"];
 	}
 
+	static get templateName() {
+		return "login-page";
+	}
+
 	constructor() {
 		super();
 	}
 
-	async connectedCallback() {
+	connectedCallback() {
 		// console.log("LoginPage.connectedCallback");
 		super.connectedCallback();
-
 		this.addEventListener("submit", this.handleSubmit);
 	}
 
-	async render() {
-		console.log("LoginPage.render");
-
-		this.interpolator ??= loadTemplate("login-page").then(t => {
-			const c = t.content.cloneNode(true);
-			return buildInterpolator(c);
-		});
-		const i = await this.interpolator;
-
-		this.appendChild(i(this));
+	disconnectedCallback() {
+		// console.log("LoginPage.disconnectedCallback");
+		this.removeEventListener("submit", this.handleSubmit);
 	}
 
 	handleSubmit = async event => {
-		console.log("LoginPage.handleSubmit", event);
+		// console.log("LoginPage.handleSubmit", event);
 		event.preventDefault();
 
 		if (event.submitter.getAttribute("aria-disabled") === "true")
@@ -78,5 +72,11 @@ export default class LoginPage extends SlottableElement {
 		} finally {
 			event.submitter.setAttribute("aria-disabled", "false");
 		}
+	}
+
+	renderState() {
+		// console.log("LoginPage.renderState");
+		this.interpolate ??= this.createInterpolateDom();
+		this.appendChild(this.interpolate());
 	}
 }

@@ -21,14 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { SlottableElement } from "./web-components.js";
-import { loadTemplate } from "./utils.js";
+import { SlottableElement } from "./slottable-element.js";
 
 export default class CustomersPage extends SlottableElement {
 
 	static get observedAttributes() {
 		return ["data-query", "slot"];
+	}
+
+	static get templateName() {
+		return "customers-page";
 	}
 
 	constructor() {
@@ -38,51 +40,18 @@ export default class CustomersPage extends SlottableElement {
 	connectedCallback() {
 		// console.log("CustomersPage.connectedCallback");
 		super.connectedCallback();
-
 		this.addEventListener("input", this.handleInput);
 	}
 
-	async computeState() {
-		console.log("CustomersPage.computeState");
-
-		const u = new URL("/api/customers", location.href);
-		const q = this.dataset.query;
-		if (q)
-			u.searchParams.append("query", q);
-		this.state = await (await fetch(u)).json();
-		history.replaceState(this.state, "");
-	}
-
-	async render() {
-		console.log("CustomersPage.render");
-
-		this.interpolators ??= loadTemplate("customers-page").then(t => {
-			const c = t.content.cloneNode(true);
-			const cc = [...c.querySelectorAll("template")].map(x => x.content);
-			return [buildInterpolator(c), ...cc.map(x => buildInterpolator(x))];
-		});
-		const ii = await this.interpolators;
-
-		this.appendChild(ii[0]({
-			articles: this.state
-				? this.state.map(x => ii[1](x).cloneNode(true))
-				: Array.from({ length: 6 }).map(_ => ii[2]().cloneNode(true)),
-			rows: this.state
-				? this.state.map(x => ii[3](x).cloneNode(true))
-				: Array.from({ length: 6 }).map(_ => ii[4]().cloneNode(true))
-		}));
-
-		const q = this.dataset.query;
-		if (q)
-			this.querySelector('[type="text"]').value = q;
+	disconnectedCallback() {
+		// console.log("CustomersPage.disconnectedCallback");
+		this.removeEventListener("input", this.handleInput);
 	}
 
 	handleInput = event => {
-		console.log("CustomersPage.handleInput", event);
-
+		// console.log("CustomersPage.handleInput", event);
 		if (typeof this.inputTimeout === "number")
 			clearTimeout(this.inputTimeout);
-
 		const q = event.target.value;
 		this.inputTimeout = setTimeout(() => {
 			this.inputTimeout = undefined;
@@ -92,5 +61,42 @@ export default class CustomersPage extends SlottableElement {
 			history.pushState({}, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
+	}
+
+	async computeState() {
+		// console.log("CustomersPage.computeState");
+		const u = new URL("/api/customers", location.href);
+		const q = this.dataset.query;
+		if (q)
+			u.searchParams.append("query", q);
+		const s = await (await fetch(u)).json();
+		history.replaceState(s, "");
+		return s;
+	}
+
+	renderState() {
+		// console.log("CustomersPage.renderState");
+		this.interpolate ??= this.createInterpolateDom();
+		this.appendChild(this.interpolate({
+			...this.dataset,
+			articles: this.state ? (() => {
+				if (this.interpolateArticles?.length !== this.state.length)
+					this.interpolateArticles = this.state.map(() => this.createInterpolateDom("article"));
+				return this.state.map((x, i) => this.interpolateArticles[i](x));
+			})() : (() => {
+				this.articleSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("article-skeleton")());
+				return this.articleSkeletons;
+			})(),
+			rows: this.state ? (() => {
+				if (this.interpolateRows?.length !== this.state.length)
+					this.interpolateRows = this.state.map(() => this.createInterpolateDom("row"));
+				return this.state.map((x, i) => this.interpolateRows[i](x));
+			})() : (() => {
+				this.rowSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("row-skeleton")());
+				return this.rowSkeletons;
+			})()
+		}));
+		// if (this.dataset.query)
+			// this.querySelector('[type="text"]').value = this.dataset.query;
 	}
 }

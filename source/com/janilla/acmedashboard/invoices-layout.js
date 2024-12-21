@@ -21,36 +21,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { loadTemplate, removeAllChildren } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class InvoicesLayout extends HTMLElement {
+export default class InvoicesLayout extends FlexibleElement {
+
+	static get templateName() {
+		return "invoices-layout";
+	}
 
 	constructor() {
 		super();
-
 		this.attachShadow({ mode: "open" });
 	}
 
-	async connectedCallback() {
+	connectedCallback() {
 		// console.log("InvoicesLayout.connectedCallback");
-
-		const c = (await loadTemplate("invoices-layout")).content.cloneNode(true);
-		const cc = [...c.querySelectorAll("template")].map(x => x.content);
-		this.interpolate = [buildInterpolator(cc[0]), buildInterpolator(cc[1])];
-
-		this.shadowRoot.appendChild(c);
-		this.shadowRoot.querySelector("slot").addEventListener("slotchange", this.handleSlotchange);
+		super.connectedCallback();
+		this.shadowRoot.addEventListener("slotchange", this.handleSlotChange);
 	}
 
-	handleSlotchange = event => {
-		console.log("InvoicesLayout.handleSlotchange", event);
+	disconnectedCallback() {
+		// console.log("InvoicesLayout.disconnectedCallback");
+		this.shadowRoot.removeEventListener("slotchange", this.handleSlotChange);
+	}
 
-		const bn = this.shadowRoot.querySelector("breadcrumb-nav");
-		removeAllChildren(bn);
-		const n0 = event.target.assignedNodes()[0];
-		for (let n = n0; n; n = n.previousElementSibling)
-			bn.prepend(this.interpolate[n === n0 ? 1 : 0](n.dataset).cloneNode(true));
-		bn.connectedCallback();
+	handleSlotChange = event => {
+		// console.log("InvoicesLayout.handleSlotChange", event);
+		/*
+		const nn = [];
+		for (let n = event.target.assignedNodes()[0]; n; n = n.previousElementSibling)
+			nn.push(n);
+		this.items = nn.reverse().map((x, i) => this.createInterpolateDom(i < nn.length - 1 ? 1 : 2)({
+			...x.dataset,
+			slot: `item-${i}`
+		}));
+		*/
+		this.requestUpdate();
+	}
+
+	async updateDisplay() {
+		// console.log("InvoicesLayout.updateDisplay");
+		await super.updateDisplay();
+		this.interpolate ??= this.createInterpolateDom();
+		this.shadowRoot.appendChild(this.interpolate({
+			breadcrumbItems: (() => {
+				const nn = [];
+				for (let n = this.querySelector("[slot]"); n; n = n.previousElementSibling)
+					nn.push(n);
+				nn.reverse();
+				if (this.interpolateBreadcrumbItems?.length !== nn.length)
+					this.interpolateBreadcrumbItems = nn.map((_, i) => this.createInterpolateDom(i < nn.length - 1 ? "breadcrumb-link" : "breadcrumb-heading"));
+				return nn.map((x, i) => this.interpolateBreadcrumbItems[i]({
+					...x.dataset,
+					slot: `item-${i}`
+				}));
+			})()
+		}));
+		this.shadowRoot.querySelector("breadcrumb-nav").requestUpdate();
 	}
 }

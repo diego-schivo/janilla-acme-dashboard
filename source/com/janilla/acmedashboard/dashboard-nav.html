@@ -2,24 +2,7 @@
 	<acme-logo></acme-logo>
 </header>
 <ul>
-	<li>
-		<a href="/dashboard">
-			<hero-icon data-name="home"></hero-icon>
-			<span>Home</span>
-		</a>
-	</li>
-	<li>
-		<a href="/dashboard/invoices">
-			<hero-icon data-name="document-duplicate"></hero-icon>
-			<span>Invoices</span>
-		</a>
-	</li>
-	<li>
-		<a href="/dashboard/customers">
-			<hero-icon data-name="user-group"></hero-icon>
-			<span>Customers</span>
-		</a>
-	</li>
+	<!--${items}-->
 	<li></li>
 	<li>
 		<form>
@@ -30,3 +13,12 @@
 		</form>
 	</li>
 </ul>
+
+<template id="item">
+	<li class="${class}">
+		<a href="${href}">
+			<hero-icon data-name="${icon}"></hero-icon>
+			<span>${text}</span>
+		</a>
+	</li>
+</template>

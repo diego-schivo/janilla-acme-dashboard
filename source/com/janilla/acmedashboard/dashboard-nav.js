@@ -21,54 +21,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class DashboardNav extends HTMLElement {
+const links = [{
+	href: "/dashboard",
+	icon: "home",
+	text: "Home"
+}, {
+	href: "/dashboard/invoices",
+	icon: "document-duplicate",
+	text: "Invoices"
+}, {
+	href: "/dashboard/customers",
+	icon: "user-group",
+	text: "Customers"
+}];
+
+export default class DashboardNav extends FlexibleElement {
+
+	static get templateName() {
+		return "dashboard-nav";
+	}
 
 	constructor() {
 		super();
 	}
 
-	async connectedCallback() {
+	connectedCallback() {
 		// console.log("DashboardNav.connectedCallback");
-
-		const t = await loadTemplate("dashboard-nav");
-		this.appendChild(t.content.cloneNode(true));
-		this.updateActive();
-
-		addEventListener("popstate", this.handlePopstate);
+		super.connectedCallback();
+		addEventListener("popstate", this.handlePopState);
 		this.addEventListener("submit", this.handleSubmit);
 	}
 
 	disconnectedCallback() {
 		// console.log("DashboardNav.disconnectedCallback");
-
-		removeEventListener("popstate", this.handlePopstate);
+		removeEventListener("popstate", this.handlePopState);
+		this.removeEventListener("submit", this.handleSubmit);
 	}
 
-	updateActive() {
-		console.log("DashboardNav.updateActive");
-
-		this.querySelectorAll("a").forEach(x => {
-			const a = x.getAttribute("href") === document.location.pathname;
-			x.parentElement.classList[a ? "add" : "remove"]("active");
-		});
-	}
-
-	handlePopstate = () => {
-		console.log("DashboardNav.handlePopstate");
-
-		this.updateActive();
+	handlePopState = () => {
+		// console.log("DashboardNav.handlePopState");
+		this.requestUpdate();
 	}
 
 	handleSubmit = async event => {
-		console.log("DashboardNav.handleSubmit", event);
+		// console.log("DashboardNav.handleSubmit", event);
 		event.preventDefault();
-
 		if (event.submitter.getAttribute("aria-disabled") === "true")
 			return;
 		event.submitter.setAttribute("aria-disabled", "true");
-
 		try {
 			await fetch("/api/authentication", { method: "DELETE" });
 			history.pushState({}, "", "/login");
@@ -76,5 +78,20 @@ export default class DashboardNav extends HTMLElement {
 		} finally {
 			event.submitter.setAttribute("aria-disabled", "false");
 		}
+	}
+
+	async updateDisplay() {
+		// console.log("DashboardNav.updateDisplay");
+		await super.updateDisplay();
+		this.interpolate ??= this.createInterpolateDom();
+		this.appendChild(this.interpolate({
+			items: (() => {
+				this.interpolateItems ??= links.map(() => this.createInterpolateDom("item"));
+				return links.map((x, i) => this.interpolateItems[i]({
+					...x,
+					class: x.href === document.location.pathname ? "active" : ""
+				}));
+			})()
+		}));
 	}
 }

@@ -21,8 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { buildInterpolator } from "./dom.js";
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
 const iconNameByType = {
 	collected: "banknotes",
@@ -31,21 +30,22 @@ const iconNameByType = {
 	customers: "user-group"
 };
 
-export default class SingleCard extends HTMLElement {
+export default class SingleCard extends FlexibleElement {
+
+	static get templateName() {
+		return "single-card";
+	}
 
 	constructor() {
 		super();
-
 		this.attachShadow({ mode: "open" });
 	}
 
-	async connectedCallback() {
-		// console.log("SingleCard.connectedCallback");
-
-		const t = await loadTemplate("single-card");
-		const c = t.content.cloneNode(true);
-		const i = buildInterpolator(c);
-		this.shadowRoot.appendChild(i({
+	async updateDisplay() {
+		// console.log("SingleCard.updateDisplay");
+		await super.updateDisplay();
+		this.interpolate ??= this.createInterpolateDom();
+		this.shadowRoot.appendChild(this.interpolate({
 			...this.dataset,
 			icon: iconNameByType[this.dataset.type]
 		}));

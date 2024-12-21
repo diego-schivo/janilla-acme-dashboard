@@ -21,18 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { loadTemplate } from "./utils.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class AcmeLogo extends HTMLElement {
+export default class AcmeLogo extends FlexibleElement {
+
+	static get templateName() {
+		return "acme-logo";
+	}
 
 	constructor() {
 		super();
 	}
 
-	async connectedCallback() {
-		// console.log("AcmeLogo.connectedCallback");
-
-		const t = await loadTemplate("acme-logo");
-		this.appendChild(t.content.cloneNode(true));
+	async updateDisplay() {
+		// console.log("AcmeLogo.updateDisplay");
+		await super.updateDisplay();
+		this.interpolate ??= this.createInterpolateDom();
+		this.appendChild(this.interpolate());
 	}
 }
