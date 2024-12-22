@@ -23,10 +23,10 @@
  */
 package com.janilla.acmedashboard;
 
-import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
+import com.janilla.web.Renderable;
 import com.janilla.web.WebHandlerFactory;
 
 public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
@@ -36,9 +36,10 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 	@Override
 	protected boolean handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
-		if (exchange.getException() instanceof MethodBlockedException e) {
-			var o = RenderEngine.Entry.of(null, e, null);
-			mainFactory.createHandler(o, exchange).handle(exchange);
+		var r = Renderable.of(exchange.getException());
+		if (r != null) {
+			var h = mainFactory.createHandler(r, exchange);
+			h.handle(exchange);
 		}
 		return true;
 	}

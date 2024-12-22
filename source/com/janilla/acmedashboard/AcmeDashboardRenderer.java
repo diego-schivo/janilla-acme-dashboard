@@ -23,16 +23,14 @@
  */
 package com.janilla.acmedashboard;
 
-import com.janilla.web.Error;
-import com.janilla.web.Render;
+import com.janilla.http.HttpExchange;
+import com.janilla.web.Renderer;
 
-@Error(code = 403, text = "Forbidden")
-@Render(ExceptionRenderer.class)
-public class MethodBlockedException extends RuntimeException {
+public class AcmeDashboardRenderer extends Renderer<AcmeDashboard> {
 
-	private static final long serialVersionUID = -7450331330327132850L;
-
-	public MethodBlockedException() {
-		super("The requested action is disabled on this public server: please set up and run the application locally");
+	@Override
+	public String apply(AcmeDashboard application, HttpExchange exchange) {
+		var tt = templates("index.html");
+		return interpolate(tt.get(null), application);
 	}
 }
