@@ -24,10 +24,8 @@
 package com.janilla.acmedashboard;
 
 import com.janilla.web.Error;
-import com.janilla.web.Render;
 
 @Error(code = 403, text = "Forbidden")
-@Render(ExceptionRenderer.class)
 public class MethodBlockedException extends RuntimeException {
 
 	private static final long serialVersionUID = -7450331330327132850L;
