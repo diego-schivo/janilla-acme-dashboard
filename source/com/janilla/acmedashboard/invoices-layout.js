@@ -47,31 +47,20 @@ export default class InvoicesLayout extends FlexibleElement {
 
 	handleSlotChange = event => {
 		// console.log("InvoicesLayout.handleSlotChange", event);
-		/*
-		const nn = [];
-		for (let n = event.target.assignedNodes()[0]; n; n = n.previousElementSibling)
-			nn.push(n);
-		this.items = nn.reverse().map((x, i) => this.createInterpolateDom(i < nn.length - 1 ? 1 : 2)({
-			...x.dataset,
-			slot: `item-${i}`
-		}));
-		*/
 		this.requestUpdate();
 	}
 
 	async updateDisplay() {
 		// console.log("InvoicesLayout.updateDisplay");
-		await super.updateDisplay();
-		this.interpolate ??= this.createInterpolateDom();
-		this.shadowRoot.appendChild(this.interpolate({
+		this.shadowRoot.appendChild(this.interpolateDom({
+			$template: "",
 			breadcrumbItems: (() => {
 				const nn = [];
 				for (let n = this.querySelector("[slot]"); n; n = n.previousElementSibling)
 					nn.push(n);
 				nn.reverse();
-				if (this.interpolateBreadcrumbItems?.length !== nn.length)
-					this.interpolateBreadcrumbItems = nn.map((_, i) => this.createInterpolateDom(i < nn.length - 1 ? "breadcrumb-link" : "breadcrumb-heading"));
-				return nn.map((x, i) => this.interpolateBreadcrumbItems[i]({
+				return nn.map((x, i) => ({
+					$template: i < nn.length - 1 ? "breadcrumb-link" : "breadcrumb-heading",
 					...x.dataset,
 					slot: `item-${i}`
 				}));

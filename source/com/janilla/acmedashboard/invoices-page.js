@@ -94,52 +94,35 @@ export default class InvoicesPage extends SlottableElement {
 		const p = this.dataset.page;
 		if (p)
 			u.searchParams.append("page", p);
-		const s = await (await fetch(u)).json();
-		history.replaceState(s, "");
-		return s;
+		this.janillas.state = await (await fetch(u)).json();
+		history.replaceState(this.janillas.state, "");
 	}
 
 	renderState() {
 		// console.log("InvoicesPage.renderState");
-		this.interpolate ??= this.createInterpolateDom();
 		const u = new URL("/dashboard/invoices", location.href);
 		const q = this.dataset.query;
 		if (q)
 			u.searchParams.append("query", q);
 		const p = this.dataset.page;
-		this.appendChild(this.interpolate({
+		this.appendChild(this.interpolateDom({
+			$template: "",
 			...this.dataset,
-			articles: this.state ? (() => {
-				const ii = this.state.items;
-				if (this.interpolateArticles?.length !== ii.length)
-					this.interpolateArticles = ii.map(() => this.createInterpolateDom("article"));
-				return ii.map((x, i) => this.interpolateArticles[i]({
-					...x,
-					href: `/dashboard/invoices/${x.id}/edit`
-				}));
-			})() : (() => {
-				this.articleSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("article-skeleton")());
-				return this.articleSkeletons;
-			})(),
-			rows: this.state ? (() => {
-				const ii = this.state.items;
-				if (this.interpolateRows?.length !== ii.length)
-					this.interpolateRows = ii.map(() => this.createInterpolateDom("row"));
-				return ii.map((x, i) => this.interpolateRows[i]({
-					...x,
-					href: `/dashboard/invoices/${x.id}/edit`
-				}));
-			})() : (() => {
-				this.rowSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("row-skeleton")());
-				return this.rowSkeletons;
-			})(),
+			articles: this.janillas.state ? this.janillas.state.items.map(x => ({
+				$template: "article",
+				...x,
+				href: `/dashboard/invoices/${x.id}/edit`
+			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
+			rows: this.janillas.state ? this.janillas.state.items.map(x => ({
+				$template: "row",
+				...x,
+				href: `/dashboard/invoices/${x.id}/edit`
+			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" })),
 			pagination: {
 				href: u.pathname + u.search,
 				page: p ?? 1,
-				pageCount: this.state ? Math.ceil(this.state.total / 6) : undefined
+				pageCount: this.janillas.state ? Math.ceil(this.janillas.state.total / 6) : undefined
 			}
 		}));
-		// if (q)
-		// this.querySelector('[type="text"]').value = q;
 	}
 }

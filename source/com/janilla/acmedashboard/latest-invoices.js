@@ -34,14 +34,15 @@ export default class LatestInvoices extends FlexibleElement {
 	}
 
 	get state() {
-		return this.dashboardPage.state?.invoices;
+		return this.dashboardPage.janillas.state?.invoices;
 	}
 
 	set state(x) {
-		if (x != null && !this.dashboardPage.state)
-			this.dashboardPage.state = {};
-		if (x != null || this.dashboardPage.state)
-			this.dashboardPage.state.invoices = x;
+		const js = this.dashboardPage.janillas;
+		if (x != null && !js.state)
+			js.state = {};
+		if (x != null || js.state)
+			js.state.invoices = x;
 	}
 
 	connectedCallback() {
@@ -52,7 +53,6 @@ export default class LatestInvoices extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("LatestInvoices.updateDisplay");
-		await super.updateDisplay();
 		if (!this.dashboardPage.slot)
 			this.state = null;
 		this.renderState();
@@ -64,16 +64,13 @@ export default class LatestInvoices extends FlexibleElement {
 
 	renderState() {
 		// console.log("LatestInvoices.renderState");
-		this.interpolate ??= this.createInterpolateDom();
-		this.appendChild(this.interpolate({
-			articles: this.state ? (() => {
-				if (this.interpolateArticles?.length != this.state.length)
-					this.interpolateArticles = this.state.map(() => this.createInterpolateDom("article"));
-				return this.state.map((x, i) => this.interpolateArticles[i](x));
-			})() : (() => {
-				this.articleSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("article-skeleton")());
-				return this.articleSkeletons;
-			})()
+		const s = this.state;
+		this.appendChild(this.interpolateDom({
+			$template: "",
+			articles: s ? s.map(x => ({
+				$template: "article",
+				...x
+			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" }))
 		}));
 	}
 }

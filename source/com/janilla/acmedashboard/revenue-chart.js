@@ -34,14 +34,15 @@ export default class RevenueChart extends FlexibleElement {
 	}
 
 	get state() {
-		return this.dashboardPage.state?.revenue;
+		return this.dashboardPage.janillas.state?.revenue;
 	}
 
 	set state(x) {
-		if (x != null && !this.dashboardPage.state)
-			this.dashboardPage.state = {};
-		if (x != null || this.dashboardPage.state)
-			this.dashboardPage.state.revenue = x;
+		const js = this.dashboardPage.janillas;
+		if (x != null && !js.state)
+			js.state = {};
+		if (x != null || js.state)
+			js.state.revenue = x;
 	}
 
 	connectedCallback() {
@@ -52,7 +53,6 @@ export default class RevenueChart extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("RevenueChart.updateDisplay");
-		await super.updateDisplay();
 		if (!this.dashboardPage.slot)
 			this.state = null;
 		this.renderState();
@@ -64,22 +64,19 @@ export default class RevenueChart extends FlexibleElement {
 
 	renderState() {
 		// console.log("RevenueChart.renderState");
-		this.interpolate ??= this.createInterpolateDom();
-		var k = !this.state ? 0 : Math.ceil(Math.max(...this.state.map(x => x.revenue)) / 1000);
-		this.appendChild(this.interpolate({
-			y: !this.state ? null : (() => {
-				if (this.interpolateY?.length !== k + 1)
-					this.interpolateY = Array.from({ length: k + 1 }, () => this.createInterpolateDom("y"));
-				return this.interpolateY.map((x, i) => x(`$${i}K`));
-			})(),
-			x: !this.state ? null : (() => {
-				if (this.interpolateX?.length !== this.state.length)
-					this.interpolateX = this.state.map(() => this.createInterpolateDom("x"));
-				return this.state.map((x, i) => this.interpolateX[i]({
-					...x,
-					style: `height: ${x.revenue / (1000 * k) * 100}%`
-				}));
-			})()
+		const s = this.state;
+		var k = !s ? 0 : Math.ceil(Math.max(...s.map(x => x.revenue)) / 1000);
+		this.appendChild(this.interpolateDom({
+			$template: "",
+			y: !s ? null : Array.from({ length: k + 1 }, (_, i) => ({
+				$template: "y",
+				y: `$${i}K`
+			})),
+			x: !s ? null : s.map(x => ({
+				$template: "x",
+				...x,
+				style: `height: ${x.revenue / (1000 * k) * 100}%`
+			}))
 		}));
 	}
 }

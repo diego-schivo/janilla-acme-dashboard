@@ -36,8 +36,6 @@ export default class DashboardLayout extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("DashboardLayout.updateDisplay");
-		await super.updateDisplay();
-		this.interpolate ??= this.createInterpolateDom();
-		this.shadowRoot.appendChild(this.interpolate(this.state));
+		this.shadowRoot.appendChild(this.interpolateDom(this.janillas.state));
 	}
 }

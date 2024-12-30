@@ -93,28 +93,25 @@ export default class InvoicePage extends SlottableElement {
 			fetch("/api/customers/names").then(x => x.json()),
 			this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
 		]);
-		const s = {
+		this.janillas.state = {
 			customers: nn,
 			...i
-		}
-		history.replaceState(s, "");
-		return s;
+		};
+		history.replaceState(this.janillas.state, "");
 	}
 
 	renderState() {
 		// console.log("InvoicePage.renderState");
-		this.interpolate ??= this.createInterpolateDom();
-		this.appendChild(this.interpolate({
+		this.appendChild(this.interpolateDom({
+			$template: "",
 			...this.dataset,
-			customerOptions: (() => {
-				const cc = this.state?.customers;
-				if (this.interpolateCustomerOptions?.length !== cc?.length)
-					this.interpolateCustomerOptions = cc?.map(() => this.createInterpolateDom("customer-option"));
-				return cc?.map((x, i) => this.interpolateCustomerOptions[i](x));
-			})()
+			customerOptions: this.janillas.state?.customers?.map(x => ({
+				$template: "customer-option",
+				...x
+			}))
 		}));
 		const f = this.querySelector("form");
 		[...new Set(Array.from(f.elements).filter(x => x.matches("input, select")).map(x => x.name))]
-			.forEach(x => f[x].value = this.state?.[x] ?? "");
+			.forEach(x => f[x].value = this.janillas.state?.[x] ?? "");
 	}
 }

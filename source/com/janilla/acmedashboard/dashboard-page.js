@@ -42,10 +42,4 @@ export default class DashboardPage extends SlottableElement {
 		await super.updateDisplay();
 		this.querySelectorAll("card-wrapper, revenue-chart, latest-invoices").forEach(x => x.requestUpdate());
 	}
-
-	renderState() {
-		// console.log("DashboardPage.renderState");
-		this.interpolate ??= this.createInterpolateDom();
-		this.appendChild(this.interpolate());
-	}
 }

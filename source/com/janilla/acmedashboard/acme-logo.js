@@ -32,11 +32,4 @@ export default class AcmeLogo extends FlexibleElement {
 	constructor() {
 		super();
 	}
-
-	async updateDisplay() {
-		// console.log("AcmeLogo.updateDisplay");
-		await super.updateDisplay();
-		this.interpolate ??= this.createInterpolateDom();
-		this.appendChild(this.interpolate());
-	}
 }

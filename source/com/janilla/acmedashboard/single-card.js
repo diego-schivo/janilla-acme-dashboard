@@ -43,9 +43,8 @@ export default class SingleCard extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("SingleCard.updateDisplay");
-		await super.updateDisplay();
-		this.interpolate ??= this.createInterpolateDom();
-		this.shadowRoot.appendChild(this.interpolate({
+		this.shadowRoot.appendChild(this.interpolateDom({
+			$template: "",
 			...this.dataset,
 			icon: iconNameByType[this.dataset.type]
 		}));

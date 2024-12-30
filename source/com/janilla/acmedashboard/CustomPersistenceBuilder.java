@@ -32,25 +32,15 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 	@Override
 	public Persistence build() {
-		var e = Files.exists(file);
+		var fe = Files.exists(file);
 		var p = super.build();
-		p.setTypeResolver(x -> {
-			try {
-				return Class.forName(AcmeDashboard.class.getPackageName() + "." + x.replace('.', '$'));
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
-			}
-		});
-		if (!e)
-			seed(p);
+		if (!fe) {
+			var pd = PlaceholderData.INSTANCE;
+			pd.customers().forEach(p.crud(Customer.class)::create);
+			pd.invoices().forEach(p.crud(Invoice.class)::create);
+			pd.revenue().forEach(p.crud(Revenue.class)::create);
+			pd.users().forEach(p.crud(User.class)::create);
+		}
 		return p;
-	}
-
-	void seed(Persistence persistence) {
-		var pd = PlaceholderData.INSTANCE;
-		pd.customers().forEach(persistence.crud(Customer.class)::create);
-		pd.invoices().forEach(persistence.crud(Invoice.class)::create);
-		pd.revenue().forEach(persistence.crud(Revenue.class)::create);
-		pd.users().forEach(persistence.crud(User.class)::create);
 	}
 }

@@ -82,16 +82,13 @@ export default class DashboardNav extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("DashboardNav.updateDisplay");
-		await super.updateDisplay();
-		this.interpolate ??= this.createInterpolateDom();
-		this.appendChild(this.interpolate({
-			items: (() => {
-				this.interpolateItems ??= links.map(() => this.createInterpolateDom("item"));
-				return links.map((x, i) => this.interpolateItems[i]({
-					...x,
-					class: x.href === document.location.pathname ? "active" : ""
-				}));
-			})()
+		this.appendChild(this.interpolateDom({
+			$template: "",
+			items: links.map(x => ({
+				$template: "item",
+				...x,
+				class: x.href === document.location.pathname ? "active" : ""
+			}))
 		}));
 	}
 }

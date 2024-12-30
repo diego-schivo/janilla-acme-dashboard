@@ -69,34 +69,23 @@ export default class CustomersPage extends SlottableElement {
 		const q = this.dataset.query;
 		if (q)
 			u.searchParams.append("query", q);
-		const s = await (await fetch(u)).json();
-		history.replaceState(s, "");
-		return s;
+		this.janillas.state = await (await fetch(u)).json();
+		history.replaceState(this.janillas.state, "");
 	}
 
 	renderState() {
 		// console.log("CustomersPage.renderState");
-		this.interpolate ??= this.createInterpolateDom();
-		this.appendChild(this.interpolate({
+		this.appendChild(this.interpolateDom({
+			$template: "",
 			...this.dataset,
-			articles: this.state ? (() => {
-				if (this.interpolateArticles?.length !== this.state.length)
-					this.interpolateArticles = this.state.map(() => this.createInterpolateDom("article"));
-				return this.state.map((x, i) => this.interpolateArticles[i](x));
-			})() : (() => {
-				this.articleSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("article-skeleton")());
-				return this.articleSkeletons;
-			})(),
-			rows: this.state ? (() => {
-				if (this.interpolateRows?.length !== this.state.length)
-					this.interpolateRows = this.state.map(() => this.createInterpolateDom("row"));
-				return this.state.map((x, i) => this.interpolateRows[i](x));
-			})() : (() => {
-				this.rowSkeletons ??= Array.from({ length: 6 }).map(() => this.createInterpolateDom("row-skeleton")());
-				return this.rowSkeletons;
-			})()
+			articles: this.janillas.state ? this.janillas.state.map(x => ({
+				$template: "article",
+				...x
+			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
+			rows: this.janillas.state ? this.janillas.state.map(x => ({
+				$template: "row",
+				...x
+			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" }))
 		}));
-		// if (this.dataset.query)
-			// this.querySelector('[type="text"]').value = this.dataset.query;
 	}
 }

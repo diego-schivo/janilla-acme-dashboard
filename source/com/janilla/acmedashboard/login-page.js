@@ -73,10 +73,4 @@ export default class LoginPage extends SlottableElement {
 			event.submitter.setAttribute("aria-disabled", "false");
 		}
 	}
-
-	renderState() {
-		// console.log("LoginPage.renderState");
-		this.interpolate ??= this.createInterpolateDom();
-		this.appendChild(this.interpolate());
-	}
 }

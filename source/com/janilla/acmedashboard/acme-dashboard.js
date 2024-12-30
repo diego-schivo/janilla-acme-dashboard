@@ -25,7 +25,7 @@ import { FlexibleElement } from "./flexible-element.js";
 
 const updateElement = (element, active, more) => {
 	if (active) {
-		// console.log("AcmeDashboard.updateElement", element);
+		// console.log("updateElement", element);
 		element.setAttribute("slot", "content");
 	}
 
@@ -78,9 +78,7 @@ export default class AcmeDashboard extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("AcmeDashboard.updateDisplay");
-		await super.updateDisplay();
-		this.interpolate ??= this.createInterpolateDom();
-		this.shadowRoot.appendChild(this.interpolate());
+		this.shadowRoot.appendChild(this.interpolateDom());
 		const p1 = location.pathname;
 		const p2 = p1 === "/" ? (await (await fetch("/api/authentication")).json() ? "/dashboard" : "/") : p1;
 		if (p2 !== p1) {
@@ -91,21 +89,19 @@ export default class AcmeDashboard extends FlexibleElement {
 	}
 
 	updateContent(state) {
-		// console.log("AcmeDashboard.updateContent");
-		const cc = this.querySelectorAll("*");
-		if (cc)
-			Array.prototype.forEach.call(cc, x => x.removeAttribute("slot"));
+		// console.log("AcmeDashboard.updateContent", state);
+		Array.prototype.forEach.call(this.querySelectorAll("*"), x => x.removeAttribute("slot"));
 
 		const lp = location.pathname;
 		updateElement(this.querySelector("welcome-page"), lp === "/");
 		updateElement(this.querySelector("login-page"), lp === "/login");
 		updateElement(this.querySelector("dashboard-layout"), lp === "/dashboard" || lp.startsWith("/dashboard/"));
 		updateElement(this.querySelector("dashboard-page"), lp === "/dashboard", (el, a) => {
-			el.state = a ? state : undefined;
+			el.janillas.state = a ? state : undefined;
 		});
 		updateElement(this.querySelector("invoices-layout"), lp === "/dashboard/invoices" || lp.startsWith("/dashboard/invoices/"));
 		updateElement(this.querySelector("invoices-page"), lp === "/dashboard/invoices", (el, a) => {
-			el.state = a ? state : undefined;
+			el.janillas.state = a ? state : undefined;
 			if (a) {
 				const u = new URL(location.href);
 				el.setAttribute("data-query", u.searchParams.get("query") ?? "");
@@ -117,7 +113,7 @@ export default class AcmeDashboard extends FlexibleElement {
 		});
 		const m = lp === "/dashboard/invoices/create" ? [] : lp.match(/\/dashboard\/invoices\/(\d+)\/edit/);
 		updateElement(this.querySelector("invoice-page"), !!m, (el, a) => {
-			el.state = a ? state : undefined;
+			el.janillas.state = a ? state : undefined;
 			if (a) {
 				el.setAttribute("data-title", m[1] ? "Edit Invoice" : "Create Invoice");
 				el.setAttribute("data-id", m[1] ?? "");
@@ -127,7 +123,7 @@ export default class AcmeDashboard extends FlexibleElement {
 			}
 		});
 		updateElement(this.querySelector("customers-page"), lp === "/dashboard/customers", (el, a) => {
-			el.state = a ? state : undefined;
+			el.janillas.state = a ? state : undefined;
 			if (a) {
 				const u = new URL(location.href);
 				el.setAttribute("data-query", u.searchParams.get("query") ?? "");

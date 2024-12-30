@@ -34,14 +34,15 @@ export default class CardWrapper extends FlexibleElement {
 	}
 
 	get state() {
-		return this.dashboardPage.state?.cards;
+		return this.dashboardPage.janillas.state?.cards;
 	}
 
 	set state(x) {
-		if (x != null && !this.dashboardPage.state)
-			this.dashboardPage.state = {};
-		if (x != null || this.dashboardPage.state)
-			this.dashboardPage.state.cards = x;
+		const js = this.dashboardPage.janillas;
+		if (x != null && !js.state)
+			js.state = {};
+		if (x != null || js.state)
+			js.state.cards = x;
 	}
 
 	connectedCallback() {
@@ -52,14 +53,18 @@ export default class CardWrapper extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("CardWrapper.updateDisplay");
-		await super.updateDisplay();
-		this.interpolate ??= this.createInterpolateDom();
 		if (!this.dashboardPage.slot)
 			this.state = null;
-		this.appendChild(this.interpolate(this.state));
+		this.appendChild(this.interpolateDom({
+			$template: "",
+			...this.state
+		}));
 		if (this.dashboardPage.slot && !this.state) {
 			this.state = await (await fetch("/api/dashboard/cards")).json();
-			this.appendChild(this.interpolate(this.state));
+			this.appendChild(this.interpolateDom({
+				$template: "",
+				...this.state
+			}));
 		}
 	}
 }

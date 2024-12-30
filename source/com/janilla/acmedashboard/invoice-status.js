@@ -50,9 +50,10 @@ export default class InvoiceStatus extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("InvoiceStatus.updateDisplay");
-		await super.updateDisplay();
-		this.interpolate ??= this.createInterpolateDom();
 		const v = this.dataset.value;
-		this.appendChild(this.interpolate(v ? statuses[v] : undefined));
+		this.appendChild(this.interpolateDom(v ? {
+			$template: "",
+			...statuses[v]
+		} : undefined));
 	}
 }

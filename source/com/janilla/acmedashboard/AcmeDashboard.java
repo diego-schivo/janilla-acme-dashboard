@@ -42,7 +42,7 @@ import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
-@Render(AcmeDashboardRenderer.class)
+@Render(template = "index.html")
 public class AcmeDashboard {
 
 	public static void main(String[] args) {

@@ -36,15 +36,4 @@ export default class WelcomePage extends SlottableElement {
 	constructor() {
 		super();
 	}
-
-	async computeState() {
-		// console.log("WelcomePage.computeState");
-		return {};
-	}
-
-	renderState() {
-		// console.log("WelcomePage.renderState");
-		this.interpolate ??= this.createInterpolateDom();
-		this.appendChild(this.interpolate());
-	}
 }

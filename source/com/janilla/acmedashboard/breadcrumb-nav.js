@@ -36,15 +36,13 @@ export default class BreadcrumbNav extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("BreadcrumbNav.updateDisplay");
-		await super.updateDisplay();
-		this.interpolate ??= this.createInterpolateDom();
-		this.shadowRoot.appendChild(this.interpolate({
-			items: (() => {
-				const l = this.children.length;
-				if (this.interpolateItems?.length !== l)
-					this.interpolateItems = Array.from({ length: l }, (_, i) => this.createInterpolateDom(i < l - 1 ? "item" : "last-item"));
-				return this.interpolateItems.map((x, i) => x({ slot: `item-${i}` }));
-			})()
+		const l = this.children.length;
+		this.shadowRoot.appendChild(this.interpolateDom({
+			$template: "",
+			items: Array.from({ length: l }, (_, i) => ({
+				$template: i < l - 1 ? "item" : "last-item",
+				slot: `item-${i}`
+			}))
 		}));
 	}
 }
