@@ -42,7 +42,7 @@ public class CustomerApi {
 	public Stream<Map.Entry<String, String>> names() {
 		var cc = persistence.crud(Customer.class);
 		return cc.read(cc.list())
-				.collect(Collectors.toMap(x -> x.id().toString(), Customer::name, (v, w) -> v, LinkedHashMap::new))
+				.collect(Collectors.toMap(x -> x.id().toString(), Customer::name, (v, _) -> v, LinkedHashMap::new))
 				.entrySet().stream();
 	}
 
