@@ -23,18 +23,25 @@
  */
 package com.janilla.acmedashboard;
 
+import java.util.Collection;
+
+import com.janilla.database.Database;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
 
 public class CustomPersistence extends Persistence {
 
+	public CustomPersistence(Database database, Collection<Class<?>> types) {
+		super(database, types);
+	}
+
 	@Override
-	protected <E> Crud<E> createCrud(Class<E> type) {
+	protected <E> Crud<E> newCrud(Class<E> type) {
 		if (type == Invoice.class) {
 			@SuppressWarnings("unchecked")
-			var c = (Crud<E>) new InvoiceCrud();
+			var c = (Crud<E>) new InvoiceCrud(Invoice.class, this);
 			return c;
 		}
-		return super.createCrud(type);
+		return super.newCrud(type);
 	}
 }

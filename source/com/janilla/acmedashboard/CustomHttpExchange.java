@@ -25,6 +25,7 @@ package com.janilla.acmedashboard;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -36,38 +37,43 @@ import com.janilla.http.HttpCookie;
 import com.janilla.http.HttpExchange;
 import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
-import com.janilla.util.Lazy;
 import com.janilla.web.UnauthenticatedException;
 
-public class CustomExchange extends HttpExchange {
+public class CustomHttpExchange extends HttpExchange {
 
 	public Properties configuration;
 
 	public Persistence persistence;
 
-	protected Supplier<String> sessionEmail = Lazy.of(() -> {
-		var hh = getRequest().getHeaders();
-		var h = hh != null ? hh.stream().filter(x -> x.name().equals("cookie")).map(HeaderField::value)
-				.collect(Collectors.joining("; ")) : null;
-		var cc = h != null ? Http.parseCookieHeader(h) : null;
-		var t = cc != null ? cc.get("session") : null;
-		Map<String, ?> p;
-		try {
-			p = t != null ? Jwt.verifyToken(t, configuration.getProperty("acmedashboard.jwt.key")) : null;
-		} catch (IllegalArgumentException e) {
-			p = null;
-		}
-		var e = p != null ? (String) p.get("loggedInAs") : null;
-		return e;
-	});
+	private Map<String, Object> map = new HashMap<>();
 
-	private Supplier<User> sessionUser = Lazy.of(() -> {
-		var c = persistence.crud(User.class);
-		var e = getSessionEmail();
-		var i = e != null ? c.find("email", e) : 0;
-		var u = i > 0 ? c.read(i) : null;
-		return u;
-	});
+	protected Supplier<String> sessionEmail = () -> {
+		if (!map.containsKey("sessionEmail")) {
+			var hh = getRequest().getHeaders();
+			var h = hh != null ? hh.stream().filter(x -> x.name().equals("cookie")).map(HeaderField::value)
+					.collect(Collectors.joining("; ")) : null;
+			var cc = h != null ? Http.parseCookieHeader(h) : null;
+			var t = cc != null ? cc.get("session") : null;
+			Map<String, ?> p;
+			try {
+				p = t != null ? Jwt.verifyToken(t, configuration.getProperty("acmedashboard.jwt.key")) : null;
+			} catch (IllegalArgumentException e) {
+				p = null;
+			}
+			map.put("sessionEmail", p != null ? p.get("loggedInAs") : null);
+		}
+		return (String) map.get("sessionEmail");
+	};
+
+	private Supplier<User> sessionUser = () -> {
+		if (!map.containsKey("sessionUser")) {
+			var c = persistence.crud(User.class);
+			var e = getSessionEmail();
+			var i = e != null ? c.find("email", e) : 0;
+			map.put("sessionUser", i > 0 ? c.read(i) : null);
+		}
+		return (User) map.get("sessionUser");
+	};
 
 	public String getSessionEmail() {
 		return sessionEmail.get();

@@ -37,7 +37,7 @@ public class AuthenticationApi {
 	public Persistence persistence;
 
 	@Handle(method = "POST", path = "/api/authentication")
-	public User create(User user, CustomExchange exchange) {
+	public User create(User user, CustomHttpExchange exchange) {
 		var uc = persistence.crud(User.class);
 		var u = uc.read(uc.find("email", user.email()));
 		if (!u.password().equals(user.password()))
@@ -50,12 +50,12 @@ public class AuthenticationApi {
 	}
 
 	@Handle(method = "GET", path = "/api/authentication")
-	public User read(CustomExchange exchange) {
+	public User read(CustomHttpExchange exchange) {
 		return exchange.getSessionUser();
 	}
 
 	@Handle(method = "DELETE", path = "/api/authentication")
-	public void delete(User user, CustomExchange exchange) {
+	public void delete(User user, CustomHttpExchange exchange) {
 		exchange.setSessionCookie(null);
 	}
 }

@@ -28,11 +28,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.janilla.persistence.Crud;
+import com.janilla.persistence.Persistence;
 
 public class InvoiceCrud extends Crud<Invoice> {
 
+	public InvoiceCrud(Class<Invoice> type, Persistence persistence) {
+		super(type, persistence);
+	}
+
 	public BigDecimal getAmount(Invoice.Status status) {
-		var a = database.perform((_, ii) -> ii.perform("Invoice.status", i -> i.apply(status, (aa, _) -> {
+		var a = persistence.database().perform((_, ii) -> ii.perform("Invoice.status", i -> i.apply(status, (aa, _) -> {
 			var d = (Double) aa.get("amount");
 			return d != null ? BigDecimal.valueOf(d) : null;
 		}, false)), false);
@@ -40,12 +45,13 @@ public class InvoiceCrud extends Crud<Invoice> {
 	}
 
 	public BigDecimal getAmount(Long customerId, Invoice.Status status) {
-		var a = database.perform((_, ii) -> ii.perform("Invoice.customerId", i -> i.apply(customerId, (aa, _) -> {
-			@SuppressWarnings("unchecked")
-			var m = (Map<String, Double>) aa.get("amount");
-			var d = m != null ? m.get(status.name()) : null;
-			return d != null ? BigDecimal.valueOf(d) : null;
-		}, false)), false);
+		var a = persistence.database()
+				.perform((_, ii) -> ii.perform("Invoice.customerId", i -> i.apply(customerId, (aa, _) -> {
+					@SuppressWarnings("unchecked")
+					var m = (Map<String, Double>) aa.get("amount");
+					var d = m != null ? m.get(status.name()) : null;
+					return d != null ? BigDecimal.valueOf(d) : null;
+				}, false)), false);
 		return a != null ? a : BigDecimal.ZERO;
 	}
 
@@ -59,14 +65,14 @@ public class InvoiceCrud extends Crud<Invoice> {
 				x = x.subtract(entity2.amount());
 			if (x.compareTo(BigDecimal.ZERO) > 0) {
 				var y = x;
-				database.perform(
-						(_, ii) -> ii
-								.perform("Invoice.status",
+				persistence.database()
+						.perform(
+								(_, ii) -> ii.perform("Invoice.status",
 										i -> i.apply(entity1.status(),
 												(aa, _) -> aa.compute("amount",
 														(_, v) -> BigDecimal.valueOf((double) v).subtract(y)),
 												false)),
-						true);
+								true);
 			}
 		}
 
@@ -76,7 +82,7 @@ public class InvoiceCrud extends Crud<Invoice> {
 				x = x.subtract(entity1.amount());
 			if (x.compareTo(BigDecimal.ZERO) > 0) {
 				var y = x;
-				database.perform(
+				persistence.database().perform(
 						(_, ii) -> ii.perform("Invoice.status", i -> i.apply(entity2.status(),
 								(aa, _) -> aa.compute("amount",
 										(_, v) -> v != null ? BigDecimal.valueOf((double) v).add(y) : y),
@@ -92,7 +98,7 @@ public class InvoiceCrud extends Crud<Invoice> {
 				x = x.subtract(entity2.amount());
 			if (x.compareTo(BigDecimal.ZERO) > 0) {
 				var y = x;
-				database.perform(
+				persistence.database().perform(
 						(_, ii) -> ii.perform("Invoice.customerId", i -> i.apply(entity1.customerId(), (aa, _) -> {
 							@SuppressWarnings("unchecked")
 							var m = (Map<String, Double>) aa.get("amount");
@@ -109,7 +115,7 @@ public class InvoiceCrud extends Crud<Invoice> {
 				x = x.subtract(entity1.amount());
 			if (x.compareTo(BigDecimal.ZERO) > 0) {
 				var y = x;
-				database.perform(
+				persistence.database().perform(
 						(_, ii) -> ii.perform("Invoice.customerId", i -> i.apply(entity2.customerId(), (aa, _) -> {
 							@SuppressWarnings("unchecked")
 							var m = (Map<String, Double>) aa.computeIfAbsent("amount", _ -> new LinkedHashMap<>());

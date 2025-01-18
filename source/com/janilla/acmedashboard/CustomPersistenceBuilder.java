@@ -24,15 +24,21 @@
 package com.janilla.acmedashboard;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
+import com.janilla.reflect.Factory;
 
 public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
+	public CustomPersistenceBuilder(Path databaseFile, Factory factory) {
+		super(databaseFile, factory);
+	}
+
 	@Override
 	public Persistence build() {
-		var fe = Files.exists(file);
+		var fe = Files.exists(databaseFile);
 		var p = super.build();
 		if (!fe) {
 			var pd = PlaceholderData.INSTANCE;
