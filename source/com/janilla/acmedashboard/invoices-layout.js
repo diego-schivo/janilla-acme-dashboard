@@ -25,6 +25,10 @@ import { FlexibleElement } from "./flexible-element.js";
 
 export default class InvoicesLayout extends FlexibleElement {
 
+	static get observedAttributes() {
+		return ["data-uri", "slot"];
+	}
+
 	static get templateName() {
 		return "invoices-layout";
 	}
@@ -34,26 +38,30 @@ export default class InvoicesLayout extends FlexibleElement {
 		this.attachShadow({ mode: "open" });
 	}
 
-	connectedCallback() {
-		// console.log("InvoicesLayout.connectedCallback");
-		super.connectedCallback();
-		this.shadowRoot.addEventListener("slotchange", this.handleSlotChange);
-	}
-
-	disconnectedCallback() {
-		// console.log("InvoicesLayout.disconnectedCallback");
-		this.shadowRoot.removeEventListener("slotchange", this.handleSlotChange);
-	}
-
-	handleSlotChange = event => {
-		// console.log("InvoicesLayout.handleSlotChange", event);
-		this.requestUpdate();
-	}
-
 	async updateDisplay() {
 		// console.log("InvoicesLayout.updateDisplay");
-		this.shadowRoot.appendChild(this.interpolateDom({
+		const p = location.pathname;
+		const pp = new URLSearchParams(location.search);
+		this.appendChild(this.interpolateDom({
 			$template: "",
+			invoicesPage: {
+				$template: "invoices-page",
+				slot: p === "/dashboard/invoices" ? "content" : null,
+				query: pp.get("query"),
+				page: pp.get("page")
+			},
+			invoicePage: (() => {
+				const m = p === "/dashboard/invoices/create" ? [] : p?.match(/\/dashboard\/invoices\/(\d+)\/edit/);
+				return {
+					$template: "invoice-page",
+					slot: m ? "content" : null,
+					title: m ? (m[1] ? "Edit Invoice" : "Create Invoice") : null,
+					id: m?.[1]
+				};
+			})()
+		}));
+		this.shadowRoot.appendChild(this.interpolateDom({
+			$template: "shadow",
 			breadcrumbItems: (() => {
 				const nn = [];
 				for (let n = this.querySelector("[slot]"); n; n = n.previousElementSibling)

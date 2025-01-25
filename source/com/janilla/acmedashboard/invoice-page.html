@@ -8,7 +8,7 @@
 					<!--${customerOptions}-->
 				</select>
 				<template id="customer-option">
-					<option value="${key}">${value}</option>
+					<option value="${key}" selected="${selected}">${value}</option>
 				</template>
 				<hero-icon data-name="user-circle"></hero-icon>
 			</div>
@@ -17,7 +17,7 @@
 		<div>
 			<label for="amount">Choose an amount</label>
 			<div class="amount-control">
-				<input id="amount" name="amount" type="number" step="0.01" placeholder="Enter USD amount" />
+				<input id="amount" name="amount" type="number" step="0.01" placeholder="Enter USD amount" value="${amount}" />
 				<hero-icon data-name="currency-dollar"></hero-icon>
 			</div>
 			<div class="amount-error" aria-live="polite" aria-atomic="true"></div>
@@ -25,18 +25,15 @@
 		<fieldset>
 			<legend>Set the invoice status</legend>
 			<ol>
-				<li>
-					<input id="pending" name="status" type="radio" value="PENDING" />
-					<label for="pending">
-						<invoice-status data-value="PENDING"></invoice-status>
-					</label>
-				</li>
-				<li>
-					<input id="paid" name="status" type="radio" value="PAID" />
-					<label for="paid">
-						<invoice-status data-value="PAID"></invoice-status>
-					</label>
-				</li>
+				<!--${statusItems}-->
+				<template id="status-item">
+					<li>
+						<input id="${value}" name="status" type="radio" value="${value}" checked="${checked}" />
+						<label for="${value}">
+							<invoice-status data-value="${value}"></invoice-status>
+						</label>
+					</li>
+				</template>
 			</ol>
 			<div class="status-error" aria-live="polite" aria-atomic="true"></div>
 		</fieldset>

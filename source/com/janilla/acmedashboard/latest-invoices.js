@@ -34,36 +34,15 @@ export default class LatestInvoices extends FlexibleElement {
 	}
 
 	get state() {
-		return this.dashboardPage.janillas.state?.invoices;
+		return this.closest("dashboard-page").state?.invoices;
 	}
 
 	set state(x) {
-		const js = this.dashboardPage.janillas;
-		if (x != null && !js.state)
-			js.state = {};
-		if (x != null || js.state)
-			js.state.invoices = x;
-	}
-
-	connectedCallback() {
-		// console.log("LatestInvoices.connectedCallback");
-		super.connectedCallback();
-		this.dashboardPage = this.closest("dashboard-page");
+		this.closest("dashboard-page").state.invoices = x;
 	}
 
 	async updateDisplay() {
 		// console.log("LatestInvoices.updateDisplay");
-		if (!this.dashboardPage.slot)
-			this.state = null;
-		this.renderState();
-		if (this.dashboardPage.slot && !this.state) {
-			this.state = await (await fetch("/api/dashboard/invoices")).json();
-			this.renderState();
-		}
-	}
-
-	renderState() {
-		// console.log("LatestInvoices.renderState");
 		const s = this.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
@@ -72,5 +51,10 @@ export default class LatestInvoices extends FlexibleElement {
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" }))
 		}));
+		if (this.closest("dashboard-page").slot && !this.state) {
+			this.state = await (await fetch("/api/dashboard/invoices")).json();
+			history.replaceState(this.closest("root-layout").state, "");
+			this.requestUpdate();
+		}
 	}
 }

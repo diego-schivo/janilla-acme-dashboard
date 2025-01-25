@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { SlottableElement } from "./slottable-element.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class CustomersPage extends SlottableElement {
+export default class CustomersPage extends FlexibleElement {
 
 	static get observedAttributes() {
 		return ["data-query", "slot"];
@@ -35,6 +35,14 @@ export default class CustomersPage extends SlottableElement {
 
 	constructor() {
 		super();
+	}
+
+	get state() {
+		return this.closest("root-layout").state.customers;
+	}
+
+	set state(x) {
+		this.closest("root-layout").state.customers = x;
 	}
 
 	connectedCallback() {
@@ -55,34 +63,45 @@ export default class CustomersPage extends SlottableElement {
 		const q = event.target.value;
 		this.inputTimeout = setTimeout(() => {
 			this.inputTimeout = undefined;
-			const u = new URL("/dashboard/customers", location.href);
+			const u = new URL(location.href);
+			const q0 = u.searchParams.get("query");
 			if (q)
-				u.searchParams.append("query", q);
-			history.pushState({}, "", u.pathname + u.search);
+				u.searchParams.set("query", q);
+			else
+				u.searchParams.delete("query");
+			if (!q0)
+				history.pushState({}, "", u.pathname + u.search);
+			else
+				history.replaceState({}, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
 	}
 
-	async computeState() {
-		// console.log("CustomersPage.computeState");
-		const u = new URL("/api/customers", location.href);
+	async updateDisplay() {
+		// console.log("InvoicesPage.updateDisplay");
+		if (!this.slot && this.state)
+			this.state = null;
+		if (this.slot && !this.state) {
+			const u = new URL("/api/customers", location.href);
+			const q = this.dataset.query;
+			if (q)
+				u.searchParams.append("query", q);
+			this.state = await (await fetch(u)).json();
+			history.replaceState(this.closest("root-layout").state, "");
+		}
+		const s = this.state;
+		const u = new URL("/dashboard/invoices", location.href);
 		const q = this.dataset.query;
 		if (q)
 			u.searchParams.append("query", q);
-		this.janillas.state = await (await fetch(u)).json();
-		history.replaceState(this.janillas.state, "");
-	}
-
-	renderState() {
-		// console.log("CustomersPage.renderState");
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: this.janillas.state ? this.janillas.state.map(x => ({
+			articles: s ? s.map(x => ({
 				$template: "article",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: this.janillas.state ? this.janillas.state.map(x => ({
+			rows: s ? s.map(x => ({
 				$template: "row",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" }))

@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { SlottableElement } from "./slottable-element.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class InvoicesPage extends SlottableElement {
+export default class InvoicesPage extends FlexibleElement {
 
 	static get observedAttributes() {
 		return ["data-page", "data-query", "slot"];
@@ -35,6 +35,14 @@ export default class InvoicesPage extends SlottableElement {
 
 	constructor() {
 		super();
+	}
+
+	get state() {
+		return this.closest("root-layout").state.invoices;
+	}
+
+	set state(x) {
+		this.closest("root-layout").state.invoices = x;
 	}
 
 	connectedCallback() {
@@ -57,10 +65,16 @@ export default class InvoicesPage extends SlottableElement {
 		const q = event.target.value;
 		this.inputTimeout = setTimeout(() => {
 			this.inputTimeout = undefined;
-			const u = new URL("/dashboard/invoices", location.href);
+			const u = new URL(location.href);
+			const q0 = u.searchParams.get("query");
 			if (q)
-				u.searchParams.append("query", q);
-			history.pushState({}, "", u.pathname + u.search);
+				u.searchParams.set("query", q);
+			else
+				u.searchParams.delete("query");
+			if (!q0)
+				history.pushState({}, "", u.pathname + u.search);
+			else
+				history.replaceState({}, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
 	}
@@ -85,21 +99,22 @@ export default class InvoicesPage extends SlottableElement {
 		}
 	}
 
-	async computeState() {
-		// console.log("InvoicesPage.computeState");
-		const u = new URL("/api/invoices", location.href);
-		const q = this.dataset.query;
-		if (q)
-			u.searchParams.append("query", q);
-		const p = this.dataset.page;
-		if (p)
-			u.searchParams.append("page", p);
-		this.janillas.state = await (await fetch(u)).json();
-		history.replaceState(this.janillas.state, "");
-	}
-
-	renderState() {
-		// console.log("InvoicesPage.renderState");
+	async updateDisplay() {
+		// console.log("InvoicesPage.updateDisplay");
+		if (!this.slot && this.state)
+			this.state = null;
+		if (this.slot && !this.state) {
+			const u = new URL("/api/invoices", location.href);
+			const q = this.dataset.query;
+			if (q)
+				u.searchParams.append("query", q);
+			const p = this.dataset.page;
+			if (p)
+				u.searchParams.append("page", p);
+			this.state = await (await fetch(u)).json();
+			history.replaceState(this.closest("root-layout").state, "");
+		}
+		const s = this.state;
 		const u = new URL("/dashboard/invoices", location.href);
 		const q = this.dataset.query;
 		if (q)
@@ -108,12 +123,12 @@ export default class InvoicesPage extends SlottableElement {
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: this.janillas.state ? this.janillas.state.items.map(x => ({
+			articles: s ? s.items.map(x => ({
 				$template: "article",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: this.janillas.state ? this.janillas.state.items.map(x => ({
+			rows: s ? s.items.map(x => ({
 				$template: "row",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
@@ -121,7 +136,7 @@ export default class InvoicesPage extends SlottableElement {
 			pagination: {
 				href: u.pathname + u.search,
 				page: p ?? 1,
-				pageCount: this.janillas.state ? Math.ceil(this.janillas.state.total / 6) : undefined
+				pageCount: s ? Math.ceil(s.total / 6) : 0
 			}
 		}));
 	}

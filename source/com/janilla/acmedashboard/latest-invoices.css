@@ -31,9 +31,10 @@ latest-invoices {
 				grid-area: d;
 			}
 
-			&.skeleton * {
+			&.skeleton span:empty {
 				background: rgb(243, 244, 246);
 				border-radius: 0.25rem;
+				display: block;
 				height: 1rem;
 				width: 3rem;
 

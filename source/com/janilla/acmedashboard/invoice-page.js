@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { SlottableElement } from "./slottable-element.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class InvoicePage extends SlottableElement {
+export default class InvoicePage extends FlexibleElement {
 
 	static get observedAttributes() {
 		return ["data-id", "slot"];
@@ -35,6 +35,14 @@ export default class InvoicePage extends SlottableElement {
 
 	constructor() {
 		super();
+	}
+
+	get state() {
+		return this.closest("root-layout").state.invoice;
+	}
+
+	set state(x) {
+		this.closest("root-layout").state.invoice = x;
 	}
 
 	connectedCallback() {
@@ -87,31 +95,36 @@ export default class InvoicePage extends SlottableElement {
 		}
 	}
 
-	async computeState() {
-		// console.log("InvoicePage.computeState");
-		const [nn, i] = await Promise.all([
-			fetch("/api/customers/names").then(x => x.json()),
-			this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
-		]);
-		this.janillas.state = {
-			customers: nn,
-			...i
-		};
-		history.replaceState(this.janillas.state, "");
-	}
-
-	renderState() {
-		// console.log("InvoicePage.renderState");
+	async updateDisplay() {
+		// console.log("InvoicePage.updateDisplay");
+		if (!this.slot && this.state)
+			this.state = null;
+		if (this.slot && !this.state) {
+			const [nn, i] = await Promise.all([
+				fetch("/api/customers/names").then(x => x.json()),
+				this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
+			]);
+			this.state = {
+				customers: nn,
+				...i
+			};
+			history.replaceState(this.closest("root-layout").state, "");
+		}
+		const s = this.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			customerOptions: this.janillas.state?.customers?.map(x => ({
+			...s,
+			customerOptions: s?.customers?.map(x => ({
 				$template: "customer-option",
-				...x
+				...x,
+				selected: x.key == s?.customerId
+			})),
+			statusItems: ["PENDING", "PAID"].map(x => ({
+				$template: "status-item",
+				value: x,
+				checked: x === s?.status
 			}))
 		}));
-		const f = this.querySelector("form");
-		[...new Set(Array.from(f.elements).filter(x => x.matches("input, select")).map(x => x.name))]
-			.forEach(x => f[x].value = this.janillas.state?.[x] ?? "");
 	}
 }

@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { SlottableElement } from "./slottable-element.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class DashboardPage extends SlottableElement {
+export default class DashboardPage extends FlexibleElement {
 
 	static get observedAttributes() {
 		return ["slot"];
@@ -37,8 +37,20 @@ export default class DashboardPage extends SlottableElement {
 		super();
 	}
 
+	get state() {
+		return this.closest("root-layout").state.dashboard;
+	}
+
+	set state(x) {
+		this.closest("root-layout").state.dashboard = x;
+	}
+
 	async updateDisplay() {
 		// console.log("DashboardPage.updateDisplay");
+		if (!this.slot && this.state)
+			this.state = null;
+		if (this.slot && !this.state)
+			this.state = {};
 		await super.updateDisplay();
 		this.querySelectorAll("card-wrapper, revenue-chart, latest-invoices").forEach(x => x.requestUpdate());
 	}

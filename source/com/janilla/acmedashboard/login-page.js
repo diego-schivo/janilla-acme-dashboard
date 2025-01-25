@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { SlottableElement } from "./slottable-element.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class LoginPage extends SlottableElement {
+export default class LoginPage extends FlexibleElement {
 
 	static get observedAttributes() {
 		return ["slot"];
@@ -51,11 +51,9 @@ export default class LoginPage extends SlottableElement {
 	handleSubmit = async event => {
 		// console.log("LoginPage.handleSubmit", event);
 		event.preventDefault();
-
 		if (event.submitter.getAttribute("aria-disabled") === "true")
 			return;
 		event.submitter.setAttribute("aria-disabled", "true");
-
 		try {
 			const fd = new FormData(event.target);
 			const u = await (await fetch("/api/authentication", {
@@ -64,9 +62,8 @@ export default class LoginPage extends SlottableElement {
 				body: JSON.stringify(Object.fromEntries(fd))
 			})).json();
 			this.querySelector(".error").innerHTML = u ? "" : "Invalid credentials.";
-
 			if (u) {
-				history.pushState({}, "", "/dashboard");
+				history.pushState(this.closest("root-layout").state, "", "/dashboard");
 				dispatchEvent(new CustomEvent("popstate"));
 			}
 		} finally {

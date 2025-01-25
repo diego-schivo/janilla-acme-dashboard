@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import AcmeDashboard from "./acme-dashboard.js";
+import RootLayout from "./root-layout.js";
 import AcmeLogo from "./acme-logo.js";
 import BreadcrumbNav from "./breadcrumb-nav.js";
 import CardWrapper from "./card-wrapper.js";
@@ -42,7 +42,7 @@ import RevenueChart from "./revenue-chart.js";
 import SingleCard from "./single-card.js";
 import WelcomePage from "./welcome-page.js";
 
-customElements.define("acme-dashboard", AcmeDashboard);
+customElements.define("root-layout", RootLayout);
 customElements.define("acme-logo", AcmeLogo);
 customElements.define("breadcrumb-nav", BreadcrumbNav);
 customElements.define("card-wrapper", CardWrapper);

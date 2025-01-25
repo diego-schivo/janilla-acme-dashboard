@@ -47,6 +47,7 @@ export default class PaginationNav extends FlexibleElement {
 			links: pc > 1 ? [(() => {
 				u.searchParams.set("page", p - 1);
 				return {
+					$template: "link",
 					href: p > 1 ? u.pathname + u.search : undefined,
 					content: {
 						$template: "icon",
@@ -57,6 +58,7 @@ export default class PaginationNav extends FlexibleElement {
 				.map(x => {
 					u.searchParams.set("page", x);
 					return {
+						$template: "link",
 						href: u.pathname + u.search,
 						class: x === p ? "active" : "",
 						content: {
@@ -67,6 +69,7 @@ export default class PaginationNav extends FlexibleElement {
 				}), (() => {
 					u.searchParams.set("page", p + 1);
 					return {
+						$template: "link",
 						href: p < pc ? u.pathname + u.search : undefined,
 						content: {
 							$template: "icon",

@@ -25,6 +25,10 @@ import { FlexibleElement } from "./flexible-element.js";
 
 export default class DashboardLayout extends FlexibleElement {
 
+	static get observedAttributes() {
+		return ["data-uri", "slot"];
+	}
+
 	static get templateName() {
 		return "dashboard-layout";
 	}
@@ -36,6 +40,28 @@ export default class DashboardLayout extends FlexibleElement {
 
 	async updateDisplay() {
 		// console.log("DashboardLayout.updateDisplay");
-		this.shadowRoot.appendChild(this.interpolateDom(this.janillas.state));
+		this.shadowRoot.appendChild(this.interpolateDom({ $template: "shadow" }));
+		const p = location.pathname;
+		const pp = new URLSearchParams(location.search);
+		this.appendChild(this.interpolateDom({
+			$template: "",
+			dashboardPage: {
+				$template: "dashboard-page",
+				slot: p === "/dashboard" ? "content" : null
+			},
+			invoicesLayout: (() => {
+				const a = p === "/dashboard/invoices" || p?.startsWith("/dashboard/invoices/");
+				return {
+					$template: "invoices-layout",
+					slot: a ? "content" : null,
+					uri: a ? p + location.search : null
+				};
+			})(),
+			customersPage: {
+				$template: "customers-page",
+				slot: p === "/dashboard/customers" ? "content" : null,
+				query: pp.get("query")
+			}
+		}));
 	}
 }

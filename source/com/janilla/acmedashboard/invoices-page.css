@@ -123,40 +123,41 @@ invoices-page {
 			}
 
 			&.skeleton {
-				div:first-child {
-					span:first-child {
+				span:empty {
+					background: rgb(243, 244, 246);
+					border-radius: 0.25rem;
+					display: block;
+					height: 1.5rem;
+					width: 6rem;
+				}
+
+				div:first-child span:empty {
+					&:first-child {
 						border-radius: 9999px;
 						height: 2rem;
 						width: 2rem;
 					}
 
-					span:nth-child(3) {
+					&:nth-child(3) {
 						height: 1rem;
 						width: 8rem;
 					}
 
-					span:nth-child(4) {
+					&:nth-child(4) {
 						width: 4rem;
 					}
 				}
 
-				div:nth-child(2) {
-					span:nth-child(2) {
+				div:nth-child(2) span:empty {
+					&:nth-child(2) {
 						width: 8rem;
 					}
 
-					span:nth-child(3),
-					span:nth-child(4) {
+					&:nth-child(3),
+					&:nth-child(4) {
 						height: 2.5rem;
 						width: 2.5rem;
 					}
-				}
-
-				span {
-					background: rgb(243, 244, 246);
-					border-radius: 0.25rem;
-					height: 1.5rem;
-					width: 6rem;
 				}
 			}
 		}
@@ -181,8 +182,41 @@ invoices-page {
 			background: rgb(255, 255, 255);
 		}
 	
-		tr:not(:last-child) {
-			border-bottom: 1px solid rgb(229, 231, 235);
+		tr {
+			&:not(:last-child) {
+				border-bottom: 1px solid rgb(229, 231, 235);
+			}
+
+			&.skeleton {
+				span:empty {
+					background: rgb(243, 244, 246);
+					border-radius: 0.25rem;
+					display: block;
+					height: 1.5rem;
+					width: 4rem;
+				}
+	
+				td:first-child span:empty {
+					&:first-child {
+						border-radius: 9999px;
+						height: 2rem;
+						width: 2rem;
+					}
+
+					&:nth-child(2) {
+						width: 6rem;
+					}
+				}
+	
+				td:nth-child(2) span:empty {
+					width: 8rem;
+				}
+	
+				td:last-child span:empty {
+					height: 38px;
+					width: 38px;
+				}
+			}
 		}
 	
 		td {
@@ -200,61 +234,6 @@ invoices-page {
 	
 			&:last-child {
 				justify-content: flex-end;
-			}
-
-			div:empty {
-				align-items: center;
-				display: flex;
-				gap: 0.75rem;
-
-				&::after,
-				&::before {
-					background: rgb(243, 244, 246);
-					border-radius: 0.25rem;
-					height: 1.5rem;
-					width: 4rem;
-				}
-
-				&::before {
-					content: "";
-				}
-			}
-
-			&:first-child {
-				div:empty {
-					&::before {
-						border-radius: 9999px;
-						height: 2rem;
-						width: 2rem;
-					}
-
-					&::after {
-						content: "";
-						width: 6rem;
-					}
-				}
-			}
-
-			&:nth-child(2) {
-				div:empty {
-					&::before {
-						width: 8rem;
-					}
-				}
-			}
-
-			&:last-child {
-				div:empty {
-					&::after,
-					&::before {
-						height: 38px;
-						width: 38px;
-					}
-
-					&::after {
-						content: "";
-					}
-				}
 			}
 		}
 	

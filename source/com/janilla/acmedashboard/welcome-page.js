@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { SlottableElement } from "./slottable-element.js";
+import { FlexibleElement } from "./flexible-element.js";
 
-export default class WelcomePage extends SlottableElement {
+export default class WelcomePage extends FlexibleElement {
 
 	static get observedAttributes() {
 		return ["slot"];

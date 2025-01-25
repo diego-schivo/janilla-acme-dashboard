@@ -1,8 +1,10 @@
-<link href="/invoices-layout.css" rel="stylesheet" />
-<breadcrumb-nav>
-	<!--${breadcrumbItems}-->
-</breadcrumb-nav>
-<slot name="content"></slot>
+<template id="shadow">
+	<link href="/invoices-layout.css" rel="stylesheet" />
+	<breadcrumb-nav>
+		<!--${breadcrumbItems}-->
+	</breadcrumb-nav>
+	<slot name="content"></slot>
+</template>
 
 <template id="breadcrumb-link">
 	<a href="${href}" slot="${slot}">${title}</a>
@@ -10,4 +12,15 @@
 
 <template id="breadcrumb-heading">
 	<h1 slot="${slot}">${title}</h1>
+</template>
+
+<!--${invoicesPage}-->
+<!--${invoicePage}-->
+
+<template id="invoices-page">
+	<invoices-page slot="${slot}" data-title="Invoices" data-href="/dashboard/invoices" data-query="${query}" data-page="${page}"></invoices-page>
+</template>
+
+<template id="invoice-page">
+	<invoice-page slot="${slot}" data-title="${title}" data-id="${id}"></invoice-page>
 </template>

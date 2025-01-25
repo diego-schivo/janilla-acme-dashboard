@@ -34,36 +34,15 @@ export default class RevenueChart extends FlexibleElement {
 	}
 
 	get state() {
-		return this.dashboardPage.janillas.state?.revenue;
+		return this.closest("dashboard-page").state?.revenue;
 	}
 
 	set state(x) {
-		const js = this.dashboardPage.janillas;
-		if (x != null && !js.state)
-			js.state = {};
-		if (x != null || js.state)
-			js.state.revenue = x;
-	}
-
-	connectedCallback() {
-		// console.log("RevenueChart.connectedCallback");
-		super.connectedCallback();
-		this.dashboardPage = this.closest("dashboard-page");
+		this.closest("dashboard-page").state.revenue = x;
 	}
 
 	async updateDisplay() {
 		// console.log("RevenueChart.updateDisplay");
-		if (!this.dashboardPage.slot)
-			this.state = null;
-		this.renderState();
-		if (this.dashboardPage.slot && !this.state) {
-			this.state = await (await fetch("/api/dashboard/revenue")).json();
-			this.renderState();
-		}
-	}
-
-	renderState() {
-		// console.log("RevenueChart.renderState");
 		const s = this.state;
 		var k = !s ? 0 : Math.ceil(Math.max(...s.map(x => x.revenue)) / 1000);
 		this.appendChild(this.interpolateDom({
@@ -78,5 +57,10 @@ export default class RevenueChart extends FlexibleElement {
 				style: `height: ${x.revenue / (1000 * k) * 100}%`
 			}))
 		}));
+		if (this.closest("dashboard-page").slot && !this.state) {
+			this.state = await (await fetch("/api/dashboard/revenue")).json();
+			history.replaceState(this.closest("root-layout").state, "");
+			this.requestUpdate();
+		}
 	}
 }

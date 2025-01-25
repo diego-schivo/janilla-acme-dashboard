@@ -34,37 +34,23 @@ export default class CardWrapper extends FlexibleElement {
 	}
 
 	get state() {
-		return this.dashboardPage.janillas.state?.cards;
+		return this.closest("dashboard-page").state?.cards;
 	}
 
 	set state(x) {
-		const js = this.dashboardPage.janillas;
-		if (x != null && !js.state)
-			js.state = {};
-		if (x != null || js.state)
-			js.state.cards = x;
-	}
-
-	connectedCallback() {
-		// console.log("CardWrapper.connectedCallback");
-		super.connectedCallback();
-		this.dashboardPage = this.closest("dashboard-page");
+		this.closest("dashboard-page").state.cards = x;
 	}
 
 	async updateDisplay() {
 		// console.log("CardWrapper.updateDisplay");
-		if (!this.dashboardPage.slot)
-			this.state = null;
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.state
 		}));
-		if (this.dashboardPage.slot && !this.state) {
+		if (this.closest("dashboard-page").slot && !this.state) {
 			this.state = await (await fetch("/api/dashboard/cards")).json();
-			this.appendChild(this.interpolateDom({
-				$template: "",
-				...this.state
-			}));
+			history.replaceState(this.closest("root-layout").state, "");
+			this.requestUpdate();
 		}
 	}
 }
