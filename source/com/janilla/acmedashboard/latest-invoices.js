@@ -33,12 +33,12 @@ export default class LatestInvoices extends UpdatableHTMLElement {
 		super();
 	}
 
-	get state() {
-		return this.closest("dashboard-page").state?.invoices;
-	}
-
-	set state(x) {
-		this.closest("dashboard-page").state.invoices = x;
+	get historyState() {
+		const s = this.state;
+		return {
+			...history.state,
+			"latest-invoices": Object.fromEntries(["invoices"].map(x => [x, s[x]]))
+		};
 	}
 
 	async updateDisplay() {
@@ -46,14 +46,14 @@ export default class LatestInvoices extends UpdatableHTMLElement {
 		const s = this.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
-			articles: s ? s.map(x => ({
+			articles: s.invoices ? s.invoices.map(x => ({
 				$template: "article",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" }))
 		}));
-		if (this.closest("dashboard-page").slot && !this.state) {
-			this.state = await (await fetch("/api/dashboard/invoices")).json();
-			history.replaceState(this.closest("root-layout").state, "");
+		if (this.closest("dashboard-page").slot && !s.invoices) {
+			s.invoices = await (await fetch("/api/dashboard/invoices")).json();
+			history.replaceState(this.historyState, "");
 			this.requestUpdate();
 		}
 	}

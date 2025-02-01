@@ -37,14 +37,6 @@ export default class InvoicePage extends UpdatableHTMLElement {
 		super();
 	}
 
-	get state() {
-		return this.closest("root-layout").state.invoice;
-	}
-
-	set state(x) {
-		this.closest("root-layout").state.invoice = x;
-	}
-
 	connectedCallback() {
 		// console.log("InvoicePage.connectedCallback");
 		super.connectedCallback();

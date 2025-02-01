@@ -37,14 +37,6 @@ export default class DashboardPage extends UpdatableHTMLElement {
 		super();
 	}
 
-	get state() {
-		return this.closest("root-layout").state.dashboard;
-	}
-
-	set state(x) {
-		this.closest("root-layout").state.dashboard = x;
-	}
-
 	async updateDisplay() {
 		// console.log("DashboardPage.updateDisplay");
 		if (!this.slot && this.state)

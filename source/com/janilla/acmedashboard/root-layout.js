@@ -34,14 +34,6 @@ export default class RootLayout extends UpdatableHTMLElement {
 		this.attachShadow({ mode: "open" });
 	}
 
-	get state() {
-		return this.janillas.state;
-	}
-
-	set state(x) {
-		this.janillas.state = x;
-	}
-
 	connectedCallback() {
 		// console.log("RootLayout.connectedCallback");
 		addEventListener("popstate", this.handlePopState);
@@ -62,14 +54,23 @@ export default class RootLayout extends UpdatableHTMLElement {
 			return;
 		event.preventDefault();
 		const u = new URL(a.href);
-		this.state = {};
-		history.pushState(this.state, "", u.pathname + u.search);
+		history.pushState(null, "", u.pathname + u.search);
 		dispatchEvent(new CustomEvent("popstate"));
 	}
 
 	handlePopState = event => {
 		// console.log("RootLayout.handlePopState", event);
-		this.state = event.state ?? {};
+		if (event instanceof PopStateEvent) {
+			this.state = event.state;
+			for (const [k, v] of Object.entries(event.state))
+				if (k.includes("-")) {
+					const el = this.querySelector(k);
+					if (el) {
+						el.state = v;
+						el.requestUpdate();
+					}
+				}
+		}
 		this.requestUpdate();
 	}
 

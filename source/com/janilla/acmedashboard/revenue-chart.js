@@ -33,33 +33,33 @@ export default class RevenueChart extends UpdatableHTMLElement {
 		super();
 	}
 
-	get state() {
-		return this.closest("dashboard-page").state?.revenue;
-	}
-
-	set state(x) {
-		this.closest("dashboard-page").state.revenue = x;
+	get historyState() {
+		const s = this.state;
+		return {
+			...history.state,
+			"revenue-chart": Object.fromEntries(["revenue"].map(x => [x, s[x]]))
+		};
 	}
 
 	async updateDisplay() {
 		// console.log("RevenueChart.updateDisplay");
 		const s = this.state;
-		var k = !s ? 0 : Math.ceil(Math.max(...s.map(x => x.revenue)) / 1000);
+		var k = !s.revenue ? 0 : Math.ceil(Math.max(...s.revenue.map(x => x.revenue)) / 1000);
 		this.appendChild(this.interpolateDom({
 			$template: "",
-			y: !s ? null : Array.from({ length: k + 1 }, (_, i) => ({
+			y: s.revenue ? Array.from({ length: k + 1 }, (_, i) => ({
 				$template: "y",
 				y: `$${i}K`
-			})),
-			x: !s ? null : s.map(x => ({
+			})) : null,
+			x: s.revenue?.map(x => ({
 				$template: "x",
 				...x,
 				style: `height: ${x.revenue / (1000 * k) * 100}%`
 			}))
 		}));
-		if (this.closest("dashboard-page").slot && !this.state) {
-			this.state = await (await fetch("/api/dashboard/revenue")).json();
-			history.replaceState(this.closest("root-layout").state, "");
+		if (this.closest("dashboard-page").slot && !s.revenue) {
+			s.revenue = await (await fetch("/api/dashboard/revenue")).json();
+			history.replaceState(this.historyState, "");
 			this.requestUpdate();
 		}
 	}

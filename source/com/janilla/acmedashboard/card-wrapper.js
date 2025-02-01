@@ -33,23 +33,24 @@ export default class CardWrapper extends UpdatableHTMLElement {
 		super();
 	}
 
-	get state() {
-		return this.closest("dashboard-page").state?.cards;
-	}
-
-	set state(x) {
-		this.closest("dashboard-page").state.cards = x;
+	get historyState() {
+		const s = this.state;
+		return {
+			...history.state,
+			"card-wrapper": Object.fromEntries(["cards"].map(x => [x, s[x]]))
+		};
 	}
 
 	async updateDisplay() {
 		// console.log("CardWrapper.updateDisplay");
+		const s = this.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
-			...this.state
+			...s.cards
 		}));
-		if (this.closest("dashboard-page").slot && !this.state) {
-			this.state = await (await fetch("/api/dashboard/cards")).json();
-			history.replaceState(this.closest("root-layout").state, "");
+		if (this.closest("dashboard-page").slot && !s.cards) {
+			s.cards = await (await fetch("/api/dashboard/cards")).json();
+			history.replaceState(this.historyState, "");
 			this.requestUpdate();
 		}
 	}

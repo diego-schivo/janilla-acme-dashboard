@@ -37,14 +37,6 @@ export default class CustomersPage extends UpdatableHTMLElement {
 		super();
 	}
 
-	get state() {
-		return this.closest("root-layout").state.customers;
-	}
-
-	set state(x) {
-		this.closest("root-layout").state.customers = x;
-	}
-
 	connectedCallback() {
 		// console.log("CustomersPage.connectedCallback");
 		super.connectedCallback();
