@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { FlexibleElement } from "./flexible-element.js";
+import { UpdatableHTMLElement } from "./updatable-html-element.js";
 
 const statuses = {
 	"PAID": {
@@ -34,7 +34,7 @@ const statuses = {
 	}
 };
 
-export default class InvoiceStatus extends FlexibleElement {
+export default class InvoiceStatus extends UpdatableHTMLElement {
 
 	static get observedAttributes() {
 		return ["data-value"];

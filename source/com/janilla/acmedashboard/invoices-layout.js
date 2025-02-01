@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { FlexibleElement } from "./flexible-element.js";
+import { UpdatableHTMLElement } from "./updatable-html-element.js";
 
-export default class InvoicesLayout extends FlexibleElement {
+export default class InvoicesLayout extends UpdatableHTMLElement {
 
 	static get observedAttributes() {
 		return ["data-uri", "slot"];

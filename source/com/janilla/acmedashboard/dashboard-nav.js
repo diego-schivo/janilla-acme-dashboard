@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { FlexibleElement } from "./flexible-element.js";
+import { UpdatableHTMLElement } from "./updatable-html-element.js";
 
 const links = [{
 	href: "/dashboard",
@@ -37,7 +37,7 @@ const links = [{
 	text: "Customers"
 }];
 
-export default class DashboardNav extends FlexibleElement {
+export default class DashboardNav extends UpdatableHTMLElement {
 
 	static get templateName() {
 		return "dashboard-nav";

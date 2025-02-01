@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableElement } from "./updatable-element.js";
+import { UpdatableHTMLElement } from "./updatable-html-element.js";
 import { removeAllChildren } from "./dom-utils.js";
 
 const documents = {};
 const parser = new DOMParser();
 
-export default class HeroIcon extends UpdatableElement {
+export default class HeroIcon extends UpdatableHTMLElement {
 
 	static get observedAttributes() {
 		return ["data-name"];
