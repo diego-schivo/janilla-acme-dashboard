@@ -1,5 +1,5 @@
 pagination-nav {
-	color: rgb(0, 0, 0);
+	color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));
 	display: flex;
 	gap: 1rem;
 	justify-content: center;
@@ -45,18 +45,18 @@ pagination-nav {
 		}
 	
 		&:not([href]) {
-			color: rgb(209, 213, 219);
+			color: light-dark(rgb(209, 213, 219), rgb(46, 42, 36));
 		}
 	
 	
 		&[href]:hover {
-			background: rgb(243, 244, 246);
+			background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
 		}
 	
 		&.active {
-			background: rgb(47, 111, 235);
-			border-color: rgb(47, 111, 235);
-			color: rgb(255, 255, 255);
+			background: light-dark(rgb(47, 111, 235), rgb(208, 144, 20));
+			border-color: light-dark(rgb(47, 111, 235), rgb(208, 144, 20));
+			color: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
 		}
 	}
 	

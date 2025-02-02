@@ -54,7 +54,7 @@ export default class RootLayout extends UpdatableHTMLElement {
 			return;
 		event.preventDefault();
 		const u = new URL(a.href);
-		history.pushState(null, "", u.pathname + u.search);
+		history.pushState(undefined, "", u.pathname + u.search);
 		dispatchEvent(new CustomEvent("popstate"));
 	}
 

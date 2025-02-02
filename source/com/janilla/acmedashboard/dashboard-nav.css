@@ -13,7 +13,7 @@ dashboard-nav {
 
 	header {
 		align-items: flex-end;
-		background-color: rgb(0, 112, 243);
+		background-color: light-dark(rgb(0, 112, 243), rgb(255, 143, 12));
 		border-radius: 0.5rem;
 		box-sizing: border-box;
 		display: flex;
@@ -36,9 +36,9 @@ dashboard-nav {
 	}
 		
 	li {
-		background: rgb(249, 250, 251);
+		background: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
 		border-radius: 0.375rem;
-		color: rgb(0, 0, 0);
+		color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));
 
 		@media (max-width: 767px) {
 			&:not(:last-child) {
@@ -57,8 +57,8 @@ dashboard-nav {
 		
 		&.active,
 		&:hover {
-			background: rgb(224, 242, 254);
-			color: rgb(47, 111, 235);
+			background: light-dark(rgb(224, 242, 254), rgb(31, 13, 1));
+			color: light-dark(rgb(47, 111, 235), rgb(208, 144, 20));
 		}
 	}
 	

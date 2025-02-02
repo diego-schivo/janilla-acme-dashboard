@@ -11,7 +11,7 @@ card-wrapper {
 	}
 
 	single-card intl-format:empty {
-		background: rgb(243, 244, 246);
+		background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
 		border-radius: 0.25rem;
 		display: inline-block;
 		height: 1.5rem;

@@ -37,6 +37,14 @@ export default class InvoicePage extends UpdatableHTMLElement {
 		super();
 	}
 
+	get historyState() {
+		const s = this.state;
+		return {
+			...history.state,
+			"invoice-page": Object.assign({}, s)
+		};
+	}
+
 	connectedCallback() {
 		// console.log("InvoicePage.connectedCallback");
 		super.connectedCallback();
@@ -76,7 +84,7 @@ export default class InvoicePage extends UpdatableHTMLElement {
 			});
 
 			if (r.ok) {
-				history.pushState({}, "", "/dashboard/invoices");
+				history.pushState(undefined, "", "/dashboard/invoices");
 				dispatchEvent(new CustomEvent("popstate"));
 			} else {
 				const t = await r.text();
@@ -89,33 +97,33 @@ export default class InvoicePage extends UpdatableHTMLElement {
 
 	async updateDisplay() {
 		// console.log("InvoicePage.updateDisplay");
-		if (!this.slot && this.state)
-			this.state = null;
-		if (this.slot && !this.state) {
+		if (this.state.customers && !history.state)
+			this.state = {};
+		if (!this.state.customers && this.slot) {
 			const [nn, i] = await Promise.all([
 				fetch("/api/customers/names").then(x => x.json()),
 				this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
 			]);
-			this.state = {
+			Object.assign(this.state, {
 				customers: nn,
 				...i
-			};
-			history.replaceState(this.closest("root-layout").state, "");
+			});
+			history.replaceState(this.historyState, "");
 		}
 		const s = this.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
 			...s,
-			customerOptions: s?.customers?.map(x => ({
+			customerOptions: s.customers?.map(x => ({
 				$template: "customer-option",
 				...x,
-				selected: x.key == s?.customerId
+				selected: x.key == s.customerId
 			})),
 			statusItems: ["PENDING", "PAID"].map(x => ({
 				$template: "status-item",
 				value: x,
-				checked: x === s?.status
+				checked: x === s.status
 			}))
 		}));
 	}

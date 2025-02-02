@@ -7,7 +7,7 @@ invoice-page {
 		line-height: 1.25rem;
 	
 		> :first-child {
-			background: rgb(249, 250, 251);
+			background: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
 			border-radius: 0.375rem;
 			display: flex;
 			flex-direction: column;
@@ -35,7 +35,7 @@ invoice-page {
 	
 	fieldset {
 		ol {
-			background: rgb(255, 255, 255);
+			background: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
 			border: 1px solid rgb(229, 231, 235);
 			border-radius: 0.375rem;
 			display: flex;

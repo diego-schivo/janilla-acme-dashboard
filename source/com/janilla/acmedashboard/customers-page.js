@@ -37,6 +37,14 @@ export default class CustomersPage extends UpdatableHTMLElement {
 		super();
 	}
 
+	get historyState() {
+		const s = this.state;
+		return {
+			...history.state,
+			"customers-page": Object.fromEntries(["items"].map(x => [x, s[x]]))
+		};
+	}
+
 	connectedCallback() {
 		// console.log("CustomersPage.connectedCallback");
 		super.connectedCallback();
@@ -62,38 +70,34 @@ export default class CustomersPage extends UpdatableHTMLElement {
 			else
 				u.searchParams.delete("query");
 			if (!q0)
-				history.pushState({}, "", u.pathname + u.search);
+				history.pushState(undefined, "", u.pathname + u.search);
 			else
-				history.replaceState({}, "", u.pathname + u.search);
+				history.replaceState(undefined, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
 	}
 
 	async updateDisplay() {
 		// console.log("InvoicesPage.updateDisplay");
-		if (!this.slot && this.state)
-			this.state = null;
-		if (this.slot && !this.state) {
+		if (this.state.items && !history.state)
+			this.state = {};
+		if (!this.state.items && this.slot) {
 			const u = new URL("/api/customers", location.href);
 			const q = this.dataset.query;
 			if (q)
 				u.searchParams.append("query", q);
-			this.state = await (await fetch(u)).json();
-			history.replaceState(this.closest("root-layout").state, "");
+			this.state.items = await (await fetch(u)).json();
+			history.replaceState(this.historyState, "");
 		}
 		const s = this.state;
-		const u = new URL("/dashboard/invoices", location.href);
-		const q = this.dataset.query;
-		if (q)
-			u.searchParams.append("query", q);
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: s ? s.map(x => ({
+			articles: s.items ? s.items.map(x => ({
 				$template: "article",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: s ? s.map(x => ({
+			rows: s.items ? s.items.map(x => ({
 				$template: "row",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" }))

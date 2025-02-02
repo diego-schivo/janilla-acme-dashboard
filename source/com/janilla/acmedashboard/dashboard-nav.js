@@ -73,7 +73,7 @@ export default class DashboardNav extends UpdatableHTMLElement {
 		event.submitter.setAttribute("aria-disabled", "true");
 		try {
 			await fetch("/api/authentication", { method: "DELETE" });
-			history.pushState({}, "", "/login");
+			history.pushState(undefined, "", "/login");
 			dispatchEvent(new CustomEvent("popstate"));
 		} finally {
 			event.submitter.setAttribute("aria-disabled", "false");

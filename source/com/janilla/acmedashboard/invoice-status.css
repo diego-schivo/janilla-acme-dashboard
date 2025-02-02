@@ -7,13 +7,13 @@ invoice-status {
 	padding: 0.25rem 0.5rem;
 
 	&[data-value="PAID"] {
-		background: rgb(34, 197, 94);
-		color: rgb(255, 255, 255);
+		background: light-dark(rgb(34, 197, 94), rgb(221, 58, 161));
+		color: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
 	}
 
 	&[data-value="PENDING"] {
-		background: rgb(243, 244, 246);
-		color: rgb(107, 114, 128);
+		background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
+		color: light-dark(rgb(107, 114, 128), rgb(148, 141, 127));
 	}
 
 	hero-icon {

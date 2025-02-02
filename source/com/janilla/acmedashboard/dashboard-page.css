@@ -49,7 +49,7 @@ dashboard-page {
 			}
 		
 			> div {
-				background: rgb(249, 250, 251);
+				background: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
 				display: flex;
 				flex-direction: column;
 				flex-grow: 1;
@@ -59,14 +59,14 @@ dashboard-page {
 				line-height: 1.25rem;
 		
 				> :first-child {
-					background: rgb(255, 255, 255);
+					background: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
 				}
 			}
 		}
 		
 		footer {
 			align-items: center;
-			color: rgb(107, 114, 128);
+			color: light-dark(rgb(107, 114, 128), rgb(148, 141, 127));
 			display: flex;
 			gap: 0.5rem;
 			padding: 0.5rem 0;

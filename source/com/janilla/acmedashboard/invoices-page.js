@@ -37,6 +37,14 @@ export default class InvoicesPage extends UpdatableHTMLElement {
 		super();
 	}
 
+	get historyState() {
+		const s = this.state;
+		return {
+			...history.state,
+			"invoices-page": Object.fromEntries(["items", "total"].map(x => [x, s[x]]))
+		};
+	}
+
 	connectedCallback() {
 		// console.log("InvoicesPage.connectedCallback");
 		super.connectedCallback();
@@ -64,9 +72,9 @@ export default class InvoicesPage extends UpdatableHTMLElement {
 			else
 				u.searchParams.delete("query");
 			if (!q0)
-				history.pushState({}, "", u.pathname + u.search);
+				history.pushState(undefined, "", u.pathname + u.search);
 			else
-				history.replaceState({}, "", u.pathname + u.search);
+				history.replaceState(undefined, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
 	}
@@ -93,9 +101,9 @@ export default class InvoicesPage extends UpdatableHTMLElement {
 
 	async updateDisplay() {
 		// console.log("InvoicesPage.updateDisplay");
-		if (!this.slot && this.state)
-			this.state = null;
-		if (this.slot && !this.state) {
+		if (this.state.items && !history.state)
+			this.state = {};
+		if (!this.state.items && this.slot) {
 			const u = new URL("/api/invoices", location.href);
 			const q = this.dataset.query;
 			if (q)
@@ -103,8 +111,8 @@ export default class InvoicesPage extends UpdatableHTMLElement {
 			const p = this.dataset.page;
 			if (p)
 				u.searchParams.append("page", p);
-			this.state = await (await fetch(u)).json();
-			history.replaceState(this.closest("root-layout").state, "");
+			Object.assign(this.state, await (await fetch(u)).json());
+			history.replaceState(this.historyState, "");
 		}
 		const s = this.state;
 		const u = new URL("/dashboard/invoices", location.href);
@@ -115,12 +123,12 @@ export default class InvoicesPage extends UpdatableHTMLElement {
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: s ? s.items.map(x => ({
+			articles: s.items ? s.items.map(x => ({
 				$template: "article",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: s ? s.items.map(x => ({
+			rows: s.items ? s.items.map(x => ({
 				$template: "row",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
@@ -128,7 +136,7 @@ export default class InvoicesPage extends UpdatableHTMLElement {
 			pagination: {
 				href: u.pathname + u.search,
 				page: p ?? 1,
-				pageCount: s ? Math.ceil(s.total / 6) : 0
+				pageCount: s.total ? Math.ceil(s.total / 6) : 0
 			}
 		}));
 	}

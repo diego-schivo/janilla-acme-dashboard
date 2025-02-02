@@ -13,7 +13,7 @@ customers-page {
 	}
 	
 	section {
-		background: rgb(249, 250, 251);
+		background: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
 		border-radius: 0.5rem;
 		padding: 0.5rem;
 
@@ -37,13 +37,13 @@ customers-page {
 		}
 
 		article {
-			background: rgb(255, 255, 255);
+			background: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
 			border-radius: 0.375rem;
 			padding: 1rem;
 
 			&.skeleton {
 				span:empty {
-					background: rgb(243, 244, 246);
+					background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
 					border-radius: 0.25rem;
 					display: block;
 					height: 1.5rem;
@@ -87,7 +87,7 @@ customers-page {
 				}
 		
 				> :nth-child(3) {
-					color: rgb(107, 114, 128);
+					color: light-dark(rgb(107, 114, 128), rgb(148, 141, 127));
 					font-size: 0.875rem;
 					grid-area: c;
 					line-height: 1.25rem;
@@ -136,7 +136,7 @@ customers-page {
 		}
 		
 		tbody {
-			background: rgb(255, 255, 255);
+			background: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
 		}
 	
 		tr {
@@ -146,7 +146,7 @@ customers-page {
 
 			&.skeleton {
 				span:empty {
-					background: rgb(243, 244, 246);
+					background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
 					border-radius: 0.25rem;
 					display: block;
 					height: 1.5rem;

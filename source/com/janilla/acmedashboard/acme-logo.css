@@ -1,6 +1,6 @@
 acme-logo {
 	align-items: center;
-	color: rgb(255, 255, 255);
+	color: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
 	display: flex;
 	font-family: "Lusitana";
 	line-height: 1;

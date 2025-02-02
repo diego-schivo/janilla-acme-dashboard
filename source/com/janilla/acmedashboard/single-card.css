@@ -2,7 +2,7 @@
 @import "hero-icon.css";
 
 :host {
-	background: rgb(249, 250, 251);
+	background: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
 	border-radius: 0.75rem;
 	flex: 1;
 	padding: 0.5rem;
@@ -24,7 +24,7 @@ h3 {
 }
 
 p {
-	background: rgb(255, 255, 255);
+	background: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
 	border-radius: 0.75rem;
 	font-family: "Lusitana";
 	font-size: 1.5rem;

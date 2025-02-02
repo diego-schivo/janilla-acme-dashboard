@@ -40,7 +40,7 @@ public class AuthenticationApi {
 	public User create(User user, CustomHttpExchange exchange) {
 		var uc = persistence.crud(User.class);
 		var u = uc.read(uc.find("email", user.email()));
-		if (!u.password().equals(user.password()))
+		if (u == null || !u.password().equals(user.password()))
 			return null;
 		var h = Map.of("alg", "HS256", "typ", "JWT");
 		var p = Map.of("loggedInAs", u.email());

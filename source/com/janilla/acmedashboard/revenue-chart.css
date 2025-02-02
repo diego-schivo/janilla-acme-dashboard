@@ -1,6 +1,6 @@
 revenue-chart {
 	.chart {
-		color: rgb(156, 163, 175);
+		color: light-dark(rgb(156, 163, 175), rgb(99, 92, 80));
 		display: flex;
 		gap: 0.75rem;
 	
@@ -30,7 +30,7 @@ revenue-chart {
 		}
 	
 		div {
-			background: rgb(147, 197, 253);
+			background: light-dark(rgb(147, 197, 253), rgb(108, 58, 2));
 			border-radius: 0.375rem;
 		}
 		

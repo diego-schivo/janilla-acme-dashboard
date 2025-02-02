@@ -6,7 +6,7 @@ welcome-page {
 
 	header {
 		align-items: flex-end;
-		background-color: rgb(0, 112, 243);
+		background-color: light-dark(rgb(0, 112, 243), rgb(255, 143, 12));
 		border-radius: 0.5rem;
 		box-sizing: border-box;
 		display: flex;
@@ -35,7 +35,7 @@ welcome-page {
 			justify-content: center;
 			
 			&:first-child {
-				background-color: rgb(249, 250, 251);
+				background-color: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
 				border-radius: 0.5rem;
 				padding: 2.5rem 1.5rem;
 
@@ -64,7 +64,7 @@ welcome-page {
 			}
 			
 			a {
-				color: rgb(0, 112, 243);
+				color: light-dark(rgb(0, 112, 243), rgb(255, 143, 12));
 			}
 		}
 		

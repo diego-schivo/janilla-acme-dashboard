@@ -32,7 +32,7 @@ latest-invoices {
 			}
 
 			&.skeleton span:empty {
-				background: rgb(243, 244, 246);
+				background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
 				border-radius: 0.25rem;
 				display: block;
 				height: 1rem;
@@ -70,7 +70,7 @@ latest-invoices {
 		}
 		
 		&:nth-of-type(2) {
-			color: rgb(107, 114, 128);
+			color: light-dark(rgb(107, 114, 128), rgb(148, 141, 127));
 		}
 	}
 	
