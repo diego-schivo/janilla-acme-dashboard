@@ -41,6 +41,6 @@ public class CustomHttpProtocol extends HttpProtocol {
 
 	@Override
 	protected HttpExchange createExchange(HttpRequest request) {
-		return factory.create(CustomHttpExchange.class);
+		return factory.create(HttpExchange.class);
 	}
 }
