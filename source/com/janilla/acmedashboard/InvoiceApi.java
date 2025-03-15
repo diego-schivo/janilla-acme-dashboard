@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.janilla.persistence.Crud.Page;
+import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Flatten;
 import com.janilla.reflect.Reflection;
@@ -75,7 +75,7 @@ public class InvoiceApi {
 		return persistence.crud(Invoice.class).delete(id);
 	}
 
-	public record Page2(@Flatten Page page, Stream<Invoice2> items) {
+	public record Page2(@Flatten Crud.Page page, Stream<Invoice2> items) {
 	}
 
 	public record Invoice2(@Flatten Invoice invoice, Customer customer) {

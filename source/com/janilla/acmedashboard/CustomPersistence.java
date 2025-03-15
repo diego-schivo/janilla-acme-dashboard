@@ -39,7 +39,7 @@ public class CustomPersistence extends Persistence {
 	protected <E> Crud<E> newCrud(Class<E> type) {
 		if (type == Invoice.class) {
 			@SuppressWarnings("unchecked")
-			var c = (Crud<E>) new InvoiceCrud(Invoice.class, this);
+			var c = (Crud<E>) new InvoiceCrud(this);
 			return c;
 		}
 		return super.newCrud(type);

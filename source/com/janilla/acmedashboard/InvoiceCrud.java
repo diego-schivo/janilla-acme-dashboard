@@ -32,8 +32,8 @@ import com.janilla.persistence.Persistence;
 
 public class InvoiceCrud extends Crud<Invoice> {
 
-	public InvoiceCrud(Class<Invoice> type, Persistence persistence) {
-		super(type, persistence);
+	public InvoiceCrud(Persistence persistence) {
+		super(Invoice.class, persistence);
 	}
 
 	public BigDecimal getAmount(Invoice.Status status) {
