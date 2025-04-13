@@ -47,12 +47,12 @@ public class DashboardApi {
 	@Handle(method = "GET", path = "/api/dashboard/revenue")
 	public List<Revenue> getRevenue() {
 		var rc = persistence.crud(Revenue.class);
-		return rc.read(rc.list()).toList();
+		return rc.read(rc.list());
 	}
 
 	@Handle(method = "GET", path = "/api/dashboard/invoices")
 	public List<Invoice2> getInvoices() {
 		var ic = persistence.crud(Invoice.class);
-		return ic.read(ic.list(0, 5).ids()).map(x -> Invoice2.of(x, persistence)).toList();
+		return ic.read(ic.list(0, 5).ids()).stream().map(x -> Invoice2.of(x, persistence)).toList();
 	}
 }

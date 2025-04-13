@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
-export default class LatestInvoices extends UpdatableHTMLElement {
+export default class LatestInvoices extends WebComponent {
 
 	static get templateName() {
 		return "latest-invoices";
@@ -54,7 +54,7 @@ export default class LatestInvoices extends UpdatableHTMLElement {
 		if (this.closest("dashboard-page").slot && !s.invoices) {
 			s.invoices = await (await fetch("/api/dashboard/invoices")).json();
 			history.replaceState(this.historyState, "");
-			this.requestUpdate();
+			this.requestDisplay();
 		}
 	}
 }

@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
-export default class InvoicePage extends UpdatableHTMLElement {
+export default class InvoicePage extends WebComponent {
 
 	static get observedAttributes() {
 		return ["data-id", "slot"];

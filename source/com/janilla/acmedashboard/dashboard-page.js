@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
-export default class DashboardPage extends UpdatableHTMLElement {
+export default class DashboardPage extends WebComponent {
 
 	static get observedAttributes() {
 		return ["slot"];
@@ -44,6 +44,6 @@ export default class DashboardPage extends UpdatableHTMLElement {
 		if (this.slot && !this.state)
 			this.state = {};
 		await super.updateDisplay();
-		this.querySelectorAll("card-wrapper, revenue-chart, latest-invoices").forEach(x => x.requestUpdate());
+		this.querySelectorAll("card-wrapper, revenue-chart, latest-invoices").forEach(x => x.requestDisplay());
 	}
 }

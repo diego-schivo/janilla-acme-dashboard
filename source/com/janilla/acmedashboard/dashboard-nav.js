@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
 const links = [{
 	href: "/dashboard",
@@ -37,7 +37,7 @@ const links = [{
 	text: "Customers"
 }];
 
-export default class DashboardNav extends UpdatableHTMLElement {
+export default class DashboardNav extends WebComponent {
 
 	static get templateName() {
 		return "dashboard-nav";
@@ -62,7 +62,7 @@ export default class DashboardNav extends UpdatableHTMLElement {
 
 	handlePopState = () => {
 		// console.log("DashboardNav.handlePopState");
-		this.requestUpdate();
+		this.requestDisplay();
 	}
 
 	handleSubmit = async event => {

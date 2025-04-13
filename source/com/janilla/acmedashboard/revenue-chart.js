@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
-export default class RevenueChart extends UpdatableHTMLElement {
+export default class RevenueChart extends WebComponent {
 
 	static get templateName() {
 		return "revenue-chart";
@@ -60,7 +60,7 @@ export default class RevenueChart extends UpdatableHTMLElement {
 		if (this.closest("dashboard-page").slot && !s.revenue) {
 			s.revenue = await (await fetch("/api/dashboard/revenue")).json();
 			history.replaceState(this.historyState, "");
-			this.requestUpdate();
+			this.requestDisplay();
 		}
 	}
 }

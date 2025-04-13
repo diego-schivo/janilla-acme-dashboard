@@ -41,7 +41,7 @@ public class CustomerApi {
 	@Handle(method = "GET", path = "/api/customers/names")
 	public Stream<Map.Entry<String, String>> names() {
 		var cc = persistence.crud(Customer.class);
-		return cc.read(cc.list())
+		return cc.read(cc.list()).stream()
 				.collect(Collectors.toMap(x -> x.id().toString(), Customer::name, (v, _) -> v, LinkedHashMap::new))
 				.entrySet().stream();
 	}
@@ -52,7 +52,7 @@ public class CustomerApi {
 		return cc
 				.read(query == null || query.isEmpty() ? cc.list()
 						: cc.filter("name", x -> ((String) x).toLowerCase().contains(query.toLowerCase())))
-				.map(x -> Customer2.of(x, persistence));
+				.stream().map(x -> Customer2.of(x, persistence));
 	}
 
 	public record Customer2(@Flatten Customer customer, long invoiceCount, BigDecimal pendingAmount,

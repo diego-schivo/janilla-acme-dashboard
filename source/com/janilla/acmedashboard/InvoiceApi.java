@@ -40,7 +40,7 @@ public class InvoiceApi {
 	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/api/invoices")
-	public Page2 list(@Bind("query") String query, @Bind("page") Integer page) {
+	public IdPage2 list(@Bind("query") String query, @Bind("page") Integer page) {
 		var p = page != null ? page.intValue() : 1;
 		var ic = persistence.crud(Invoice.class);
 		var s = (p - 1) * 6;
@@ -51,7 +51,7 @@ public class InvoiceApi {
 								Arrays.stream(persistence.crud(Customer.class).filter("name",
 										x -> ((String) x).toLowerCase().contains(query.toLowerCase()))).boxed()
 										.toArray());
-		return new Page2(q, ic.read(q.ids()).map(x -> Invoice2.of(x, persistence)));
+		return new IdPage2(q, ic.read(q.ids()).stream().map(x -> Invoice2.of(x, persistence)));
 	}
 
 	@Handle(method = "POST", path = "/api/invoices")
@@ -75,7 +75,7 @@ public class InvoiceApi {
 		return persistence.crud(Invoice.class).delete(id);
 	}
 
-	public record Page2(@Flatten Crud.Page page, Stream<Invoice2> items) {
+	public record IdPage2(@Flatten Crud.IdPage page, Stream<Invoice2> items) {
 	}
 
 	public record Invoice2(@Flatten Invoice invoice, Customer customer) {

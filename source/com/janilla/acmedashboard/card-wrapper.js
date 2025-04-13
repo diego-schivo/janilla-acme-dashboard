@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
-export default class CardWrapper extends UpdatableHTMLElement {
+export default class CardWrapper extends WebComponent {
 
 	static get templateName() {
 		return "card-wrapper";
@@ -51,7 +51,7 @@ export default class CardWrapper extends UpdatableHTMLElement {
 		if (this.closest("dashboard-page").slot && !s.cards) {
 			s.cards = await (await fetch("/api/dashboard/cards")).json();
 			history.replaceState(this.historyState, "");
-			this.requestUpdate();
+			this.requestDisplay();
 		}
 	}
 }

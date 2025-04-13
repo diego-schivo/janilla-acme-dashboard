@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
 const iconNameByType = {
 	collected: "banknotes",
@@ -30,7 +30,7 @@ const iconNameByType = {
 	customers: "user-group"
 };
 
-export default class SingleCard extends UpdatableHTMLElement {
+export default class SingleCard extends WebComponent {
 
 	static get templateName() {
 		return "single-card";

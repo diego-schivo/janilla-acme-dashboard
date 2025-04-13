@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
-export default class InvoicesLayout extends UpdatableHTMLElement {
+export default class InvoicesLayout extends WebComponent {
 
 	static get observedAttributes() {
 		return ["data-uri", "slot"];
@@ -74,6 +74,6 @@ export default class InvoicesLayout extends UpdatableHTMLElement {
 				}));
 			})()
 		}));
-		this.shadowRoot.querySelector("breadcrumb-nav").requestUpdate();
+		this.shadowRoot.querySelector("breadcrumb-nav").requestDisplay();
 	}
 }

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
 const amountFormatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
@@ -39,7 +39,7 @@ const formatters = {
 	date: x => dateFormatter.format(new Date(x))
 };
 
-export default class IntlFormat extends UpdatableHTMLElement {
+export default class IntlFormat extends WebComponent {
 
 	static get observedAttributes() {
 		return ["data-type", "data-value"];

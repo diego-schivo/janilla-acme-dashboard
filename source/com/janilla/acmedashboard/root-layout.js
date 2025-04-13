@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { UpdatableHTMLElement } from "./updatable-html-element.js";
+import { WebComponent } from "./web-component.js";
 
-export default class RootLayout extends UpdatableHTMLElement {
+export default class RootLayout extends WebComponent {
 
 	static get templateName() {
 		return "root-layout";
@@ -67,11 +67,11 @@ export default class RootLayout extends UpdatableHTMLElement {
 					const el = this.querySelector(k);
 					if (el) {
 						el.state = v;
-						el.requestUpdate();
+						el.requestDisplay();
 					}
 				}
 		}
-		this.requestUpdate();
+		this.requestDisplay();
 	}
 
 	async updateDisplay() {

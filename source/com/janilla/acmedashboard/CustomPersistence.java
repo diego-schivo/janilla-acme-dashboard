@@ -23,16 +23,15 @@
  */
 package com.janilla.acmedashboard;
 
-import java.util.Collection;
-
 import com.janilla.database.Database;
+import com.janilla.json.MapAndType.TypeResolver;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
 
 public class CustomPersistence extends Persistence {
 
-	public CustomPersistence(Database database, Collection<Class<?>> types) {
-		super(database, types);
+	public CustomPersistence(Database database, Iterable<Class<?>> types, TypeResolver typeResolver) {
+		super(database, types, typeResolver);
 	}
 
 	@Override

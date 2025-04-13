@@ -37,7 +37,7 @@ import com.janilla.http.HttpCookie;
 import com.janilla.http.HttpExchange;
 import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
-import com.janilla.web.UnauthenticatedException;
+import com.janilla.web.UnauthorizedException;
 
 public class CustomHttpExchange extends HttpExchange {
 
@@ -86,7 +86,7 @@ public class CustomHttpExchange extends HttpExchange {
 	public void requireSessionEmail() {
 		var e = getSessionEmail();
 		if (e == null)
-			throw new UnauthenticatedException();
+			throw new UnauthorizedException();
 	}
 
 	public void setSessionCookie(String value) {
