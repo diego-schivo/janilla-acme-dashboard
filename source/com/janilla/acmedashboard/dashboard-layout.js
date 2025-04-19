@@ -40,10 +40,9 @@ export default class DashboardLayout extends WebComponent {
 
 	async updateDisplay() {
 		// console.log("DashboardLayout.updateDisplay");
-		this.shadowRoot.appendChild(this.interpolateDom({ $template: "shadow" }));
 		const p = location.pathname;
 		const pp = new URLSearchParams(location.search);
-		this.appendChild(this.interpolateDom({
+		const df = this.interpolateDom({
 			$template: "",
 			dashboardPage: {
 				$template: "dashboard-page",
@@ -62,6 +61,8 @@ export default class DashboardLayout extends WebComponent {
 				slot: p === "/dashboard/customers" ? "content" : null,
 				query: pp.get("query")
 			}
-		}));
+		});
+		this.shadowRoot.append(...df.querySelectorAll("link, aside, main"));
+		this.appendChild(df);
 	}
 }

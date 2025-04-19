@@ -42,8 +42,19 @@ export default class InvoicesLayout extends WebComponent {
 		// console.log("InvoicesLayout.updateDisplay");
 		const p = location.pathname;
 		const pp = new URLSearchParams(location.search);
-		this.appendChild(this.interpolateDom({
+		const df = this.interpolateDom({
 			$template: "",
+			breadcrumbItems: (() => {
+				const nn = [];
+				for (let n = this.querySelector("[slot]"); n; n = n.previousElementSibling)
+					nn.push(n);
+				nn.reverse();
+				return nn.map((x, i) => ({
+					$template: i < nn.length - 1 ? "breadcrumb-link" : "breadcrumb-heading",
+					...x.dataset,
+					slot: `item-${i}`
+				}));
+			})(),
 			invoicesPage: {
 				$template: "invoices-page",
 				slot: p === "/dashboard/invoices" ? "content" : null,
@@ -59,21 +70,9 @@ export default class InvoicesLayout extends WebComponent {
 					id: m?.[1]
 				};
 			})()
-		}));
-		this.shadowRoot.appendChild(this.interpolateDom({
-			$template: "shadow",
-			breadcrumbItems: (() => {
-				const nn = [];
-				for (let n = this.querySelector("[slot]"); n; n = n.previousElementSibling)
-					nn.push(n);
-				nn.reverse();
-				return nn.map((x, i) => ({
-					$template: i < nn.length - 1 ? "breadcrumb-link" : "breadcrumb-heading",
-					...x.dataset,
-					slot: `item-${i}`
-				}));
-			})()
-		}));
+		});
+		this.shadowRoot.append(...df.querySelectorAll("link, breadcrumb-nav, slot"));
 		this.shadowRoot.querySelector("breadcrumb-nav").requestDisplay();
+		this.appendChild(df);
 	}
 }

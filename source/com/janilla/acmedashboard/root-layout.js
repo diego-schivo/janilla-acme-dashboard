@@ -85,8 +85,7 @@ export default class RootLayout extends WebComponent {
 				return;
 			}
 		}
-		this.shadowRoot.appendChild(this.interpolateDom({ $template: "shadow" }));
-		this.appendChild(this.interpolateDom({
+		const df = this.interpolateDom({
 			$template: "",
 			welcomePage: {
 				$template: "welcome-page",
@@ -104,6 +103,8 @@ export default class RootLayout extends WebComponent {
 					uri: a ? p + location.search : null
 				};
 			})()
-		}));
+		});
+		this.shadowRoot.append(...df.querySelectorAll("slot"));
+		this.appendChild(df);
 	}
 }
