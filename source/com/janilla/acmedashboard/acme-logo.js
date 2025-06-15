@@ -25,8 +25,8 @@ import WebComponent from "./web-component.js";
 
 export default class AcmeLogo extends WebComponent {
 
-	static get templateName() {
-		return "acme-logo";
+	static get templateNames() {
+		return ["acme-logo"];
 	}
 
 	constructor() {

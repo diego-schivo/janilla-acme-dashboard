@@ -23,10 +23,11 @@
  */
 package com.janilla.acmedashboard;
 
+import com.janilla.persistence.Entity;
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 @Store
 @Index(sort = "name")
-public record Customer(Long id, @Index String name, String email, String imageUrl) {
+public record Customer(Long id, @Index String name, String email, String imageUrl) implements Entity<Long> {
 }

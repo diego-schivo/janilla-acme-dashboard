@@ -30,7 +30,7 @@ import java.util.Map;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
 
-public class InvoiceCrud extends Crud<Invoice> {
+public class InvoiceCrud extends Crud<Long, Invoice> {
 
 	public InvoiceCrud(Persistence persistence) {
 		super(Invoice.class, persistence);
@@ -56,7 +56,7 @@ public class InvoiceCrud extends Crud<Invoice> {
 	}
 
 	@Override
-	protected void updateIndexes(Invoice entity1, Invoice entity2, long id) {
+	protected void updateIndexes(Invoice entity1, Invoice entity2, Long id) {
 		super.updateIndexes(entity1, entity2, id);
 
 		if (entity1 != null) {

@@ -29,8 +29,8 @@ export default class InvoicesLayout extends WebComponent {
 		return ["data-uri", "slot"];
 	}
 
-	static get templateName() {
-		return "invoices-layout";
+	static get templateNames() {
+		return ["invoices-layout"];
 	}
 
 	constructor() {

@@ -39,8 +39,8 @@ const links = [{
 
 export default class DashboardNav extends WebComponent {
 
-	static get templateName() {
-		return "dashboard-nav";
+	static get templateNames() {
+		return ["dashboard-nav"];
 	}
 
 	constructor() {

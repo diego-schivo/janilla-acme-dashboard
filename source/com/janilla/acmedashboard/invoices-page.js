@@ -29,8 +29,8 @@ export default class InvoicesPage extends WebComponent {
 		return ["data-page", "data-query", "slot"];
 	}
 
-	static get templateName() {
-		return "invoices-page";
+	static get templateNames() {
+		return ["invoices-page"];
 	}
 
 	constructor() {

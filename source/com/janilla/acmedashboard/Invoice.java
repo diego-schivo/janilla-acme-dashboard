@@ -26,13 +26,14 @@ package com.janilla.acmedashboard;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.janilla.persistence.Entity;
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 @Store
 @Index(sort = "-date")
 public record Invoice(Long id, @Index(sort = "-date") Long customerId, BigDecimal amount,
-		@Index(sort = "-date") Status status, LocalDate date) {
+		@Index(sort = "-date") Status status, LocalDate date) implements Entity<Long> {
 
 	public Invoice withDate(LocalDate date) {
 		return new Invoice(id, customerId, amount, status, date);

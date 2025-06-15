@@ -29,8 +29,8 @@ export default class DashboardPage extends WebComponent {
 		return ["slot"];
 	}
 
-	static get templateName() {
-		return "dashboard-page";
+	static get templateNames() {
+		return ["dashboard-page"];
 	}
 
 	constructor() {

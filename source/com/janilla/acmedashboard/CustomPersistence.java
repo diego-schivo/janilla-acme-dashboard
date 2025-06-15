@@ -26,19 +26,20 @@ package com.janilla.acmedashboard;
 import com.janilla.database.Database;
 import com.janilla.json.MapAndType.TypeResolver;
 import com.janilla.persistence.Crud;
+import com.janilla.persistence.Entity;
 import com.janilla.persistence.Persistence;
 
 public class CustomPersistence extends Persistence {
 
-	public CustomPersistence(Database database, Iterable<Class<?>> types, TypeResolver typeResolver) {
+	public CustomPersistence(Database database, Iterable<Class<? extends Entity<?>>> types, TypeResolver typeResolver) {
 		super(database, types, typeResolver);
 	}
 
 	@Override
-	protected <E> Crud<E> newCrud(Class<E> type) {
+	protected <E extends Entity<?>> Crud<?, E> newCrud(Class<E> type) {
 		if (type == Invoice.class) {
 			@SuppressWarnings("unchecked")
-			var c = (Crud<E>) new InvoiceCrud(this);
+			var c = (Crud<?, E>) new InvoiceCrud(this);
 			return c;
 		}
 		return super.newCrud(type);

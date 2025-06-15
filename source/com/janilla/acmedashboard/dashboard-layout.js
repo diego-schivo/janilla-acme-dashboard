@@ -29,8 +29,8 @@ export default class DashboardLayout extends WebComponent {
 		return ["data-uri", "slot"];
 	}
 
-	static get templateName() {
-		return "dashboard-layout";
+	static get templateNames() {
+		return ["dashboard-layout"];
 	}
 
 	constructor() {

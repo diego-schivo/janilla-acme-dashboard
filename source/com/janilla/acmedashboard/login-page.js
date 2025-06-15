@@ -29,8 +29,8 @@ export default class LoginPage extends WebComponent {
 		return ["slot"];
 	}
 
-	static get templateName() {
-		return "login-page";
+	static get templateNames() {
+		return ["login-page"];
 	}
 
 	constructor() {

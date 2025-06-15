@@ -25,8 +25,8 @@ import WebComponent from "./web-component.js";
 
 export default class CardWrapper extends WebComponent {
 
-	static get templateName() {
-		return "card-wrapper";
+	static get templateNames() {
+		return ["card-wrapper"];
 	}
 
 	constructor() {

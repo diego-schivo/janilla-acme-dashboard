@@ -40,8 +40,8 @@ export default class InvoiceStatus extends WebComponent {
 		return ["data-value"];
 	}
 
-	static get templateName() {
-		return "invoice-status";
+	static get templateNames() {
+		return ["invoice-status"];
 	}
 
 	constructor() {

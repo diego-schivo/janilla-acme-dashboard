@@ -29,8 +29,8 @@ export default class WelcomePage extends WebComponent {
 		return ["slot"];
 	}
 
-	static get templateName() {
-		return "welcome-page";
+	static get templateNames() {
+		return ["welcome-page"];
 	}
 
 	constructor() {

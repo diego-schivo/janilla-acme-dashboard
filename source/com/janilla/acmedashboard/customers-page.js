@@ -29,8 +29,8 @@ export default class CustomersPage extends WebComponent {
 		return ["data-query", "slot"];
 	}
 
-	static get templateName() {
-		return "customers-page";
+	static get templateNames() {
+		return ["customers-page"];
 	}
 
 	constructor() {

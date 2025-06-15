@@ -32,8 +32,8 @@ const iconNameByType = {
 
 export default class SingleCard extends WebComponent {
 
-	static get templateName() {
-		return "single-card";
+	static get templateNames() {
+		return ["single-card"];
 	}
 
 	constructor() {

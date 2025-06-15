@@ -25,8 +25,8 @@ import WebComponent from "./web-component.js";
 
 export default class RevenueChart extends WebComponent {
 
-	static get templateName() {
-		return "revenue-chart";
+	static get templateNames() {
+		return ["revenue-chart"];
 	}
 
 	constructor() {

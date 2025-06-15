@@ -24,7 +24,6 @@
 package com.janilla.acmedashboard;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -44,13 +43,9 @@ public class InvoiceApi {
 		var p = page != null ? page.intValue() : 1;
 		var ic = persistence.crud(Invoice.class);
 		var s = (p - 1) * 6;
-		var q = query == null
-				|| query.isEmpty()
-						? ic.list(s, 6)
-						: ic.filter("customerId", s, 6,
-								Arrays.stream(persistence.crud(Customer.class).filter("name",
-										x -> ((String) x).toLowerCase().contains(query.toLowerCase()))).boxed()
-										.toArray());
+		var q = query == null || query.isEmpty() ? ic.list(s, 6)
+				: ic.filter("customerId", s, 6, persistence.crud(Customer.class)
+						.filter("name", x -> ((String) x).toLowerCase().contains(query.toLowerCase())).toArray());
 		return new IdPage2(q, ic.read(q.ids()).stream().map(x -> Invoice2.of(x, persistence)));
 	}
 
@@ -75,7 +70,7 @@ public class InvoiceApi {
 		return persistence.crud(Invoice.class).delete(id);
 	}
 
-	public record IdPage2(@Flatten Crud.IdPage page, Stream<Invoice2> items) {
+	public record IdPage2(@Flatten Crud.IdPage<Long> page, Stream<Invoice2> items) {
 	}
 
 	public record Invoice2(@Flatten Invoice invoice, Customer customer) {
