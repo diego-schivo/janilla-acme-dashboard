@@ -49,7 +49,6 @@ export default class InvoiceStatus extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("InvoiceStatus.updateDisplay");
 		const v = this.dataset.value;
 		this.appendChild(this.interpolateDom(v ? {
 			$template: "",

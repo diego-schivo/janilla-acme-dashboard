@@ -24,6 +24,7 @@
 package com.janilla.acmedashboard;
 
 import java.util.Properties;
+import java.util.Set;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.web.HandleException;
@@ -35,14 +36,34 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	@Override
 	protected void handle(Invocation invocation, HttpExchange exchange) {
-		var rq = exchange.getRequest();
-		if (Boolean.parseBoolean(configuration.getProperty("acmedashboard.live-demo")))
-			if (!rq.getMethod().equals("GET") && !rq.getPath().equals("/api/authentication"))
-						throw new HandleException(new MethodBlockedException());
-		if (rq.getPath().startsWith("/api") && !rq.getPath().equals("/api/authentication"))
-			((CustomHttpExchange) exchange).requireSessionEmail();
+		var ex = (CustomHttpExchange) exchange;
+		var rq = ex.getRequest();
+		var rs = ex.getResponse();
 
-//		if (rq.getPath().startsWith("/api"))
+		if (Boolean.parseBoolean(configuration.getProperty("acmedashboard.live-demo")))
+			if (rq.getMethod().equals("GET") || rq.getPath().equals("/api/authentication"))
+				;
+			else
+				throw new HandleException(new MethodBlockedException());
+
+		if (rq.getPath().contains("."))
+			;
+		else if (rq.getPath().startsWith("/api/")) {
+			if (rq.getPath().equals("/api/authentication"))
+				;
+			else
+				ex.requireSessionEmail();
+		} else {
+			if (Set.of("/", "/login").contains(rq.getPath()))
+				;
+			else if (ex.getSessionEmail() == null) {
+				rs.setStatus(302);
+				rs.setHeaderValue("cache-control", "no-cache");
+				rs.setHeaderValue("location", "/login");
+			}
+		}
+
+//		if (rq.getPath().startsWith("/api/"))
 //			try {
 //				Thread.sleep(500);
 //			} catch (InterruptedException e) {

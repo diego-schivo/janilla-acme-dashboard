@@ -37,50 +37,40 @@ export default class InvoicesPage extends WebComponent {
 		super();
 	}
 
-	get historyState() {
-		const s = this.state;
-		return {
-			...history.state,
-			"invoices-page": Object.fromEntries(["items", "total"].map(x => [x, s[x]]))
-		};
-	}
-
 	connectedCallback() {
-		// console.log("InvoicesPage.connectedCallback");
 		super.connectedCallback();
 		this.addEventListener("input", this.handleInput);
 		this.addEventListener("submit", this.handleSubmit);
 	}
 
 	disconnectedCallback() {
-		// console.log("InvoicesPage.disconnectedCallback");
+		super.disconnectedCallback();
 		this.removeEventListener("input", this.handleInput);
 		this.removeEventListener("submit", this.handleSubmit);
 	}
 
 	handleInput = event => {
-		// console.log("InvoicesPage.handleInput", event);
 		if (typeof this.inputTimeout === "number")
 			clearTimeout(this.inputTimeout);
 		const q = event.target.value;
 		this.inputTimeout = setTimeout(() => {
 			this.inputTimeout = undefined;
 			const u = new URL(location.href);
+			u.searchParams.delete("page");
 			const q0 = u.searchParams.get("query");
 			if (q)
 				u.searchParams.set("query", q);
 			else
 				u.searchParams.delete("query");
-			if (!q0)
-				history.pushState(undefined, "", u.pathname + u.search);
-			else
+			if (q0)
 				history.replaceState(undefined, "", u.pathname + u.search);
+			else
+				history.pushState(undefined, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
 	}
 
 	handleSubmit = async event => {
-		// console.log("InvoicesPage.handleSubmit", event);
 		event.preventDefault();
 		if (event.submitter.getAttribute("aria-disabled") === "true")
 			return;
@@ -88,9 +78,10 @@ export default class InvoicesPage extends WebComponent {
 		try {
 			const fd = new FormData(event.target);
 			const r = await fetch(`/api/invoices/${fd.get("id")}`, { method: "DELETE" });
-			if (r.ok)
+			if (r.ok) {
+				delete this.state.items;
 				await this.updateDisplay();
-			else {
+			} else {
 				const t = await r.text();
 				alert(t);
 			}
@@ -100,21 +91,7 @@ export default class InvoicesPage extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("InvoicesPage.updateDisplay");
-		if (this.state.items && !history.state)
-			this.state = {};
-		if (!this.state.items && this.slot) {
-			const u = new URL("/api/invoices", location.href);
-			const q = this.dataset.query;
-			if (q)
-				u.searchParams.append("query", q);
-			const p = this.dataset.page;
-			if (p)
-				u.searchParams.append("page", p);
-			Object.assign(this.state, await (await fetch(u)).json());
-			history.replaceState(this.historyState, "");
-		}
-		const s = this.state;
+		const s = history.state;
 		const u = new URL("/dashboard/invoices", location.href);
 		const q = this.dataset.query;
 		if (q)
@@ -123,21 +100,32 @@ export default class InvoicesPage extends WebComponent {
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: s.items ? s.items.map(x => ({
+			articles: this.slot && s ? s.items?.map(x => ({
 				$template: "article",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: s.items ? s.items.map(x => ({
+			rows: this.slot && s ? s.items?.map(x => ({
 				$template: "row",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" })),
-			pagination: {
+			pagination: this.slot && s ? {
 				href: u.pathname + u.search,
 				page: p ?? 1,
-				pageCount: s.total ? Math.ceil(s.total / 6) : 0
-			}
+				pageCount: Math.ceil((s.total ?? 0) / 6)
+			} : null
 		}));
+		if (this.slot && !s) {
+			const u = new URL("/api/invoices", location.href);
+			["query", "page"].forEach(x => {
+				if (this.dataset[x])
+					u.searchParams.append(x, this.dataset[x]);
+			});
+			fetch(u.pathname + u.search).then(x => x.json()).then(x => {
+				history.replaceState(x, "");
+				this.requestDisplay();
+			});
+		}
 	}
 }

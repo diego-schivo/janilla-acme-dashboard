@@ -23,7 +23,7 @@
  */
 import WebComponent from "./web-component.js";
 
-const iconNameByType = {
+const iconNames = {
 	collected: "banknotes",
 	pending: "clock",
 	invoices: "inbox",
@@ -42,11 +42,10 @@ export default class SingleCard extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("SingleCard.updateDisplay");
 		this.shadowRoot.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			icon: iconNameByType[this.dataset.type]
+			icon: iconNames[this.dataset.type]
 		}));
 	}
 }

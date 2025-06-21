@@ -24,35 +24,21 @@
 package com.janilla.acmedashboard;
 
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.json.JsonToken;
 import com.janilla.json.ReflectionJsonIterator;
-import com.janilla.persistence.Persistence;
+import com.janilla.reflect.Factory;
 import com.janilla.web.JsonHandlerFactory;
 
 public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 
-	public Properties configuration;
-
-	public Persistence persistence;
+	public Factory factory;
 
 	@Override
 	protected Iterator<JsonToken<?>> buildJsonIterator(Object object, HttpExchange exchange) {
-		var i = new ReflectionJsonIterator() {
-
-			@Override
-			public Iterator<JsonToken<?>> newValueIterator(Object object) {
-				var o = stack().peek();
-				if (o instanceof Map.Entry me && me.getKey().equals("password")) {
-					object = "******";
-				}
-				return super.newValueIterator(object);
-			}
-		};
-		i.setObject(object);
-		return i;
+		var x = factory.create(ReflectionJsonIterator.class);
+		x.setObject(object);
+		return x;
 	}
 }

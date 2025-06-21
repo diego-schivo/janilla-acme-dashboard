@@ -35,20 +35,23 @@ export default class RootLayout extends WebComponent {
 	}
 
 	connectedCallback() {
-		// console.log("RootLayout.connectedCallback");
+		const el = this.children.length === 1 ? this.firstElementChild : null;
+		if (el.matches('[type="application/json"]')) {
+			el.remove();
+			history.replaceState(JSON.parse(el.text), "");
+		}
 		addEventListener("popstate", this.handlePopState);
 		this.addEventListener("click", this.handleClick);
 		dispatchEvent(new CustomEvent("popstate"));
 	}
 
 	disconnectedCallback() {
-		// console.log("RootLayout.disconnectedCallback");
+		super.disconnectedCallback();
 		removeEventListener("popstate", this.handlePopState);
 		this.removeEventListener("click", this.handleClick);
 	}
 
 	handleClick = event => {
-		// console.log("RootLayout.handleClick", event);
 		const a = event.composedPath().find(x => x.tagName?.toLowerCase() === "a");
 		if (!a?.href)
 			return;
@@ -58,47 +61,34 @@ export default class RootLayout extends WebComponent {
 		dispatchEvent(new CustomEvent("popstate"));
 	}
 
-	handlePopState = event => {
-		// console.log("RootLayout.handlePopState", event);
-		if (event instanceof PopStateEvent) {
-			this.state = event.state;
-			for (const [k, v] of Object.entries(event.state))
-				if (k.includes("-")) {
-					const el = this.querySelector(k);
-					if (el) {
-						el.state = v;
-						el.requestDisplay();
-					}
-				}
-		}
+	handlePopState = _ => {
 		this.requestDisplay();
 	}
 
 	async updateDisplay() {
-		// console.log("RootLayout.updateDisplay");
 		const p = location.pathname;
 		if (p === "/") {
-			const j = await (await fetch("/api/authentication")).json();
+			const j = await this.fetchData("/api/authentication");
 			if (j) {
-				history.pushState({}, "", "/dashboard");
+				history.pushState(undefined, "", "/dashboard");
 				dispatchEvent(new CustomEvent("popstate"));
 				return;
 			}
 		}
 		const df = this.interpolateDom({
 			$template: "",
-			welcomePage: {
-				$template: "welcome-page",
+			welcome: {
+				$template: "welcome",
 				slot: p === "/" ? "content" : null
 			},
-			loginPage: {
-				$template: "login-page",
+			login: {
+				$template: "login",
 				slot: p === "/login" ? "content" : null
 			},
-			dashboardLayout: (() => {
-				const a = p === "/dashboard" || p.startsWith("/dashboard/");
+			dashboard: (() => {
+				const a = p.split("/")[1] === "dashboard";
 				return {
-					$template: "dashboard-layout",
+					$template: "dashboard",
 					slot: a ? "content" : null,
 					uri: a ? p + location.search : null
 				};

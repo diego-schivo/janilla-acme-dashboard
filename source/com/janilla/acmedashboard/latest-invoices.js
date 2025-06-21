@@ -33,28 +33,23 @@ export default class LatestInvoices extends WebComponent {
 		super();
 	}
 
-	get historyState() {
-		const s = this.state;
-		return {
-			...history.state,
-			"latest-invoices": Object.fromEntries(["invoices"].map(x => [x, s[x]]))
-		};
-	}
-
 	async updateDisplay() {
-		// console.log("LatestInvoices.updateDisplay");
-		const s = this.state;
+		const dp = this.closest("dashboard-page");
+		const s = history.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
-			articles: s.invoices ? s.invoices.map(x => ({
+			articles: dp.slot && s ? s.invoices?.map(x => ({
 				$template: "article",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" }))
 		}));
-		if (this.closest("dashboard-page").slot && !s.invoices) {
-			s.invoices = await (await fetch("/api/dashboard/invoices")).json();
-			history.replaceState(this.historyState, "");
-			this.requestDisplay();
-		}
+		if (dp.slot && !s)
+			fetch("/api/dashboard/invoices").then(x => x.json()).then(x => {
+				history.replaceState({
+					...history.state,
+					invoices: x
+				}, "");
+				this.requestDisplay();
+			});
 	}
 }

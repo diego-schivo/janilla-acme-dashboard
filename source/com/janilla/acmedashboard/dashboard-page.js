@@ -38,7 +38,6 @@ export default class DashboardPage extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("DashboardPage.updateDisplay");
 		if (!this.slot && this.state)
 			this.state = null;
 		if (this.slot && !this.state)

@@ -5,18 +5,18 @@
 <main>
 	<slot name="content"></slot>
 </main>
-<!--${dashboardPage}-->
-<!--${invoicesLayout}-->
-<!--${customersPage}-->
+<!--${dashboard}-->
+<!--${invoices}-->
+<!--${customers}-->
 
-<template id="dashboard-page">
+<template id="dashboard">
 	<dashboard-page slot="${slot}"></dashboard-page>
 </template>
 
-<template id="invoices-layout">
+<template id="invoices">
 	<invoices-layout slot="${slot}" data-uri="${uri}"></invoices-layout>
 </template>
 
-<template id="customers-page">
+<template id="customers">
 	<customers-page slot="${slot}" data-query="${query}"></customers-page>
 </template>

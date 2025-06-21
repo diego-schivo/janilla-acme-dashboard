@@ -39,25 +39,25 @@ export default class DashboardLayout extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("DashboardLayout.updateDisplay");
 		const p = location.pathname;
 		const pp = new URLSearchParams(location.search);
 		const df = this.interpolateDom({
 			$template: "",
-			dashboardPage: {
-				$template: "dashboard-page",
+			dashboard: {
+				$template: "dashboard",
 				slot: p === "/dashboard" ? "content" : null
 			},
-			invoicesLayout: (() => {
-				const a = p === "/dashboard/invoices" || p?.startsWith("/dashboard/invoices/");
+			invoices: (() => {
+				const nn = p?.split("/");
+				const a = nn[1] === "dashboard" && nn[2] === "invoices";
 				return {
-					$template: "invoices-layout",
+					$template: "invoices",
 					slot: a ? "content" : null,
 					uri: a ? p + location.search : null
 				};
 			})(),
-			customersPage: {
-				$template: "customers-page",
+			customers: {
+				$template: "customers",
 				slot: p === "/dashboard/customers" ? "content" : null,
 				query: pp.get("query")
 			}

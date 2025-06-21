@@ -23,34 +23,20 @@
  */
 package com.janilla.acmedashboard;
 
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 
-import com.janilla.database.Database;
-import com.janilla.json.MapAndType.TypeResolver;
-import com.janilla.persistence.Crud;
-import com.janilla.persistence.Entity;
-import com.janilla.persistence.Persistence;
+import com.janilla.json.JsonToken;
+import com.janilla.json.ReflectionJsonIterator;
 
-public class CustomPersistence extends Persistence {
-
-	public CustomPersistence(Database database, Iterable<Class<? extends Entity<?>>> types, TypeResolver typeResolver) {
-		super(database, types, typeResolver);
-	}
+public class CustomReflectionJsonIterator extends ReflectionJsonIterator {
 
 	@Override
-	protected <E extends Entity<?>> Crud<?, E> newCrud(Class<E> type) {
-		if (type == Invoice.class) {
-			@SuppressWarnings("unchecked")
-			var x = (Crud<?, E>) new InvoiceCrud(this);
-			return x;
+	public Iterator<JsonToken<?>> newValueIterator(Object object) {
+		var o = stack().peek();
+		if (o instanceof Map.Entry x && x.getKey().equals("password")) {
+			object = "**********";
 		}
-		return super.newCrud(type);
-	}
-
-	@Override
-	protected <ID extends Comparable<ID>> Function<Map<String, Object>, ID> nextId(Class<?> type) {
-		return Set.of(Customer.class, Revenue.class, User.class).contains(type) ? null : super.nextId(type);
+		return super.newValueIterator(object);
 	}
 }

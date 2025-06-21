@@ -39,7 +39,6 @@ export default class InvoicesLayout extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("InvoicesLayout.updateDisplay");
 		const p = location.pathname;
 		const pp = new URLSearchParams(location.search);
 		const df = this.interpolateDom({
@@ -55,16 +54,16 @@ export default class InvoicesLayout extends WebComponent {
 					slot: `item-${i}`
 				}));
 			})(),
-			invoicesPage: {
-				$template: "invoices-page",
+			invoices: {
+				$template: "invoices",
 				slot: p === "/dashboard/invoices" ? "content" : null,
 				query: pp.get("query"),
 				page: pp.get("page")
 			},
-			invoicePage: (() => {
-				const m = p === "/dashboard/invoices/create" ? [] : p?.match(/\/dashboard\/invoices\/(\d+)\/edit/);
+			invoice: (() => {
+				const m = p === "/dashboard/invoices/create" ? [] : p?.match(/\/dashboard\/invoices\/([^/]+)\/edit/);
 				return {
-					$template: "invoice-page",
+					$template: "invoice",
 					slot: m ? "content" : null,
 					title: m ? (m[1] ? "Edit Invoice" : "Create Invoice") : null,
 					id: m?.[1]

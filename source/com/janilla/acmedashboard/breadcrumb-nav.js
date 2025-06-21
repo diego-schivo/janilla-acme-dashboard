@@ -35,7 +35,6 @@ export default class BreadcrumbNav extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("BreadcrumbNav.updateDisplay");
 		const l = this.children.length;
 		this.shadowRoot.appendChild(this.interpolateDom({
 			$template: "",

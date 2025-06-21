@@ -45,10 +45,10 @@ public class CustomHttpExchange extends HttpExchange {
 
 	public Persistence persistence;
 
-	private Map<String, Object> map = new HashMap<>();
+	private Map<String, Object> session = new HashMap<>();
 
 	protected Supplier<String> sessionEmail = () -> {
-		if (!map.containsKey("sessionEmail")) {
+		if (!session.containsKey("email")) {
 			var hh = getRequest().getHeaders();
 			var h = hh != null ? hh.stream().filter(x -> x.name().equals("cookie")).map(HeaderField::value)
 					.collect(Collectors.joining("; ")) : null;
@@ -60,19 +60,19 @@ public class CustomHttpExchange extends HttpExchange {
 			} catch (IllegalArgumentException e) {
 				p = null;
 			}
-			map.put("sessionEmail", p != null ? p.get("loggedInAs") : null);
+			session.put("email", p != null ? p.get("loggedInAs") : null);
 		}
-		return (String) map.get("sessionEmail");
+		return (String) session.get("email");
 	};
 
 	private Supplier<User> sessionUser = () -> {
-		if (!map.containsKey("sessionUser")) {
+		if (!session.containsKey("user")) {
 			var c = persistence.crud(User.class);
 			var e = getSessionEmail();
-			var i = e != null ? c.find("email", e) : 0;
-			map.put("sessionUser", i > 0 ? c.read(i) : null);
+			var i = e != null ? c.find("email", e) : null;
+			session.put("user", i != null ? c.read(i) : null);
 		}
-		return (User) map.get("sessionUser");
+		return (User) session.get("user");
 	};
 
 	public String getSessionEmail() {

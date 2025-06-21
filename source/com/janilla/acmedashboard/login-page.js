@@ -38,18 +38,16 @@ export default class LoginPage extends WebComponent {
 	}
 
 	connectedCallback() {
-		// console.log("LoginPage.connectedCallback");
 		super.connectedCallback();
 		this.addEventListener("submit", this.handleSubmit);
 	}
 
 	disconnectedCallback() {
-		// console.log("LoginPage.disconnectedCallback");
+		super.disconnectedCallback();
 		this.removeEventListener("submit", this.handleSubmit);
 	}
 
 	handleSubmit = async event => {
-		// console.log("LoginPage.handleSubmit", event);
 		event.preventDefault();
 		if (event.submitter.getAttribute("aria-disabled") === "true")
 			return;

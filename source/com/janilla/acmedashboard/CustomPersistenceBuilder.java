@@ -26,6 +26,13 @@ package com.janilla.acmedashboard;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.janilla.database.BTree;
+import com.janilla.database.BTreeMemory;
+import com.janilla.database.IdAndReference;
+import com.janilla.database.KeyAndData;
+import com.janilla.database.Store;
+import com.janilla.io.ByteConverter;
+import com.janilla.io.TransactionalByteChannel;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
@@ -41,12 +48,28 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		var fe = Files.exists(databaseFile);
 		var p = super.build();
 		if (!fe) {
-			var pd = PlaceholderData.INSTANCE;
-			pd.customers().forEach(p.crud(Customer.class)::create);
-			pd.invoices().forEach(p.crud(Invoice.class)::create);
-			pd.revenue().forEach(p.crud(Revenue.class)::create);
-			pd.users().forEach(p.crud(User.class)::create);
+			var d = PlaceholderData.read();
+			d.customers().forEach(p.crud(Customer.class)::create);
+			d.invoices().forEach(p.crud(Invoice.class)::create);
+			d.revenue().forEach(p.crud(Revenue.class)::create);
+			d.users().forEach(p.crud(User.class)::create);
 		}
 		return p;
+	}
+
+	@Override
+	protected <ID extends Comparable<ID>> Store<ID, String> newStore(int bTreeOrder, TransactionalByteChannel channel,
+			BTreeMemory memory, KeyAndData<String> keyAndData) {
+		if (keyAndData.key().equals("Revenue")) {
+			@SuppressWarnings("unchecked")
+			var x = (Store<ID, String>) new Store<>(new BTree<>(bTreeOrder, channel, memory,
+					IdAndReference.byteConverter(ByteConverter.STRING), keyAndData.bTree()), ByteConverter.STRING);
+			return x;
+		} else {
+			@SuppressWarnings("unchecked")
+			var x = (Store<ID, String>) new Store<>(new BTree<>(bTreeOrder, channel, memory,
+					IdAndReference.byteConverter(ByteConverter.UUID1), keyAndData.bTree()), ByteConverter.STRING);
+			return x;
+		}
 	}
 }

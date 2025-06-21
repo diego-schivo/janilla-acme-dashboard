@@ -37,27 +37,17 @@ export default class InvoicePage extends WebComponent {
 		super();
 	}
 
-	get historyState() {
-		const s = this.state;
-		return {
-			...history.state,
-			"invoice-page": Object.assign({}, s)
-		};
-	}
-
 	connectedCallback() {
-		// console.log("InvoicePage.connectedCallback");
 		super.connectedCallback();
 		this.addEventListener("submit", this.handleSubmit);
 	}
 
 	disconnectedCallback() {
-		// console.log("InvoicePage.disconnectedCallback");
+		super.disconnectedCallback();
 		this.removeEventListener("submit", this.handleSubmit);
 	}
 
 	handleSubmit = async event => {
-		// console.log("InvoicePage.handleSubmit", event);
 		event.preventDefault();
 
 		if (event.submitter.getAttribute("aria-disabled") === "true")
@@ -96,35 +86,33 @@ export default class InvoicePage extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("InvoicePage.updateDisplay");
-		if (this.state.customers && !history.state)
-			this.state = {};
-		if (!this.state.customers && this.slot) {
-			const [nn, i] = await Promise.all([
-				fetch("/api/customers/names").then(x => x.json()),
-				this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
-			]);
-			Object.assign(this.state, {
-				customers: nn,
-				...i
-			});
-			history.replaceState(this.historyState, "");
-		}
-		const s = this.state;
+		const s = history.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
 			...s,
-			customerOptions: s.customers?.map(x => ({
+			customerOptions: this.slot && s ? s.customers?.map(x => ({
 				$template: "customer-option",
 				...x,
 				selected: x.key == s.customerId
-			})),
-			statusItems: ["PENDING", "PAID"].map(x => ({
+			})) : null,
+			statusItems: this.slot && s ? ["PENDING", "PAID"].map(x => ({
 				$template: "status-item",
 				value: x,
-				checked: x === s.status
-			}))
+				checked: x === s.status?.name
+			})) : null
 		}));
+		if (this.slot && !s) {
+			Promise.all([
+				fetch("/api/customers/names").then(x => x.json()),
+				this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
+			]).then(([nn, i]) => {
+				history.replaceState({
+					customers: nn,
+					...i
+				}, "");
+				this.requestDisplay();
+			});
+		}
 	}
 }

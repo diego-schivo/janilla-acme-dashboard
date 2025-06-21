@@ -33,25 +33,20 @@ export default class CardWrapper extends WebComponent {
 		super();
 	}
 
-	get historyState() {
-		const s = this.state;
-		return {
-			...history.state,
-			"card-wrapper": Object.fromEntries(["cards"].map(x => [x, s[x]]))
-		};
-	}
-
 	async updateDisplay() {
-		// console.log("CardWrapper.updateDisplay");
-		const s = this.state;
+		const dp = this.closest("dashboard-page");
+		const s = history.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
-			...s.cards
+			...(dp.slot && s ? s.cards : null)
 		}));
-		if (this.closest("dashboard-page").slot && !s.cards) {
-			s.cards = await (await fetch("/api/dashboard/cards")).json();
-			history.replaceState(this.historyState, "");
-			this.requestDisplay();
-		}
+		if (dp.slot && !s)
+			fetch("/api/dashboard/cards").then(x => x.json()).then(x => {
+				history.replaceState({
+					...history.state,
+					cards: x
+				}, "");
+				this.requestDisplay();
+			});
 	}
 }

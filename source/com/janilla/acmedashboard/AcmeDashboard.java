@@ -24,27 +24,38 @@
 package com.janilla.acmedashboard;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.net.ssl.SSLContext;
 
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
+import com.janilla.json.Json;
 import com.janilla.json.MapAndType;
+import com.janilla.json.ReflectionJsonIterator;
 import com.janilla.net.Net;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
+import com.janilla.reflect.Flatten;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
+import com.janilla.web.RenderableFactory;
+import com.janilla.web.Renderer;
 
-@Render(template = "index.html")
 public class AcmeDashboard {
+
+	public static final AtomicReference<AcmeDashboard> INSTANCE = new AtomicReference<>();
 
 	public static void main(String[] args) {
 		try {
@@ -58,16 +69,16 @@ public class AcmeDashboard {
 					pp.load(Files.newInputStream(Path.of(p)));
 				}
 			}
-			var ad = new AcmeDashboard(pp);
+			var d = new AcmeDashboard(pp);
 			HttpServer s;
 			{
 				SSLContext sc;
 				try (var is = Net.class.getResourceAsStream("testkeys")) {
 					sc = Net.getSSLContext("JKS", is, "passphrase".toCharArray());
 				}
-				s = ad.factory.create(HttpServer.class, Map.of("sslContext", sc, "handler", ad.handler));
+				s = d.factory.create(HttpServer.class, Map.of("sslContext", sc, "handler", d.handler));
 			}
-			var p = Integer.parseInt(ad.configuration.getProperty("acmedashboard.server.port"));
+			var p = Integer.parseInt(d.configuration.getProperty("acmedashboard.server.port"));
 			s.serve(new InetSocketAddress(p));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -80,6 +91,8 @@ public class AcmeDashboard {
 
 	public Persistence persistence;
 
+	public RenderableFactory renderableFactory;
+
 	public HttpHandler handler;
 
 	public MapAndType.TypeResolver typeResolver;
@@ -87,6 +100,8 @@ public class AcmeDashboard {
 	public Iterable<Class<?>> types;
 
 	public AcmeDashboard(Properties configuration) {
+		if (!INSTANCE.compareAndSet(null, this))
+			throw new IllegalStateException();
 		this.configuration = configuration;
 		types = Util.getPackageClasses(getClass().getPackageName()).toList();
 		factory = new Factory(types, this);
@@ -98,11 +113,65 @@ public class AcmeDashboard {
 			var pb = factory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
 			persistence = pb.build();
 		}
+		renderableFactory = new RenderableFactory();
 		handler = factory.create(ApplicationHandlerBuilder.class).build();
 	}
 
-	@Handle(method = "GET", path = "(/[\\w\\d/-]*)")
 	public AcmeDashboard application() {
 		return this;
+	}
+
+	@Handle(method = "GET", path = "/")
+	public Object root(CustomHttpExchange exchange) {
+		return exchange.getSessionEmail() != null ? URI.create("/dashboard")
+				: new Index(Collections.singletonMap("/api/authentication", null));
+	}
+
+	@Handle(method = "GET", path = "/login")
+	public Index login() {
+		return new Index(Map.of());
+	}
+
+	@Handle(method = "GET", path = "/dashboard")
+	public Index dashboard() {
+		var a = DashboardApi.INSTANCE.get();
+		return new Index(Map.of("cards", a.getCards(), "revenue", a.getRevenue(), "invoices", a.getInvoices()));
+	}
+
+	@Handle(method = "GET", path = "/dashboard/invoices")
+	public Index invoices(String query, Integer page) {
+		return new Index(InvoiceApi.INSTANCE.get().list(query, page));
+	}
+
+	@Handle(method = "GET", path = "/dashboard/invoices/create")
+	public Index createInvoice() {
+		return new Index(new Invoice2(null, CustomerApi.INSTANCE.get().names()));
+	}
+
+	@Handle(method = "GET", path = "/dashboard/invoices/([^/]+)/edit")
+	public Index editInvoice(UUID id) {
+		return new Index(new Invoice2(InvoiceApi.INSTANCE.get().read(id), CustomerApi.INSTANCE.get().names()));
+	}
+
+	@Handle(method = "GET", path = "/dashboard/customers")
+	public Index customers(String query) {
+		return new Index(CustomerApi.INSTANCE.get().list(query));
+	}
+
+	@Render(template = "index.html")
+	public record Index(@Render(renderer = StateRenderer.class) Object state) {
+	}
+
+	public static class StateRenderer<T> extends Renderer<T> {
+
+		@Override
+		public String apply(T value) {
+			var tt = INSTANCE.get().factory.create(ReflectionJsonIterator.class);
+			tt.setObject(value);
+			return Json.format(tt);
+		}
+	}
+
+	public record Invoice2(@Flatten Invoice invoice, List<Map.Entry<String, String>> customers) {
 	}
 }

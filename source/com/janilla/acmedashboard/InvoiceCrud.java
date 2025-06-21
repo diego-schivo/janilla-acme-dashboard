@@ -26,14 +26,15 @@ package com.janilla.acmedashboard;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
 
-public class InvoiceCrud extends Crud<Long, Invoice> {
+public class InvoiceCrud extends Crud<UUID, Invoice> {
 
 	public InvoiceCrud(Persistence persistence) {
-		super(Invoice.class, persistence);
+		super(Invoice.class, _ -> UUID.randomUUID(), persistence);
 	}
 
 	public BigDecimal getAmount(Invoice.Status status) {
@@ -44,7 +45,7 @@ public class InvoiceCrud extends Crud<Long, Invoice> {
 		return a != null ? a : BigDecimal.ZERO;
 	}
 
-	public BigDecimal getAmount(Long customerId, Invoice.Status status) {
+	public BigDecimal getAmount(UUID customerId, Invoice.Status status) {
 		var a = persistence.database()
 				.perform((_, ii) -> ii.perform("Invoice.customerId", i -> i.apply(customerId, (aa, _) -> {
 					@SuppressWarnings("unchecked")
@@ -56,7 +57,7 @@ public class InvoiceCrud extends Crud<Long, Invoice> {
 	}
 
 	@Override
-	protected void updateIndexes(Invoice entity1, Invoice entity2, Long id) {
+	protected void updateIndexes(Invoice entity1, Invoice entity2, UUID id) {
 		super.updateIndexes(entity1, entity2, id);
 
 		if (entity1 != null) {

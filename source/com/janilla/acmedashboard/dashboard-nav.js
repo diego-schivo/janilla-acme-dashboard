@@ -48,25 +48,22 @@ export default class DashboardNav extends WebComponent {
 	}
 
 	connectedCallback() {
-		// console.log("DashboardNav.connectedCallback");
 		super.connectedCallback();
 		addEventListener("popstate", this.handlePopState);
 		this.addEventListener("submit", this.handleSubmit);
 	}
 
 	disconnectedCallback() {
-		// console.log("DashboardNav.disconnectedCallback");
+		super.disconnectedCallback();
 		removeEventListener("popstate", this.handlePopState);
 		this.removeEventListener("submit", this.handleSubmit);
 	}
 
 	handlePopState = () => {
-		// console.log("DashboardNav.handlePopState");
 		this.requestDisplay();
 	}
 
 	handleSubmit = async event => {
-		// console.log("DashboardNav.handleSubmit", event);
 		event.preventDefault();
 		if (event.submitter.getAttribute("aria-disabled") === "true")
 			return;
@@ -81,7 +78,6 @@ export default class DashboardNav extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("DashboardNav.updateDisplay");
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			items: links.map(x => ({

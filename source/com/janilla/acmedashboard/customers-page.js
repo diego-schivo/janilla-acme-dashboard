@@ -37,27 +37,17 @@ export default class CustomersPage extends WebComponent {
 		super();
 	}
 
-	get historyState() {
-		const s = this.state;
-		return {
-			...history.state,
-			"customers-page": Object.fromEntries(["items"].map(x => [x, s[x]]))
-		};
-	}
-
 	connectedCallback() {
-		// console.log("CustomersPage.connectedCallback");
 		super.connectedCallback();
 		this.addEventListener("input", this.handleInput);
 	}
 
 	disconnectedCallback() {
-		// console.log("CustomersPage.disconnectedCallback");
+		super.disconnectedCallback();
 		this.removeEventListener("input", this.handleInput);
 	}
 
 	handleInput = event => {
-		// console.log("CustomersPage.handleInput", event);
 		if (typeof this.inputTimeout === "number")
 			clearTimeout(this.inputTimeout);
 		const q = event.target.value;
@@ -69,38 +59,36 @@ export default class CustomersPage extends WebComponent {
 				u.searchParams.set("query", q);
 			else
 				u.searchParams.delete("query");
-			if (!q0)
-				history.pushState(undefined, "", u.pathname + u.search);
-			else
+			if (q0)
 				history.replaceState(undefined, "", u.pathname + u.search);
+			else
+				history.pushState(undefined, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
 	}
 
 	async updateDisplay() {
-		// console.log("InvoicesPage.updateDisplay");
-		if (this.state.items && !history.state)
-			this.state = {};
-		if (!this.state.items && this.slot) {
-			const u = new URL("/api/customers", location.href);
-			const q = this.dataset.query;
-			if (q)
-				u.searchParams.append("query", q);
-			this.state.items = await (await fetch(u)).json();
-			history.replaceState(this.historyState, "");
-		}
-		const s = this.state;
+		const s = history.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: s.items ? s.items.map(x => ({
+			articles: this.slot && s ? s.map(x => ({
 				$template: "article",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: s.items ? s.items.map(x => ({
+			rows: this.slot && s ? s.map(x => ({
 				$template: "row",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" }))
 		}));
+		if (this.slot && !s) {
+			const u = new URL("/api/customers", location.href);
+			if (this.dataset.query)
+				u.searchParams.append("query", this.dataset.query);
+			fetch(u.pathname + u.search).then(x => x.json()).then(x => {
+				history.replaceState(x, "");
+				this.requestDisplay();
+			});
+		}
 	}
 }

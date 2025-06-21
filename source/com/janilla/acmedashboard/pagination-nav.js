@@ -38,7 +38,6 @@ export default class PaginationNav extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("PaginationNav.updateDisplay");
 		const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount) : 0;
 		const u = new URL(this.dataset.href, location.href);
 		const p = this.dataset.page ? parseInt(this.dataset.page) : 1;

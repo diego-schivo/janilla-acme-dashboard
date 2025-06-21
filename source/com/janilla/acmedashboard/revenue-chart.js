@@ -33,34 +33,29 @@ export default class RevenueChart extends WebComponent {
 		super();
 	}
 
-	get historyState() {
-		const s = this.state;
-		return {
-			...history.state,
-			"revenue-chart": Object.fromEntries(["revenue"].map(x => [x, s[x]]))
-		};
-	}
-
 	async updateDisplay() {
-		// console.log("RevenueChart.updateDisplay");
-		const s = this.state;
-		var k = !s.revenue ? 0 : Math.ceil(Math.max(...s.revenue.map(x => x.revenue)) / 1000);
+		const dp = this.closest("dashboard-page");
+		const s = history.state;
+		var k = dp.slot && s ? Math.ceil(Math.max(...s.revenue?.map(x => x.revenue)) / 1000) : 0;
 		this.appendChild(this.interpolateDom({
 			$template: "",
-			y: s.revenue ? Array.from({ length: k + 1 }, (_, i) => ({
+			y: dp.slot && s ? Array.from({ length: k + 1 }, (_, i) => ({
 				$template: "y",
 				y: `$${i}K`
 			})) : null,
-			x: s.revenue?.map(x => ({
+			x: dp.slot && s ? s.revenue?.map(x => ({
 				$template: "x",
 				...x,
 				style: `height: ${x.revenue / (1000 * k) * 100}%`
-			}))
+			})) : null
 		}));
-		if (this.closest("dashboard-page").slot && !s.revenue) {
-			s.revenue = await (await fetch("/api/dashboard/revenue")).json();
-			history.replaceState(this.historyState, "");
-			this.requestDisplay();
-		}
+		if (dp.slot && !s)
+			fetch("/api/dashboard/revenue").then(x => x.json()).then(x => {
+				history.replaceState({
+					...history.state,
+					revenue: x
+				}, "");
+				this.requestDisplay();
+			});
 	}
 }

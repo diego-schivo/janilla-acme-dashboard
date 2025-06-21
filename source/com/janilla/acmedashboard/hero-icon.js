@@ -38,7 +38,6 @@ export default class HeroIcon extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("HeroIcon.updateDisplay");
 		if (this.dataset.name === this.name)
 			return;
 		this.name = this.dataset.name;

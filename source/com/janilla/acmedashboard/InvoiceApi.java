@@ -24,8 +24,10 @@
 package com.janilla.acmedashboard;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
@@ -36,7 +38,14 @@ import com.janilla.web.Handle;
 
 public class InvoiceApi {
 
+	public static final AtomicReference<InvoiceApi> INSTANCE = new AtomicReference<>();
+
 	public Persistence persistence;
+
+	public InvoiceApi() {
+		if (!INSTANCE.compareAndSet(null, this))
+			throw new IllegalStateException();
+	}
 
 	@Handle(method = "GET", path = "/api/invoices")
 	public IdPage2 list(@Bind("query") String query, @Bind("page") Integer page) {
@@ -46,7 +55,7 @@ public class InvoiceApi {
 		var q = query == null || query.isEmpty() ? ic.list(s, 6)
 				: ic.filter("customerId", s, 6, persistence.crud(Customer.class)
 						.filter("name", x -> ((String) x).toLowerCase().contains(query.toLowerCase())).toArray());
-		return new IdPage2(q, ic.read(q.ids()).stream().map(x -> Invoice2.of(x, persistence)));
+		return new IdPage2(q, ic.read(q.ids()).stream().map(x -> Invoice2.of(x, persistence)).toList());
 	}
 
 	@Handle(method = "POST", path = "/api/invoices")
@@ -54,23 +63,23 @@ public class InvoiceApi {
 		return persistence.crud(Invoice.class).create(invoice.withDate(LocalDate.now()));
 	}
 
-	@Handle(method = "GET", path = "/api/invoices/(\\d+)")
-	public Invoice read(long id) {
+	@Handle(method = "GET", path = "/api/invoices/([^/]+)")
+	public Invoice read(UUID id) {
 		return persistence.crud(Invoice.class).read(id);
 	}
 
-	@Handle(method = "PUT", path = "/api/invoices/(\\d+)")
-	public Invoice update(long id, Invoice invoice) {
+	@Handle(method = "PUT", path = "/api/invoices/([^/]+)")
+	public Invoice update(UUID id, Invoice invoice) {
 		return persistence.crud(Invoice.class).update(id,
 				x -> Reflection.copy(invoice, x, y -> !Set.of("id", "date").contains(y)));
 	}
 
-	@Handle(method = "DELETE", path = "/api/invoices/(\\d+)")
-	public Invoice delete(long id) {
+	@Handle(method = "DELETE", path = "/api/invoices/([^/]+)")
+	public Invoice delete(UUID id) {
 		return persistence.crud(Invoice.class).delete(id);
 	}
 
-	public record IdPage2(@Flatten Crud.IdPage<Long> page, Stream<Invoice2> items) {
+	public record IdPage2(@Flatten Crud.IdPage<UUID> page, List<Invoice2> items) {
 	}
 
 	public record Invoice2(@Flatten Invoice invoice, Customer customer) {

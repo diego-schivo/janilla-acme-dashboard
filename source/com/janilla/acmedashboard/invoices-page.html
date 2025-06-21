@@ -15,10 +15,10 @@
 	<template id="article">
 		<article>
 			<div>
-				<img loading="lazy" src="${customer.imageUrl}" />
+				<img src="${customer.imageUrl}" loading="lazy" />
 				<span>${customer.name}</span>
 				<span>${customer.email}</span>
-				<invoice-status data-value="${status}"></invoice-status>
+				<invoice-status data-value="${status.name}"></invoice-status>
 			</div>
 			<div>
 				<intl-format data-type="amount" data-value="${amount}"></intl-format>
@@ -75,7 +75,7 @@
 	<template id="row">
 		<tr>
 			<td>
-				<img loading="lazy" src="${customer.imageUrl}" />
+				<img src="${customer.imageUrl}" loading="lazy" />
 				<span>${customer.name}</span>
 			</td>
 			<td>${customer.email}</td>
@@ -86,7 +86,7 @@
 				<intl-format data-type="date" data-value="${date}"></intl-format>
 			</td>
 			<td>
-				<invoice-status data-value="${status}"></invoice-status>
+				<invoice-status data-value="${status.name}"></invoice-status>
 			</td>
 			<td>
 				<a href="${href}">

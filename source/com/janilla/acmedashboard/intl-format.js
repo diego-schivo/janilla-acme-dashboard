@@ -50,7 +50,6 @@ export default class IntlFormat extends WebComponent {
 	}
 
 	async updateDisplay() {
-		// console.log("IntlFormat.updateDisplay");
 		if (!this.dataset.value) {
 			this.textContent = "";
 			return;

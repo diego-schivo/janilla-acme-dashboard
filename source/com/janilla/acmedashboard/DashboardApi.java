@@ -25,6 +25,7 @@ package com.janilla.acmedashboard;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.janilla.acmedashboard.InvoiceApi.Invoice2;
 import com.janilla.persistence.Persistence;
@@ -32,7 +33,14 @@ import com.janilla.web.Handle;
 
 public class DashboardApi {
 
+	public static final AtomicReference<DashboardApi> INSTANCE = new AtomicReference<>();
+
 	public Persistence persistence;
+
+	public DashboardApi() {
+		if (!INSTANCE.compareAndSet(null, this))
+			throw new IllegalStateException();
+	}
 
 	@Handle(method = "GET", path = "/api/dashboard/cards")
 	public Cards getCards() {
