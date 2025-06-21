@@ -47,7 +47,7 @@ export default class PaginationNav extends WebComponent {
 				u.searchParams.set("page", p - 1);
 				return {
 					$template: "link",
-					href: p > 1 ? u.pathname + u.search : undefined,
+					href: p > 1 ? u.pathname + u.search : null,
 					content: {
 						$template: "icon",
 						icon: "arrow-left"
@@ -69,13 +69,13 @@ export default class PaginationNav extends WebComponent {
 					u.searchParams.set("page", p + 1);
 					return {
 						$template: "link",
-						href: p < pc ? u.pathname + u.search : undefined,
+						href: p < pc ? u.pathname + u.search : null,
 						content: {
 							$template: "icon",
 							icon: "arrow-right"
 						}
 					};
-				})()] : undefined
+				})()] : null
 		}));
 	}
 }

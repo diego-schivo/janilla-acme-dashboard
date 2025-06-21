@@ -23,13 +23,6 @@
  */
 import WebComponent from "./web-component.js";
 
-const iconNames = {
-	collected: "banknotes",
-	pending: "clock",
-	invoices: "inbox",
-	customers: "user-group"
-};
-
 export default class SingleCard extends WebComponent {
 
 	static get templateNames() {
@@ -42,10 +35,16 @@ export default class SingleCard extends WebComponent {
 	}
 
 	async updateDisplay() {
+		const x = ({
+			collected: "banknotes",
+			pending: "clock",
+			invoices: "inbox",
+			customers: "user-group"
+		})[this.dataset.type];
 		this.shadowRoot.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			icon: iconNames[this.dataset.type]
+			icon: x
 		}));
 	}
 }

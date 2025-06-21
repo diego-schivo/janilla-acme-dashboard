@@ -54,7 +54,7 @@ export default class IntlFormat extends WebComponent {
 			this.textContent = "";
 			return;
 		}
-		const f = this.dataset.type ? formatters[this.dataset.type] : undefined;
+		const f = this.dataset.type ? formatters[this.dataset.type] : null;
 		this.textContent = f ? f(this.dataset.value) : this.dataset.value;
 	}
 }

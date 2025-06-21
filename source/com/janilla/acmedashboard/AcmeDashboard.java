@@ -72,11 +72,11 @@ public class AcmeDashboard {
 			var d = new AcmeDashboard(pp);
 			HttpServer s;
 			{
-				SSLContext sc;
+				SSLContext c;
 				try (var is = Net.class.getResourceAsStream("testkeys")) {
-					sc = Net.getSSLContext("JKS", is, "passphrase".toCharArray());
+					c = Net.getSSLContext("JKS", is, "passphrase".toCharArray());
 				}
-				s = d.factory.create(HttpServer.class, Map.of("sslContext", sc, "handler", d.handler));
+				s = d.factory.create(HttpServer.class, Map.of("sslContext", c, "handler", d.handler));
 			}
 			var p = Integer.parseInt(d.configuration.getProperty("acmedashboard.server.port"));
 			s.serve(new InetSocketAddress(p));
@@ -124,7 +124,7 @@ public class AcmeDashboard {
 	@Handle(method = "GET", path = "/")
 	public Object root(CustomHttpExchange exchange) {
 		return exchange.getSessionEmail() != null ? URI.create("/dashboard")
-				: new Index(Collections.singletonMap("/api/authentication", null));
+				: new Index(Collections.singletonMap("authentication", null));
 	}
 
 	@Handle(method = "GET", path = "/login")
@@ -134,41 +134,42 @@ public class AcmeDashboard {
 
 	@Handle(method = "GET", path = "/dashboard")
 	public Index dashboard() {
-		var a = DashboardApi.INSTANCE.get();
-		return new Index(Map.of("cards", a.getCards(), "revenue", a.getRevenue(), "invoices", a.getInvoices()));
+		var x = DashboardApi.INSTANCE.get();
+		return new Index(Map.of("cards", x.getCards(), "revenue", x.getRevenue(), "invoices", x.getInvoices()));
 	}
 
 	@Handle(method = "GET", path = "/dashboard/invoices")
 	public Index invoices(String query, Integer page) {
-		return new Index(InvoiceApi.INSTANCE.get().list(query, page));
+		return new Index(Collections.singletonMap("invoices", InvoiceApi.INSTANCE.get().list(query, page)));
 	}
 
 	@Handle(method = "GET", path = "/dashboard/invoices/create")
 	public Index createInvoice() {
-		return new Index(new Invoice2(null, CustomerApi.INSTANCE.get().names()));
+		return new Index(Collections.singletonMap("invoice", new Invoice2(null, CustomerApi.INSTANCE.get().names())));
 	}
 
 	@Handle(method = "GET", path = "/dashboard/invoices/([^/]+)/edit")
 	public Index editInvoice(UUID id) {
-		return new Index(new Invoice2(InvoiceApi.INSTANCE.get().read(id), CustomerApi.INSTANCE.get().names()));
+		return new Index(Collections.singletonMap("invoice",
+				new Invoice2(InvoiceApi.INSTANCE.get().read(id), CustomerApi.INSTANCE.get().names())));
 	}
 
 	@Handle(method = "GET", path = "/dashboard/customers")
 	public Index customers(String query) {
-		return new Index(CustomerApi.INSTANCE.get().list(query));
+		return new Index(Collections.singletonMap("customers", CustomerApi.INSTANCE.get().list(query)));
 	}
 
 	@Render(template = "index.html")
-	public record Index(@Render(renderer = StateRenderer.class) Object state) {
+	public record Index(@Render(renderer = StateRenderer.class) Map<String, Object> state) {
 	}
 
 	public static class StateRenderer<T> extends Renderer<T> {
 
 		@Override
 		public String apply(T value) {
-			var tt = INSTANCE.get().factory.create(ReflectionJsonIterator.class);
-			tt.setObject(value);
-			return Json.format(tt);
+			var x = INSTANCE.get().factory.create(ReflectionJsonIterator.class);
+			x.setObject(value);
+			return Json.format(x);
 		}
 	}
 

@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 import WebComponent from "./web-component.js";
-import { removeAllChildren } from "./dom-utils.js";
 
 const documents = {};
 const parser = new DOMParser();
@@ -38,17 +37,19 @@ export default class HeroIcon extends WebComponent {
 	}
 
 	async updateDisplay() {
-		if (this.dataset.name === this.name)
+		const s = this.state;
+		if (this.dataset.name === s.name)
 			return;
-		this.name = this.dataset.name;
-		removeAllChildren(this);
-		if (!this.name)
+		s.name = this.dataset.name;
+		while (this.firstChild)
+			this.removeChild(this.lastChild);
+		if (!s.name)
 			return;
-		documents[this.name] ??= fetch(`/images/heroicons/${this.name}.svg`).then(x => x.text()).then(x => {
+		documents[s.name] ??= fetch(`/images/heroicons/${s.name}.svg`).then(x => x.text()).then(x => {
 			x = x.replace("#0F172A", "currentColor");
 			return parser.parseFromString(x, "image/svg+xml");
 		});
-		const d = await documents[this.name];
+		const d = await documents[s.name];
 		this.appendChild(d.firstChild.cloneNode(true));
 	}
 }

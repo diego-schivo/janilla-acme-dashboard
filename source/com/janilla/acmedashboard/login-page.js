@@ -53,11 +53,11 @@ export default class LoginPage extends WebComponent {
 			return;
 		event.submitter.setAttribute("aria-disabled", "true");
 		try {
-			const fd = new FormData(event.target);
+			const d = new FormData(event.target);
 			const u = await (await fetch("/api/authentication", {
 				method: "POST",
 				headers: { "content-type": "application/json" },
-				body: JSON.stringify(Object.fromEntries(fd))
+				body: JSON.stringify(Object.fromEntries(d))
 			})).json();
 			this.querySelector(".error").innerHTML = u ? "" : "Invalid credentials.";
 			if (u) {

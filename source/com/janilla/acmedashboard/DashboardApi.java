@@ -44,8 +44,8 @@ public class DashboardApi {
 
 	@Handle(method = "GET", path = "/api/dashboard/cards")
 	public Cards getCards() {
-		var ic = (InvoiceCrud) persistence.crud(Invoice.class);
-		return new Cards(ic.getAmount(Invoice.Status.PAID), ic.getAmount(Invoice.Status.PENDING), ic.count(),
+		var x = (InvoiceCrud) persistence.crud(Invoice.class);
+		return new Cards(x.getAmount(Invoice.Status.PAID), x.getAmount(Invoice.Status.PENDING), x.count(),
 				persistence.crud(Customer.class).count());
 	}
 
@@ -54,13 +54,13 @@ public class DashboardApi {
 
 	@Handle(method = "GET", path = "/api/dashboard/revenue")
 	public List<Revenue> getRevenue() {
-		var rc = persistence.crud(Revenue.class);
-		return rc.read(rc.list());
+		var x = persistence.crud(Revenue.class);
+		return x.read(x.list());
 	}
 
 	@Handle(method = "GET", path = "/api/dashboard/invoices")
 	public List<Invoice2> getInvoices() {
-		var ic = persistence.crud(Invoice.class);
-		return ic.read(ic.list(0, 5).ids()).stream().map(x -> Invoice2.of(x, persistence)).toList();
+		var x = persistence.crud(Invoice.class);
+		return x.read(x.list(0, 5).ids()).stream().map(y -> Invoice2.of(y, persistence)).toList();
 	}
 }

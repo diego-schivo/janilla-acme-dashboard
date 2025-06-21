@@ -34,22 +34,11 @@ public record PlaceholderData(List<Customer> customers, List<Invoice> invoices, 
 		List<User> users) {
 
 	public static PlaceholderData read() {
-		try (var is = PlaceholderData.class.getResourceAsStream("placeholder-data.json")) {
-			return (PlaceholderData) new Converter(null).convert(Json.parse(new String(is.readAllBytes())),
+		try (var x = PlaceholderData.class.getResourceAsStream("placeholder-data.json")) {
+			return (PlaceholderData) new Converter(null).convert(Json.parse(new String(x.readAllBytes())),
 					PlaceholderData.class);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
-
-//	public static PlaceholderData INSTANCE;
-//
-//	static {
-//		try (var is = PlaceholderData.class.getResourceAsStream("placeholder-data.json")) {
-//			INSTANCE = (PlaceholderData) new Converter(null).convert(Json.parse(new String(is.readAllBytes())),
-//					PlaceholderData.class);
-//		} catch (IOException e) {
-//			throw new UncheckedIOException(e);
-//		}
-//	}
 }

@@ -68,14 +68,20 @@ export default class RootLayout extends WebComponent {
 	async updateDisplay() {
 		const p = location.pathname;
 		if (p === "/") {
-			const j = await this.fetchData("/api/authentication");
-			if (j) {
+			if (!history.state) {
+				const x = await (await fetch("/api/authentication")).json();
+				history.replaceState({
+					...history.state,
+					authentication: x
+				}, "");
+			}
+			if (history.state.authentication) {
 				history.pushState(undefined, "", "/dashboard");
 				dispatchEvent(new CustomEvent("popstate"));
 				return;
 			}
 		}
-		const df = this.interpolateDom({
+		const f = this.interpolateDom({
 			$template: "",
 			welcome: {
 				$template: "welcome",
@@ -94,7 +100,7 @@ export default class RootLayout extends WebComponent {
 				};
 			})()
 		});
-		this.shadowRoot.append(...df.querySelectorAll("slot"));
-		this.appendChild(df);
+		this.shadowRoot.append(...f.querySelectorAll("slot"));
+		this.appendChild(f);
 	}
 }

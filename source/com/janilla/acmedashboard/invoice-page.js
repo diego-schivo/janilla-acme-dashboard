@@ -90,26 +90,29 @@ export default class InvoicePage extends WebComponent {
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			...s,
-			customerOptions: this.slot && s ? s.customers?.map(x => ({
+			...s?.invoice,
+			customerOptions: this.slot && s ? s.invoice?.customers?.map(x => ({
 				$template: "customer-option",
 				...x,
-				selected: x.key == s.customerId
+				selected: x.key == s.invoice?.customerId
 			})) : null,
 			statusItems: this.slot && s ? ["PENDING", "PAID"].map(x => ({
 				$template: "status-item",
 				value: x,
-				checked: x === s.status?.name
+				checked: x === s.invoice?.status?.name
 			})) : null
 		}));
 		if (this.slot && !s) {
 			Promise.all([
-				fetch("/api/customers/names").then(x => x.json()),
-				this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : undefined
-			]).then(([nn, i]) => {
+				this.dataset.id ? fetch(`/api/invoices/${this.dataset.id}`).then(x => x.json()) : null,
+				fetch("/api/customers/names").then(x => x.json())
+			]).then(([i, nn]) => {
 				history.replaceState({
-					customers: nn,
-					...i
+					...history.state,
+					invoice: {
+						...i,
+						customers: nn
+					}
 				}, "");
 				this.requestDisplay();
 			});

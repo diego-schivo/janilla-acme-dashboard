@@ -72,11 +72,11 @@ export default class CustomersPage extends WebComponent {
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: this.slot && s ? s.map(x => ({
+			articles: this.slot && s ? s.customers?.map(x => ({
 				$template: "article",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: this.slot && s ? s.map(x => ({
+			rows: this.slot && s ? s.customers?.map(x => ({
 				$template: "row",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" }))
@@ -86,7 +86,10 @@ export default class CustomersPage extends WebComponent {
 			if (this.dataset.query)
 				u.searchParams.append("query", this.dataset.query);
 			fetch(u.pathname + u.search).then(x => x.json()).then(x => {
-				history.replaceState(x, "");
+				history.replaceState({
+					...history.state,
+					customers: x
+				}, "");
 				this.requestDisplay();
 			});
 		}

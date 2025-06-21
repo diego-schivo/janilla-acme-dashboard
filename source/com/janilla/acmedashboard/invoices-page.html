@@ -11,49 +11,6 @@
 </header>
 <section>
 	<!--${articles}-->
-
-	<template id="article">
-		<article>
-			<div>
-				<img src="${customer.imageUrl}" loading="lazy" />
-				<span>${customer.name}</span>
-				<span>${customer.email}</span>
-				<invoice-status data-value="${status.name}"></invoice-status>
-			</div>
-			<div>
-				<intl-format data-type="amount" data-value="${amount}"></intl-format>
-				<intl-format data-type="date" data-value="${date}"></intl-format>
-				<a href="${href}">
-					<span class="sr-only">Edit</span>
-					<hero-icon data-name="pencil"></hero-icon>
-				</a>
-				<form>
-					<input type="hidden" name="id" value="${id}" />
-					<button>
-						<span class="sr-only">Delete</span>
-						<hero-icon data-name="trash"></hero-icon>
-					</button>
-				</form>
-			</div>
-		</article>
-	</template>
-
-	<template id="article-skeleton">
-		<article class="skeleton">
-			<div>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-			</div>
-			<div>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-			</div>
-		</article>
-	</template>
 </section>
 <section>
 	<table>
@@ -71,62 +28,105 @@
 			<!--${rows}-->
 		</tbody>
 	</table>
-
-	<template id="row">
-		<tr>
-			<td>
-				<img src="${customer.imageUrl}" loading="lazy" />
-				<span>${customer.name}</span>
-			</td>
-			<td>${customer.email}</td>
-			<td>
-				<intl-format data-type="amount" data-value="${amount}"></intl-format>
-			</td>
-			<td>
-				<intl-format data-type="date" data-value="${date}"></intl-format>
-			</td>
-			<td>
-				<invoice-status data-value="${status.name}"></invoice-status>
-			</td>
-			<td>
-				<a href="${href}">
-					<span class="sr-only">Edit</span>
-					<hero-icon data-name="pencil"></hero-icon>
-				</a>
-				<form>
-					<input type="hidden" name="id" value="${id}" />
-					<button>
-						<span class="sr-only">Delete</span>
-						<hero-icon data-name="trash"></hero-icon>
-					</button>
-				</form>
-			</td>
-		</tr>
-	</template>
-
-	<template id="row-skeleton">
-		<tr class="skeleton">
-			<td>
-				<span></span>
-				<span></span>
-			</td>
-			<td>
-				<span></span>
-			</td>
-			<td>
-				<span></span>
-			</td>
-			<td>
-				<span></span>
-			</td>
-			<td>
-				<span></span>
-			</td>
-			<td>
-				<span></span>
-				<span></span>
-			</td>
-		</tr>
-	</template>
 </section>
 <pagination-nav data-href="${pagination.href}" data-page="${pagination.page}" data-page-count="${pagination.pageCount}"></pagination-nav>
+
+<template id="article">
+	<article>
+		<div>
+			<img src="${customer.imageUrl}" loading="lazy" />
+			<span>${customer.name}</span>
+			<span>${customer.email}</span>
+			<invoice-status data-value="${status.name}"></invoice-status>
+		</div>
+		<div>
+			<intl-format data-type="amount" data-value="${amount}"></intl-format>
+			<intl-format data-type="date" data-value="${date}"></intl-format>
+			<a href="${href}">
+				<span class="sr-only">Edit</span>
+				<hero-icon data-name="pencil"></hero-icon>
+			</a>
+			<form>
+				<input type="hidden" name="id" value="${id}" />
+				<button>
+					<span class="sr-only">Delete</span>
+					<hero-icon data-name="trash"></hero-icon>
+				</button>
+			</form>
+		</div>
+	</article>
+</template>
+
+<template id="article-skeleton">
+	<article class="skeleton">
+		<div>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+		<div>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+	</article>
+</template>
+
+<template id="row">
+	<tr>
+		<td>
+			<img src="${customer.imageUrl}" loading="lazy" />
+			<span>${customer.name}</span>
+		</td>
+		<td>${customer.email}</td>
+		<td>
+			<intl-format data-type="amount" data-value="${amount}"></intl-format>
+		</td>
+		<td>
+			<intl-format data-type="date" data-value="${date}"></intl-format>
+		</td>
+		<td>
+			<invoice-status data-value="${status.name}"></invoice-status>
+		</td>
+		<td>
+			<a href="${href}">
+				<span class="sr-only">Edit</span>
+				<hero-icon data-name="pencil"></hero-icon>
+			</a>
+			<form>
+				<input type="hidden" name="id" value="${id}" />
+				<button>
+					<span class="sr-only">Delete</span>
+					<hero-icon data-name="trash"></hero-icon>
+				</button>
+			</form>
+		</td>
+	</tr>
+</template>
+
+<template id="row-skeleton">
+	<tr class="skeleton">
+		<td>
+			<span></span>
+			<span></span>
+		</td>
+		<td>
+			<span></span>
+		</td>
+		<td>
+			<span></span>
+		</td>
+		<td>
+			<span></span>
+		</td>
+		<td>
+			<span></span>
+		</td>
+		<td>
+			<span></span>
+			<span></span>
+		</td>
+	</tr>
+</template>

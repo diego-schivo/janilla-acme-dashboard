@@ -33,10 +33,8 @@ public class CustomReflectionJsonIterator extends ReflectionJsonIterator {
 
 	@Override
 	public Iterator<JsonToken<?>> newValueIterator(Object object) {
-		var o = stack().peek();
-		if (o instanceof Map.Entry x && x.getKey().equals("password")) {
+		if (stack().peek() instanceof Map.Entry x && x.getKey().equals("password"))
 			object = "**********";
-		}
 		return super.newValueIterator(object);
 	}
 }

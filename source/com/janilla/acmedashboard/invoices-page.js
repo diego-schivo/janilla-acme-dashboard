@@ -100,12 +100,12 @@ export default class InvoicesPage extends WebComponent {
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: this.slot && s ? s.items?.map(x => ({
+			articles: this.slot && s ? s.invoices?.items?.map(x => ({
 				$template: "article",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: this.slot && s ? s.items?.map(x => ({
+			rows: this.slot && s ? s.invoices?.items?.map(x => ({
 				$template: "row",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
@@ -113,7 +113,7 @@ export default class InvoicesPage extends WebComponent {
 			pagination: this.slot && s ? {
 				href: u.pathname + u.search,
 				page: p ?? 1,
-				pageCount: Math.ceil((s.total ?? 0) / 6)
+				pageCount: Math.ceil((s.invoices?.total ?? 0) / 6)
 			} : null
 		}));
 		if (this.slot && !s) {
@@ -123,7 +123,10 @@ export default class InvoicesPage extends WebComponent {
 					u.searchParams.append(x, this.dataset[x]);
 			});
 			fetch(u.pathname + u.search).then(x => x.json()).then(x => {
-				history.replaceState(x, "");
+				history.replaceState({
+					...history.state,
+					invoices: x
+				}, "");
 				this.requestDisplay();
 			});
 		}

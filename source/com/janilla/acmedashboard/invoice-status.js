@@ -23,17 +23,6 @@
  */
 import WebComponent from "./web-component.js";
 
-const statuses = {
-	"PAID": {
-		icon: "check",
-		text: "Paid"
-	},
-	"PENDING": {
-		icon: "clock",
-		text: "Pending"
-	}
-};
-
 export default class InvoiceStatus extends WebComponent {
 
 	static get observedAttributes() {
@@ -49,10 +38,19 @@ export default class InvoiceStatus extends WebComponent {
 	}
 
 	async updateDisplay() {
-		const v = this.dataset.value;
-		this.appendChild(this.interpolateDom(v ? {
+		const x = ({
+			"PAID": {
+				icon: "check",
+				text: "Paid"
+			},
+			"PENDING": {
+				icon: "clock",
+				text: "Pending"
+			}
+		})[this.dataset.value];
+		this.appendChild(this.interpolateDom(x ? {
 			$template: "",
-			...statuses[v]
-		} : undefined));
+			...x
+		} : null));
 	}
 }

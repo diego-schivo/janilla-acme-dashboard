@@ -41,7 +41,7 @@ export default class DashboardLayout extends WebComponent {
 	async updateDisplay() {
 		const p = location.pathname;
 		const pp = new URLSearchParams(location.search);
-		const df = this.interpolateDom({
+		const f = this.interpolateDom({
 			$template: "",
 			dashboard: {
 				$template: "dashboard",
@@ -62,7 +62,7 @@ export default class DashboardLayout extends WebComponent {
 				query: pp.get("query")
 			}
 		});
-		this.shadowRoot.append(...df.querySelectorAll("link, aside, main"));
-		this.appendChild(df);
+		this.shadowRoot.append(...f.querySelectorAll("link, aside, main"));
+		this.appendChild(f);
 	}
 }

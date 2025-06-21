@@ -50,12 +50,12 @@ public class InvoiceApi {
 	@Handle(method = "GET", path = "/api/invoices")
 	public IdPage2 list(@Bind("query") String query, @Bind("page") Integer page) {
 		var p = page != null ? page.intValue() : 1;
-		var ic = persistence.crud(Invoice.class);
+		var c = persistence.crud(Invoice.class);
 		var s = (p - 1) * 6;
-		var q = query == null || query.isEmpty() ? ic.list(s, 6)
-				: ic.filter("customerId", s, 6, persistence.crud(Customer.class)
+		var q = query == null || query.isEmpty() ? c.list(s, 6)
+				: c.filter("customerId", s, 6, persistence.crud(Customer.class)
 						.filter("name", x -> ((String) x).toLowerCase().contains(query.toLowerCase())).toArray());
-		return new IdPage2(q, ic.read(q.ids()).stream().map(x -> Invoice2.of(x, persistence)).toList());
+		return new IdPage2(q, c.read(q.ids()).stream().map(x -> Invoice2.of(x, persistence)).toList());
 	}
 
 	@Handle(method = "POST", path = "/api/invoices")

@@ -1,5 +1,5 @@
 <link href="/invoices-layout.css" rel="stylesheet" />
-<breadcrumb-nav>
+<breadcrumb-nav data-uri="${uri}">
 	<!--${breadcrumbItems}-->
 </breadcrumb-nav>
 <slot name="content"></slot>
@@ -15,7 +15,7 @@
 </template>
 
 <template id="invoices">
-	<invoices-page slot="${slot}" data-title="Invoices" data-href="/dashboard/invoices" data-query="${query}" data-page="${page}"></invoices-page>
+	<invoices-page slot="${slot}" data-title="${title}" data-href="${href}" data-query="${query}" data-page="${page}"></invoices-page>
 </template>
 
 <template id="invoice">

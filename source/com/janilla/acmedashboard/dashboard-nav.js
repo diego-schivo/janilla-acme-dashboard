@@ -23,20 +23,6 @@
  */
 import WebComponent from "./web-component.js";
 
-const links = [{
-	href: "/dashboard",
-	icon: "home",
-	text: "Home"
-}, {
-	href: "/dashboard/invoices",
-	icon: "document-duplicate",
-	text: "Invoices"
-}, {
-	href: "/dashboard/customers",
-	icon: "user-group",
-	text: "Customers"
-}];
-
 export default class DashboardNav extends WebComponent {
 
 	static get templateNames() {
@@ -80,7 +66,19 @@ export default class DashboardNav extends WebComponent {
 	async updateDisplay() {
 		this.appendChild(this.interpolateDom({
 			$template: "",
-			items: links.map(x => ({
+			items: [{
+				href: "/dashboard",
+				icon: "home",
+				text: "Home"
+			}, {
+				href: "/dashboard/invoices",
+				icon: "document-duplicate",
+				text: "Invoices"
+			}, {
+				href: "/dashboard/customers",
+				icon: "user-group",
+				text: "Customers"
+			}].map(x => ({
 				$template: "item",
 				...x,
 				class: x.href === document.location.pathname ? "active" : ""

@@ -39,14 +39,10 @@ public class CustomPersistence extends Persistence {
 		super(database, types, typeResolver);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected <E extends Entity<?>> Crud<?, E> newCrud(Class<E> type) {
-		if (type == Invoice.class) {
-			@SuppressWarnings("unchecked")
-			var x = (Crud<?, E>) new InvoiceCrud(this);
-			return x;
-		}
-		return super.newCrud(type);
+		return type == Invoice.class ? (Crud<?, E>) new InvoiceCrud(this) : super.newCrud(type);
 	}
 
 	@Override

@@ -8,70 +8,6 @@
 </header>
 <section>
 	<!--${articles}-->
-
-	<template id="article">
-		<article>
-			<ul>
-				<li>
-					<img src="${imageUrl}" loading="lazy" />
-					<span>${name}</span>
-					<span>${email}</span>
-				</li>
-				<li>
-					<dl>
-						<div>
-							<dt>Pending:</dt>
-							<dd>
-								<intl-format data-type="amount" data-value="${pendingAmount}"></intl-format>
-							</dd>
-						</div>
-						<div>
-							<dt>Paid:</dt>
-							<dd>
-								<intl-format data-type="amount" data-value="${paidAmount}"></intl-format>
-							</dd>
-						</div>
-					</dl>
-				</li>
-				<li>
-					<p>
-						<span>${invoiceCount}</span> invoices
-					</p>
-				</li>
-			</ul>
-		</article>
-	</template>
-
-	<template id="article-skeleton">
-		<article class="skeleton">
-			<ul>
-				<li>
-					<span></span>
-					<span></span>
-					<span></span>
-				</li>
-				<li>
-					<dl>
-						<div>
-							<dd>
-								<span></span>
-							</dd>
-						</div>
-						<div>
-							<dd>
-								<span></span>
-							</dd>
-						</div>
-					</dl>
-				</li>
-				<li>
-					<p>
-						<span></span>
-					</p>
-				</li>
-			</ul>
-		</article>
-	</template>
 </section>
 <section>
 	<table>
@@ -88,42 +24,106 @@
 			<!--${rows}-->
 		</tbody>
 	</table>
+</section>
 
-	<template id="row">
-		<tr>
-			<td>
+<template id="article">
+	<article>
+		<ul>
+			<li>
 				<img src="${imageUrl}" loading="lazy" />
 				<span>${name}</span>
-			</td>
-			<td>${email}</td>
-			<td>${invoiceCount}</td>
-			<td>
-				<intl-format data-type="amount" data-value="${pendingAmount}"></intl-format>
-			</td>
-			<td>
-				<intl-format data-type="amount" data-value="${paidAmount}"></intl-format>
-			</td>
-		</tr>
-	</template>
+				<span>${email}</span>
+			</li>
+			<li>
+				<dl>
+					<div>
+						<dt>Pending:</dt>
+						<dd>
+							<intl-format data-type="amount" data-value="${pendingAmount}"></intl-format>
+						</dd>
+					</div>
+					<div>
+						<dt>Paid:</dt>
+						<dd>
+							<intl-format data-type="amount" data-value="${paidAmount}"></intl-format>
+						</dd>
+					</div>
+				</dl>
+			</li>
+			<li>
+				<p>
+					<span>${invoiceCount}</span> invoices
+				</p>
+			</li>
+		</ul>
+	</article>
+</template>
 
-	<template id="row-skeleton">
-		<tr class="skeleton">
-			<td>
+<template id="article-skeleton">
+	<article class="skeleton">
+		<ul>
+			<li>
 				<span></span>
 				<span></span>
-			</td>
-			<td>
 				<span></span>
-			</td>
-			<td>
-				<span></span>
-			</td>
-			<td>
-				<span></span>
-			</td>
-			<td>
-				<span></span>
-			</td>
-		</tr>
-	</template>
-</section>
+			</li>
+			<li>
+				<dl>
+					<div>
+						<dd>
+							<span></span>
+						</dd>
+					</div>
+					<div>
+						<dd>
+							<span></span>
+						</dd>
+					</div>
+				</dl>
+			</li>
+			<li>
+				<p>
+					<span></span>
+				</p>
+			</li>
+		</ul>
+	</article>
+</template>
+
+<template id="row">
+	<tr>
+		<td>
+			<img src="${imageUrl}" loading="lazy" />
+			<span>${name}</span>
+		</td>
+		<td>${email}</td>
+		<td>${invoiceCount}</td>
+		<td>
+			<intl-format data-type="amount" data-value="${pendingAmount}"></intl-format>
+		</td>
+		<td>
+			<intl-format data-type="amount" data-value="${paidAmount}"></intl-format>
+		</td>
+	</tr>
+</template>
+
+<template id="row-skeleton">
+	<tr class="skeleton">
+		<td>
+			<span></span>
+			<span></span>
+		</td>
+		<td>
+			<span></span>
+		</td>
+		<td>
+			<span></span>
+		</td>
+		<td>
+			<span></span>
+		</td>
+		<td>
+			<span></span>
+		</td>
+	</tr>
+</template>

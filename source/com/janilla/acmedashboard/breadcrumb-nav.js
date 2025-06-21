@@ -25,6 +25,10 @@ import WebComponent from "./web-component.js";
 
 export default class BreadcrumbNav extends WebComponent {
 
+	static get observedAttributes() {
+		return ["data-uri"];
+	}
+
 	static get templateNames() {
 		return ["breadcrumb-nav"];
 	}

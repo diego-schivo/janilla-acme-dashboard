@@ -84,17 +84,17 @@ public class CustomHttpExchange extends HttpExchange {
 	}
 
 	public void requireSessionEmail() {
-		var e = getSessionEmail();
-		if (e == null)
+		var x = getSessionEmail();
+		if (x == null)
 			throw new UnauthorizedException();
 	}
 
 	public void setSessionCookie(String value) {
-		var c = HttpCookie.of("session", value).withPath("/").withSameSite("Lax");
+		var x = HttpCookie.of("session", value).withPath("/").withSameSite("Lax");
 		if (value != null && value.length() > 0)
-			c = c.withExpires(ZonedDateTime.now(ZoneOffset.UTC).plusDays(30));
+			x = x.withExpires(ZonedDateTime.now(ZoneOffset.UTC).plusDays(30));
 		else
-			c = c.withMaxAge(0);
-		getResponse().getHeaders().add(new HeaderField("set-cookie", c.format()));
+			x = x.withMaxAge(0);
+		getResponse().getHeaders().add(new HeaderField("set-cookie", x.format()));
 	}
 }

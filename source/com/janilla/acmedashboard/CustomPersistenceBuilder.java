@@ -45,9 +45,9 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 	@Override
 	public Persistence build() {
-		var fe = Files.exists(databaseFile);
+		var e = Files.exists(databaseFile);
 		var p = super.build();
-		if (!fe) {
+		if (!e) {
 			var d = PlaceholderData.read();
 			d.customers().forEach(p.crud(Customer.class)::create);
 			d.invoices().forEach(p.crud(Invoice.class)::create);
@@ -57,19 +57,12 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		return p;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected <ID extends Comparable<ID>> Store<ID, String> newStore(int bTreeOrder, TransactionalByteChannel channel,
 			BTreeMemory memory, KeyAndData<String> keyAndData) {
-		if (keyAndData.key().equals("Revenue")) {
-			@SuppressWarnings("unchecked")
-			var x = (Store<ID, String>) new Store<>(new BTree<>(bTreeOrder, channel, memory,
-					IdAndReference.byteConverter(ByteConverter.STRING), keyAndData.bTree()), ByteConverter.STRING);
-			return x;
-		} else {
-			@SuppressWarnings("unchecked")
-			var x = (Store<ID, String>) new Store<>(new BTree<>(bTreeOrder, channel, memory,
-					IdAndReference.byteConverter(ByteConverter.UUID1), keyAndData.bTree()), ByteConverter.STRING);
-			return x;
-		}
+		var x = keyAndData.key().equals("Revenue") ? ByteConverter.STRING : ByteConverter.UUID1;
+		return (Store<ID, String>) new Store<>(new BTree<>(bTreeOrder, channel, memory,
+				IdAndReference.byteConverter((ByteConverter) x), keyAndData.bTree()), ByteConverter.STRING);
 	}
 }

@@ -36,13 +36,4 @@ export default class DashboardPage extends WebComponent {
 	constructor() {
 		super();
 	}
-
-	async updateDisplay() {
-		if (!this.slot && this.state)
-			this.state = null;
-		if (this.slot && !this.state)
-			this.state = {};
-		await super.updateDisplay();
-		this.querySelectorAll("card-wrapper, revenue-chart, latest-invoices").forEach(x => x.requestDisplay());
-	}
 }

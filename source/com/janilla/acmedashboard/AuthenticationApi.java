@@ -46,8 +46,8 @@ public class AuthenticationApi {
 
 	@Handle(method = "POST", path = "/api/authentication")
 	public User create(User user, CustomHttpExchange exchange) {
-		var uc = persistence.crud(User.class);
-		var u = uc.read(uc.find("email", user.email()));
+		var c = persistence.crud(User.class);
+		var u = c.read(c.find("email", user.email()));
 		if (u == null || !u.password().equals(user.password()))
 			return null;
 		var h = Map.of("alg", "HS256", "typ", "JWT");
