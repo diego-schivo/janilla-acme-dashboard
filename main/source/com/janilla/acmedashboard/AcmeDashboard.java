@@ -78,7 +78,7 @@ public class AcmeDashboard {
 				}
 				s = d.factory.create(HttpServer.class, Map.of("sslContext", c, "handler", d.handler));
 			}
-			var p = Integer.parseInt(d.configuration.getProperty("acmedashboard.server.port"));
+			var p = Integer.parseInt(d.configuration.getProperty("acme-dashboard.server.port"));
 			s.serve(new InetSocketAddress(p));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -103,11 +103,15 @@ public class AcmeDashboard {
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		this.configuration = configuration;
-		types = Util.getPackageClasses(getClass().getPackageName()).toList();
+		types = Util.getPackageClasses(getClass().getPackageName())
+
+				.filter(x -> !x.getPackageName().endsWith(".test"))
+
+				.toList();
 		factory = new Factory(types, this);
 		typeResolver = factory.create(MapAndType.DollarTypeResolver.class);
 		{
-			var p = configuration.getProperty("acmedashboard.database.file");
+			var p = configuration.getProperty("acme-dashboard.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
 			var pb = factory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));

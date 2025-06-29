@@ -40,7 +40,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 		var rq = ex.getRequest();
 		var rs = ex.getResponse();
 
-		if (Boolean.parseBoolean(configuration.getProperty("acmedashboard.live-demo")))
+		if (Boolean.parseBoolean(configuration.getProperty("acme-dashboard.live-demo")))
 			if (rq.getMethod().equals("GET") || rq.getPath().equals("/api/authentication"))
 				;
 			else
@@ -63,12 +63,12 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 			}
 		}
 
-//		if (rq.getPath().startsWith("/api/"))
-//			try {
-//				Thread.sleep(500);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
+		if (rq.getPath().startsWith("/api/"))
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 
 		super.handle(invocation, exchange);
 	}

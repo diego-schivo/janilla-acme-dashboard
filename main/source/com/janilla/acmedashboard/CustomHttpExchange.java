@@ -56,7 +56,7 @@ public class CustomHttpExchange extends HttpExchange {
 			var t = cc != null ? cc.get("session") : null;
 			Map<String, ?> p;
 			try {
-				p = t != null ? Jwt.verifyToken(t, configuration.getProperty("acmedashboard.jwt.key")) : null;
+				p = t != null ? Jwt.verifyToken(t, configuration.getProperty("acme-dashboard.jwt.key")) : null;
 			} catch (IllegalArgumentException e) {
 				p = null;
 			}

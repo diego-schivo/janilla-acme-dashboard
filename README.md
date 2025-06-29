@@ -27,7 +27,7 @@ Then open a browser and navigate to <https://localhost:8443/>.
 1. download the [Eclipse Installer](https://www.eclipse.org/downloads/packages/installer)
 2. install the package for Enterprise Java and Web Developers with JRE 24
 3. launch the IDE and choose Import projects from Git (with smart import)
-4. select GitHub as the repository source, then search for `janilla-acmedashboard` and complete the wizard
+4. select GitHub as the repository source, then search for `janilla-acme-dashboard` and complete the wizard
 5. open the Java class `com.janilla.acmedashboard.AcmeDashboard` and launch Debug as Java Application
 6. open a browser and navigate to <https://localhost:8443/>
 
@@ -37,4 +37,4 @@ Then open a browser and navigate to <https://localhost:8443/>.
 
 Please visit [www.janilla.com](https://janilla.com/) for more information.
 
-You can use [GitHub Issues](https://github.com/diego-schivo/janilla-acmedashboard/issues) to give or receive feedback.
+You can use [GitHub Issues](https://github.com/diego-schivo/janilla-acme-dashboard/issues) to give or receive feedback.

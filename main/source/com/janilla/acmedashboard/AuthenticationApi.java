@@ -52,7 +52,7 @@ public class AuthenticationApi {
 			return null;
 		var h = Map.of("alg", "HS256", "typ", "JWT");
 		var p = Map.of("loggedInAs", u.email());
-		var t = Jwt.generateToken(h, p, configuration.getProperty("acmedashboard.jwt.key"));
+		var t = Jwt.generateToken(h, p, configuration.getProperty("acme-dashboard.jwt.key"));
 		exchange.setSessionCookie(t);
 		return u;
 	}

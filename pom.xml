@@ -3,15 +3,34 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.janilla</groupId>
-	<artifactId>janilla-acmedashboard</artifactId>
+	<artifactId>janilla-acme-dashboard</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>com.janilla</groupId>
 			<artifactId>janilla</artifactId>
-			<version>6.0.0</version>
+			<version>6.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.janilla</groupId>
+				<artifactId>janilla-acme-dashboard-main</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.janilla</groupId>
+				<artifactId>janilla-acme-dashboard-test</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<modules>
+		<module>main</module>
+		<module>test</module>
+	</modules>
 	<properties>
 		<maven.compiler.enablePreview>true</maven.compiler.enablePreview>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
@@ -32,30 +51,31 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.5.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
-					<executable>java</executable>
-					<arguments>
-						<argument>--enable-preview</argument>
-						<argument>-p</argument>
-						<modulepath/>
-						<argument>-m</argument>
-						<argument>com.janilla.acmedashboard/com.janilla.acmedashboard.AcmeDashboard</argument>
-					</arguments>
+					<mainClass>com.janilla.acmedashboard.main.AcmeDashboard</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>3.5.0</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>exec</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<name>Janilla Acme Dashboard</name>
 	<description>Next.js App Router Course (partial) porting to Janilla</description>
-	<url>https://github.com/diego-schivo/janilla-acmedashboard</url>
+	<url>https://github.com/diego-schivo/janilla-acme-dashboard</url>
 	<licenses>
 		<license>
 			<name>MIT</name>
@@ -71,10 +91,10 @@
 		</developer>
 	</developers>
 	<scm>
-		<connection>scm:git:git://github.com/diego-schivo/janilla-acmedashboard.git</connection>
+		<connection>scm:git:git://github.com/diego-schivo/janilla-acme-dashboard.git</connection>
 		<developerConnection>
-			scm:git:ssh://git@github.com/diego-schivo/janilla-acmedashboard.git</developerConnection>
-		<url>https://github.com/diego-schivo/janilla-acmedashboard</url>
+			scm:git:ssh://git@github.com/diego-schivo/janilla-acme-dashboard.git</developerConnection>
+		<url>https://github.com/diego-schivo/janilla-acme-dashboard</url>
 		<tag>HEAD</tag>
 	</scm>
 </project>
