@@ -61,7 +61,7 @@ export default class LoginPage extends WebComponent {
 			})).json();
 			this.querySelector(".error").innerHTML = u ? "" : "Invalid credentials.";
 			if (u) {
-				history.pushState(this.closest("root-layout").state, "", "/dashboard");
+				location.href = "/dashboard";
 				dispatchEvent(new CustomEvent("popstate"));
 			}
 		} finally {

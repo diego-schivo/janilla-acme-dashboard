@@ -81,7 +81,7 @@ export default class DashboardNav extends WebComponent {
 			}].map(x => ({
 				$template: "item",
 				...x,
-				class: x.href === document.location.pathname ? "active" : ""
+				active: x.href === location.pathname ? "active" : ""
 			}))
 		}));
 	}

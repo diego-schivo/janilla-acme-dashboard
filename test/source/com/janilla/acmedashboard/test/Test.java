@@ -33,15 +33,15 @@ import com.janilla.web.Handle;
 
 public class Test {
 
-	public AcmeDashboard main;
+	protected static final AtomicBoolean ONGOING = new AtomicBoolean();
 
-	static final AtomicBoolean ongoing = new AtomicBoolean();
+	public AcmeDashboard main;
 
 	@Handle(method = "POST", path = "/test/start")
 	public void start() throws IOException {
 //		System.out.println("Test.start, this=" + this);
-		if (ongoing.getAndSet(true))
-			throw new RuntimeException();
+		if (ONGOING.getAndSet(true))
+			throw new IllegalStateException();
 		var fch = (FileChannel) main.persistence.database().channel().channel();
 		try (var ch = Channels.newChannel(getClass().getResourceAsStream("acme-dashboard-test.database"))) {
 			var s = fch.transferFrom(ch, 0, Long.MAX_VALUE);
@@ -52,7 +52,7 @@ public class Test {
 	@Handle(method = "POST", path = "/test/stop")
 	public void stop() {
 //		System.out.println("Test.stop, this=" + this);
-		if (!ongoing.getAndSet(false))
-			throw new RuntimeException();
+		if (!ONGOING.getAndSet(false))
+			throw new IllegalStateException();
 	}
 }

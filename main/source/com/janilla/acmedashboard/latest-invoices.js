@@ -34,16 +34,16 @@ export default class LatestInvoices extends WebComponent {
 	}
 
 	async updateDisplay() {
-		const dp = this.closest("dashboard-page");
+		const d = this.closest("dashboard-page");
 		const s = history.state;
 		this.appendChild(this.interpolateDom({
 			$template: "",
-			articles: dp.slot && s ? s.invoices?.map(x => ({
+			articles: d.slot && s.invoices ? s.invoices.map(x => ({
 				$template: "article",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" }))
 		}));
-		if (dp.slot && !s)
+		if (d.slot && !s.invoices)
 			fetch("/api/dashboard/invoices").then(x => x.json()).then(x => {
 				history.replaceState({
 					...history.state,

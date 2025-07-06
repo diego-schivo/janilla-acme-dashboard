@@ -40,9 +40,9 @@ export default class RootLayout extends WebComponent {
 			el.remove();
 			history.replaceState(JSON.parse(el.text), "");
 		}
+		super.connectedCallback();
 		addEventListener("popstate", this.handlePopState);
 		this.addEventListener("click", this.handleClick);
-		dispatchEvent(new CustomEvent("popstate"));
 	}
 
 	disconnectedCallback() {
@@ -52,7 +52,7 @@ export default class RootLayout extends WebComponent {
 	}
 
 	handleClick = event => {
-		const a = event.composedPath().find(x => x.tagName?.toLowerCase() === "a");
+		const a = event.composedPath().find(x => x.matches("a"));
 		if (!a?.href)
 			return;
 		event.preventDefault();

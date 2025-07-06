@@ -43,7 +43,7 @@ export default class BreadcrumbNav extends WebComponent {
 		this.shadowRoot.appendChild(this.interpolateDom({
 			$template: "",
 			items: Array.from({ length: l }, (_, i) => ({
-				$template: i < l - 1 ? "item" : "last-item",
+				$template: i === l - 1 ? "last-item" : "item",
 				slot: `item-${i}`
 			}))
 		}));

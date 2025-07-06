@@ -44,12 +44,87 @@ const login = (email, password) => {
 	};
 }
 
+const createInvoice = async content => {
+	await login("user@nextmail.com", "123456")(content);
+	await delay();
+	const b = content.body;
+	await untilElement("h1", "Dashboard")(b);
+	await delay();
+	Array.from(b.querySelector("dashboard-layout").shadowRoot.querySelectorAll("dashboard-nav a"))
+		.find(x => x.textContent.includes("Invoices"))
+		.click();
+	await delay();
+	(await untilElement("a", "Create Invoice")(b)).click();
+	await delay();
+	(await untilElement("option", "customer")(b)).closest("select").selectedIndex = 1;
+	await delay();
+	(await untilFormControl("amount")(b)).value = "123.45";
+	await delay();
+	(await untilElement("label", "Pending")(b)).click();
+	await delay();
+	(await untilElement("button", "Create Invoice")(b)).click();
+	await delay();
+	await untilElement("intl-format", "$123.45")(b);
+}
+
+const deleteInvoice = async content => {
+	await login("user@nextmail.com", "123456")(content);
+	await delay();
+	const b = content.body;
+	await untilElement("h1", "Dashboard")(b);
+	await delay();
+	Array.from(b.querySelector("dashboard-layout").shadowRoot.querySelectorAll("dashboard-nav a"))
+		.find(x => x.textContent.includes("Invoices"))
+		.click();
+	await delay();
+	(await untilElement("tr", "Amy Burns")(b)).querySelector("button").click();
+	await delay();
+	await whileElement("tr", "Amy Burns")(b);
+	await delay();
+}
+
 const loginUser = async content => {
 	await login("user@nextmail.com", "123456")(content);
 	await delay();
-	await untilElement("button", "Sign Out")(content.body);
+	await untilElement("h1", "Dashboard")(content.body);
+}
+
+const logoutUser = async content => {
+	await login("user@nextmail.com", "123456")(content);
+	await delay();
+	const b = content.body;
+	(await untilElement("h1", "Dashboard")(b)).closest("dashboard-layout").shadowRoot.querySelector("button").click();
+	await delay();
+	(await untilElement("h1", "log in")(b));
+}
+
+const updateInvoice = async content => {
+	await login("user@nextmail.com", "123456")(content);
+	await delay();
+	const b = content.body;
+	await untilElement("h1", "Dashboard")(b);
+	await delay();
+	Array.from(b.querySelector("dashboard-layout").shadowRoot.querySelectorAll("dashboard-nav a"))
+		.find(x => x.textContent.includes("Invoices"))
+		.click();
+	await delay();
+	(await untilElement("tr", "Amy Burns")(b)).querySelector("a").click();
+	await delay();
+	(await untilElement("option", "customer")(b)).closest("select").selectedIndex = 2;
+	await delay();
+	(await untilFormControl("amount")(b)).value = "123.45";
+	await delay();
+	(await untilElement("label", "Pending")(b)).click();
+	await delay();
+	(await untilElement("button", "Edit Invoice")(b)).click();
+	await delay();
+	await untilElement("intl-format", "$123.45")(b);
 }
 
 export default {
-	"Login user": loginUser
+	"Login user": loginUser,
+	"Logout user": logoutUser,
+	"Create invoice": createInvoice,
+	"Update invoice": updateInvoice,
+	"Delete invoice": deleteInvoice
 };

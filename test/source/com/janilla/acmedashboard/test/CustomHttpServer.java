@@ -41,7 +41,7 @@ public class CustomHttpServer extends HttpServer {
 
 	@Override
 	protected HttpExchange createExchange(HttpRequest request) {
-		return Test.ongoing.get() // && request.getPath().startsWith("/api/")
+		return Test.ONGOING.get() // && request.getPath().startsWith("/api/")
 				? main.factory.create(HttpExchange.class)
 				: super.createExchange(request);
 	}

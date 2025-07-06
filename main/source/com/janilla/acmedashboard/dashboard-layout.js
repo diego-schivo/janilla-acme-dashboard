@@ -48,13 +48,14 @@ export default class DashboardLayout extends WebComponent {
 				slot: p === "/dashboard" ? "content" : null
 			},
 			invoices: (() => {
-				const nn = p?.split("/");
-				const a = nn[1] === "dashboard" && nn[2] === "invoices";
-				return {
+				const nn = p.split("/");
+				const x = {
 					$template: "invoices",
-					slot: a ? "content" : null,
-					uri: a ? p + location.search : null
+					slot: nn[1] === "dashboard" && nn[2] === "invoices" ? "content" : null
 				};
+				if (x.slot)
+					x.uri = p + location.search;
+				return x;
 			})(),
 			customers: {
 				$template: "customers",

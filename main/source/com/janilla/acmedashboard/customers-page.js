@@ -59,39 +59,38 @@ export default class CustomersPage extends WebComponent {
 				u.searchParams.set("query", q);
 			else
 				u.searchParams.delete("query");
-			if (q0)
-				history.replaceState(undefined, "", u.pathname + u.search);
-			else
-				history.pushState(undefined, "", u.pathname + u.search);
+			history[q0 ? "replaceState" : "pushState"]({
+				...history.state,
+				customers: undefined
+			}, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
 	}
 
 	async updateDisplay() {
-		const s = history.state;
+		const s = history.state ?? {};
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: this.slot && s ? s.customers?.map(x => ({
+			articles: this.slot && s.customers ? s.customers.map(x => ({
 				$template: "article",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: this.slot && s ? s.customers?.map(x => ({
+			rows: this.slot && s.customers ? s.customers.map(x => ({
 				$template: "row",
 				...x
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" }))
 		}));
-		if (this.slot && !s) {
+		if (this.slot && !s.customers) {
 			const u = new URL("/api/customers", location.href);
 			if (this.dataset.query)
 				u.searchParams.append("query", this.dataset.query);
-			fetch(u.pathname + u.search).then(x => x.json()).then(x => {
-				history.replaceState({
-					...history.state,
-					customers: x
-				}, "");
-				this.requestDisplay();
-			});
+			const x = await (await fetch(u.pathname + u.search)).json();
+			history.replaceState({
+				...history.state,
+				customers: x
+			}, "");
+			this.requestDisplay(0);
 		}
 	}
 }

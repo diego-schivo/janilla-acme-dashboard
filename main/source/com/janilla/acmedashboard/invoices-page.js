@@ -62,10 +62,10 @@ export default class InvoicesPage extends WebComponent {
 				u.searchParams.set("query", q);
 			else
 				u.searchParams.delete("query");
-			if (q0)
-				history.replaceState(undefined, "", u.pathname + u.search);
-			else
-				history.pushState(undefined, "", u.pathname + u.search);
+			history[q0 ? "replaceState" : "pushState"]({
+				...history.state,
+				invoices: undefined
+			}, "", u.pathname + u.search);
 			dispatchEvent(new CustomEvent("popstate"));
 		}, 1000);
 	}
@@ -79,11 +79,14 @@ export default class InvoicesPage extends WebComponent {
 			const fd = new FormData(event.target);
 			const r = await fetch(`/api/invoices/${fd.get("id")}`, { method: "DELETE" });
 			if (r.ok) {
-				delete this.state.items;
+				history.replaceState({
+					...history.state,
+					invoices: undefined
+				}, "");
 				await this.updateDisplay();
 			} else {
-				const t = await r.text();
-				alert(t);
+				const x = await r.text();
+				alert(x);
 			}
 		} finally {
 			event.submitter.setAttribute("aria-disabled", "false");
@@ -91,7 +94,7 @@ export default class InvoicesPage extends WebComponent {
 	}
 
 	async updateDisplay() {
-		const s = history.state;
+		const s = history.state ?? {};
 		const u = new URL("/dashboard/invoices", location.href);
 		const q = this.dataset.query;
 		if (q)
@@ -100,35 +103,34 @@ export default class InvoicesPage extends WebComponent {
 		this.appendChild(this.interpolateDom({
 			$template: "",
 			...this.dataset,
-			articles: this.slot && s ? s.invoices?.items?.map(x => ({
+			articles: this.slot && s.invoices ? s.invoices.items?.map(x => ({
 				$template: "article",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: this.slot && s ? s.invoices?.items?.map(x => ({
+			rows: this.slot && s.invoices ? s.invoices.items?.map(x => ({
 				$template: "row",
 				...x,
 				href: `/dashboard/invoices/${x.id}/edit`
 			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" })),
-			pagination: this.slot && s ? {
+			pagination: this.slot && s.invoices ? {
 				href: u.pathname + u.search,
 				page: p ?? 1,
-				pageCount: Math.ceil((s.invoices?.total ?? 0) / 6)
+				pageCount: Math.ceil((s.invoices.total ?? 0) / 6)
 			} : null
 		}));
-		if (this.slot && !s) {
+		if (this.slot && !s.invoices) {
 			const u = new URL("/api/invoices", location.href);
 			["query", "page"].forEach(x => {
 				if (this.dataset[x])
 					u.searchParams.append(x, this.dataset[x]);
 			});
-			fetch(u.pathname + u.search).then(x => x.json()).then(x => {
-				history.replaceState({
-					...history.state,
-					invoices: x
-				}, "");
-				this.requestDisplay();
-			});
+			const x = await (await fetch(u.pathname + u.search)).json();
+			history.replaceState({
+				...history.state,
+				invoices: x
+			}, "");
+			this.requestDisplay();
 		}
 	}
 }

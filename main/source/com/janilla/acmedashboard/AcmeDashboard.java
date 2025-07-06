@@ -60,25 +60,28 @@ public class AcmeDashboard {
 	public static void main(String[] args) {
 		try {
 			var pp = new Properties();
-			try (var is = AcmeDashboard.class.getResourceAsStream("configuration.properties")) {
-				pp.load(is);
+			try (var s1 = AcmeDashboard.class.getResourceAsStream("configuration.properties")) {
+				pp.load(s1);
 				if (args.length > 0) {
 					var p = args[0];
 					if (p.startsWith("~"))
 						p = System.getProperty("user.home") + p.substring(1);
-					pp.load(Files.newInputStream(Path.of(p)));
+					try (var s2 = Files.newInputStream(Path.of(p))) {
+						pp.load(s2);
+					}
 				}
 			}
-			var d = new AcmeDashboard(pp);
+			var x = new AcmeDashboard(pp);
+
 			HttpServer s;
 			{
 				SSLContext c;
 				try (var is = Net.class.getResourceAsStream("testkeys")) {
 					c = Net.getSSLContext("JKS", is, "passphrase".toCharArray());
 				}
-				s = d.factory.create(HttpServer.class, Map.of("sslContext", c, "handler", d.handler));
+				s = x.factory.create(HttpServer.class, Map.of("sslContext", c, "handler", x.handler));
 			}
-			var p = Integer.parseInt(d.configuration.getProperty("acme-dashboard.server.port"));
+			var p = Integer.parseInt(x.configuration.getProperty("acme-dashboard.server.port"));
 			s.serve(new InetSocketAddress(p));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -103,10 +106,7 @@ public class AcmeDashboard {
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		this.configuration = configuration;
-		types = Util.getPackageClasses(getClass().getPackageName())
-
-				.filter(x -> !x.getPackageName().endsWith(".test"))
-
+		types = Util.getPackageClasses(getClass().getPackageName()).filter(x -> !x.getPackageName().endsWith(".test"))
 				.toList();
 		factory = new Factory(types, this);
 		typeResolver = factory.create(MapAndType.DollarTypeResolver.class);
@@ -114,11 +114,14 @@ public class AcmeDashboard {
 			var p = configuration.getProperty("acme-dashboard.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
-			var pb = factory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
-			persistence = pb.build();
+			var b = factory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
+			persistence = b.build();
 		}
 		renderableFactory = new RenderableFactory();
-		handler = factory.create(ApplicationHandlerBuilder.class).build();
+		{
+			var b = factory.create(ApplicationHandlerBuilder.class);
+			handler = b.build();
+		}
 	}
 
 	public AcmeDashboard application() {

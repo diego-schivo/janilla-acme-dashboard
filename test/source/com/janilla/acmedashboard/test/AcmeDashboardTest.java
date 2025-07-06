@@ -50,13 +50,15 @@ public class AcmeDashboardTest {
 	public static void main(String[] args) {
 		try {
 			var pp = new Properties();
-			try (var is = AcmeDashboardTest.class.getResourceAsStream("configuration.properties")) {
-				pp.load(is);
+			try (var s1 = AcmeDashboardTest.class.getResourceAsStream("configuration.properties")) {
+				pp.load(s1);
 				if (args.length > 0) {
 					var p = args[0];
 					if (p.startsWith("~"))
 						p = System.getProperty("user.home") + p.substring(1);
-					pp.load(Files.newInputStream(Path.of(p)));
+					try (var s2 = Files.newInputStream(Path.of(p))) {
+						pp.load(s2);
+					}
 				}
 			}
 			var x = new AcmeDashboardTest(pp);
@@ -101,9 +103,9 @@ public class AcmeDashboardTest {
 			var h = b.build();
 			handler = x -> {
 				var ex = (HttpExchange) x;
-				System.out.println(
-						"AcmeDashboardTest, " + ex.getRequest().getPath() + ", Test.ongoing=" + Test.ongoing.get());
-				var h2 = Test.ongoing.get() && !ex.getRequest().getPath().startsWith("/test/") ? main.handler : h;
+//				System.out.println(
+//						"AcmeDashboardTest, " + ex.getRequest().getPath() + ", Test.ongoing=" + Test.ongoing.get());
+				var h2 = Test.ONGOING.get() && !ex.getRequest().getPath().startsWith("/test/") ? main.handler : h;
 				return h2.handle(ex);
 			};
 		}

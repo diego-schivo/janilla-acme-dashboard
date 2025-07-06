@@ -34,22 +34,22 @@ export default class RevenueChart extends WebComponent {
 	}
 
 	async updateDisplay() {
-		const dp = this.closest("dashboard-page");
+		const d = this.closest("dashboard-page");
 		const s = history.state;
-		var k = dp.slot && s ? Math.ceil(Math.max(...s.revenue?.map(x => x.revenue)) / 1000) : 0;
+		var k = d.slot && s.revenue ? Math.ceil(Math.max(...s.revenue.map(x => x.revenue)) / 1000) : 0;
 		this.appendChild(this.interpolateDom({
 			$template: "",
-			y: dp.slot && s ? Array.from({ length: k + 1 }, (_, i) => ({
+			y: d.slot && s.revenue ? Array.from({ length: k + 1 }, (_, i) => ({
 				$template: "y",
 				y: `$${i}K`
 			})) : null,
-			x: dp.slot && s ? s.revenue?.map(x => ({
+			x: d.slot && s.revenue ? s.revenue.map(x => ({
 				$template: "x",
 				...x,
 				style: `height: ${x.revenue / (1000 * k) * 100}%`
 			})) : null
 		}));
-		if (dp.slot && !s)
+		if (d.slot && !s.revenue)
 			fetch("/api/dashboard/revenue").then(x => x.json()).then(x => {
 				history.replaceState({
 					...history.state,
