@@ -23,16 +23,22 @@
  */
 package com.janilla.acmedashboard;
 
+import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
@@ -100,14 +106,14 @@ public class AcmeDashboard {
 
 	public MapAndType.TypeResolver typeResolver;
 
-	public Iterable<Class<?>> types;
+	public Set<Class<?>> types;
 
 	public AcmeDashboard(Properties configuration) {
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		this.configuration = configuration;
 		types = Util.getPackageClasses(getClass().getPackageName()).filter(x -> !x.getPackageName().endsWith(".test"))
-				.toList();
+				.collect(Collectors.toSet());
 		factory = new Factory(types, this);
 		typeResolver = factory.create(MapAndType.DollarTypeResolver.class);
 		{
@@ -119,7 +125,16 @@ public class AcmeDashboard {
 		}
 		renderableFactory = new RenderableFactory();
 		{
-			var b = factory.create(ApplicationHandlerBuilder.class);
+			var b = factory.create(ApplicationHandlerBuilder.class, Map.of("methods", factory.types().stream()
+					.flatMap(x -> !Modifier.isInterface(x.getModifiers()) && !Modifier.isAbstract(x.getModifiers())
+							? Arrays.stream(x.getMethods())
+							: Stream.empty())
+					.collect(Collectors.toSet()), "resourceFiles",
+					Stream.of("com.janilla.frontend", AcmeDashboard.class.getPackageName()).map(Util::getPackageFiles)
+							.reduce(new HashSet<>(), (x, y) -> {
+								x.addAll(y);
+								return x;
+							})));
 			handler = b.build();
 		}
 	}

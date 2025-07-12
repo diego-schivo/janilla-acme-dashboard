@@ -23,19 +23,30 @@
  */
 package com.janilla.acmedashboard;
 
+import java.lang.reflect.Method;
+import java.util.Comparator;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Function;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.RenderableFactory;
+import com.janilla.web.WebHandlerFactory;
 
 public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	public Properties configuration;
 
+	public CustomMethodHandlerFactory(Set<Method> methods, Function<Class<?>, Object> targetResolver,
+			Comparator<Invocation> invocationComparator, RenderableFactory renderableFactory,
+			WebHandlerFactory rootFactory) {
+		super(methods, targetResolver, invocationComparator, renderableFactory, rootFactory);
+	}
+
 	@Override
-	protected void handle(Invocation invocation, HttpExchange exchange) {
+	protected boolean handle(Invocation invocation, HttpExchange exchange) {
 		var ex = (CustomHttpExchange) exchange;
 		var rq = ex.getRequest();
 		var rs = ex.getResponse();
@@ -70,6 +81,6 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 //				e.printStackTrace();
 //			}
 
-		super.handle(invocation, exchange);
+		return super.handle(invocation, exchange);
 	}
 }

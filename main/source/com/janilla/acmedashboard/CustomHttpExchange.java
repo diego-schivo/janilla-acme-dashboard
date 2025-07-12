@@ -95,6 +95,6 @@ public class CustomHttpExchange extends HttpExchange {
 			x = x.withExpires(ZonedDateTime.now(ZoneOffset.UTC).plusDays(30));
 		else
 			x = x.withMaxAge(0);
-		getResponse().getHeaders().add(new HeaderField("set-cookie", x.format()));
+		getResponse().setHeaderValue("set-cookie", x.format());
 	}
 }

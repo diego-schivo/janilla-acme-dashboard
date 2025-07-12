@@ -35,7 +35,7 @@ import com.janilla.persistence.Persistence;
 
 public class CustomPersistence extends Persistence {
 
-	public CustomPersistence(Database database, Iterable<Class<? extends Entity<?>>> types, TypeResolver typeResolver) {
+	public CustomPersistence(Database database, Set<Class<? extends Entity<?>>> types, TypeResolver typeResolver) {
 		super(database, types, typeResolver);
 	}
 
