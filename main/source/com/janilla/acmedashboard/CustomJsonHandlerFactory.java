@@ -24,6 +24,7 @@
 package com.janilla.acmedashboard;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.json.JsonToken;
@@ -37,8 +38,6 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 
 	@Override
 	protected Iterator<JsonToken<?>> buildJsonIterator(Object object, HttpExchange exchange) {
-		var x = factory.create(ReflectionJsonIterator.class);
-		x.setObject(object);
-		return x;
+		return factory.create(ReflectionJsonIterator.class, Map.of("object", object, "includeType", false));
 	}
 }

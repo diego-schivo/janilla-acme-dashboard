@@ -24,32 +24,33 @@
 package com.janilla.acmedashboard;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
 
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHandlerFactory;
 import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
 import com.janilla.web.RenderableFactory;
-import com.janilla.web.WebHandlerFactory;
 
 public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	public Properties configuration;
 
-	public CustomMethodHandlerFactory(Set<Method> methods, Function<Class<?>, Object> targetResolver,
+	public CustomMethodHandlerFactory(Collection<Method> methods, Function<Class<?>, Object> targetResolver,
 			Comparator<Invocation> invocationComparator, RenderableFactory renderableFactory,
-			WebHandlerFactory rootFactory) {
+			HttpHandlerFactory rootFactory) {
 		super(methods, targetResolver, invocationComparator, renderableFactory, rootFactory);
 	}
 
 	@Override
 	protected boolean handle(Invocation invocation, HttpExchange exchange) {
 		var ex = (CustomHttpExchange) exchange;
-		var rq = ex.getRequest();
-		var rs = ex.getResponse();
+		var rq = ex.request();
+		var rs = ex.response();
 
 		if (Boolean.parseBoolean(configuration.getProperty("acme-dashboard.live-demo")))
 			if (rq.getMethod().equals("GET") || rq.getPath().equals("/api/authentication"))

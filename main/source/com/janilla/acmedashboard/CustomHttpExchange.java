@@ -35,11 +35,13 @@ import com.janilla.http.HeaderField;
 import com.janilla.http.Http;
 import com.janilla.http.HttpCookie;
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpRequest;
+import com.janilla.http.HttpResponse;
 import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.UnauthorizedException;
 
-public class CustomHttpExchange extends HttpExchange {
+public class CustomHttpExchange extends HttpExchange.Base {
 
 	public Properties configuration;
 
@@ -47,9 +49,13 @@ public class CustomHttpExchange extends HttpExchange {
 
 	private Map<String, Object> session = new HashMap<>();
 
+	public CustomHttpExchange(HttpRequest request, HttpResponse response) {
+		super(request, response);
+	}
+
 	protected Supplier<String> sessionEmail = () -> {
 		if (!session.containsKey("email")) {
-			var hh = getRequest().getHeaders();
+			var hh = request().getHeaders();
 			var h = hh != null ? hh.stream().filter(x -> x.name().equals("cookie")).map(HeaderField::value)
 					.collect(Collectors.joining("; ")) : null;
 			var cc = h != null ? Http.parseCookieHeader(h) : null;
@@ -95,6 +101,12 @@ public class CustomHttpExchange extends HttpExchange {
 			x = x.withExpires(ZonedDateTime.now(ZoneOffset.UTC).plusDays(30));
 		else
 			x = x.withMaxAge(0);
-		getResponse().setHeaderValue("set-cookie", x.format());
+		response().setHeaderValue("set-cookie", x.format());
+	}
+
+	@Override
+	public HttpExchange withException(Exception exception) {
+		this.exception = exception;
+		return this;
 	}
 }

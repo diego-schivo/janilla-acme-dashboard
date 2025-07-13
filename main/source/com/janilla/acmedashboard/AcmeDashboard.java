@@ -28,33 +28,35 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
+import com.janilla.io.IO;
+import com.janilla.json.DollarTypeResolver;
 import com.janilla.json.Json;
-import com.janilla.json.MapAndType;
 import com.janilla.json.ReflectionJsonIterator;
+import com.janilla.json.TypeResolver;
 import com.janilla.net.Net;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
 import com.janilla.reflect.Flatten;
 import com.janilla.util.Util;
-import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.Handle;
+import com.janilla.web.NotFoundException;
 import com.janilla.web.Render;
 import com.janilla.web.RenderableFactory;
 import com.janilla.web.Renderer;
@@ -104,18 +106,19 @@ public class AcmeDashboard {
 
 	public HttpHandler handler;
 
-	public MapAndType.TypeResolver typeResolver;
+	public TypeResolver typeResolver;
 
-	public Set<Class<?>> types;
+	public List<Class<?>> types;
 
 	public AcmeDashboard(Properties configuration) {
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		this.configuration = configuration;
 		types = Util.getPackageClasses(getClass().getPackageName()).filter(x -> !x.getPackageName().endsWith(".test"))
-				.collect(Collectors.toSet());
+				.toList();
 		factory = new Factory(types, this);
-		typeResolver = factory.create(MapAndType.DollarTypeResolver.class);
+		typeResolver = factory.create(DollarTypeResolver.class);
+
 		{
 			var p = configuration.getProperty("acme-dashboard.database.file");
 			if (p.startsWith("~"))
@@ -123,19 +126,27 @@ public class AcmeDashboard {
 			var b = factory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
 			persistence = b.build();
 		}
+
 		renderableFactory = new RenderableFactory();
+
 		{
-			var b = factory.create(ApplicationHandlerBuilder.class, Map.of("methods", factory.types().stream()
+			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods", factory.types().stream()
 					.flatMap(x -> !Modifier.isInterface(x.getModifiers()) && !Modifier.isAbstract(x.getModifiers())
 							? Arrays.stream(x.getMethods())
 							: Stream.empty())
-					.collect(Collectors.toSet()), "resourceFiles",
-					Stream.of("com.janilla.frontend", AcmeDashboard.class.getPackageName()).map(Util::getPackageFiles)
-							.reduce(new HashSet<>(), (x, y) -> {
+					.toList(), "files",
+					Stream.of("com.janilla.frontend", AcmeDashboard.class.getPackageName())
+							.map(x -> IO.getPackagePaths(x).stream().filter(Files::isRegularFile).toList())
+							.reduce(new ArrayList<>(), (x, y) -> {
 								x.addAll(y);
 								return x;
 							})));
-			handler = b.build();
+			handler = x -> {
+				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
+				if (h == null)
+					throw new NotFoundException(x.request().getMethod() + " " + x.request().getTarget());
+				return h.handle(x);
+			};
 		}
 	}
 
@@ -189,9 +200,8 @@ public class AcmeDashboard {
 
 		@Override
 		public String apply(T value) {
-			var x = INSTANCE.get().factory.create(ReflectionJsonIterator.class);
-			x.setObject(value);
-			return Json.format(x);
+			return Json.format(INSTANCE.get().factory.create(ReflectionJsonIterator.class,
+					Map.of("object", value, "includeType", false)));
 		}
 	}
 

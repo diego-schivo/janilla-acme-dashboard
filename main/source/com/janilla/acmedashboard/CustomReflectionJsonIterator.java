@@ -31,6 +31,10 @@ import com.janilla.json.ReflectionJsonIterator;
 
 public class CustomReflectionJsonIterator extends ReflectionJsonIterator {
 
+	public CustomReflectionJsonIterator(Object object, boolean includeType) {
+		super(object, includeType);
+	}
+
 	@Override
 	public Iterator<JsonToken<?>> newValueIterator(Object object) {
 		if (stack().peek() instanceof Map.Entry x && x.getKey().equals("password"))
