@@ -1,0 +1,76 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2024-2025 Diego Schivo
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package com.janilla.acmedashboard.frontend;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import com.janilla.http.HttpCookie;
+import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpRequest;
+import com.janilla.http.HttpResponse;
+import com.janilla.json.Jwt;
+import com.janilla.web.UnauthorizedException;
+
+public class CustomHttpExchange extends HttpExchange.Base {
+
+	protected final Properties configuration;
+
+	protected final Map<String, Object> session = new HashMap<>();
+
+	public CustomHttpExchange(HttpRequest request, HttpResponse response, Properties configuration) {
+		super(request, response);
+		this.configuration = configuration;
+	}
+
+	public String getSessionEmail() {
+		if (!session.containsKey("email")) {
+			var c = request().getHeaderValues("cookie").map(HttpCookie::parse).filter(x -> x.name().equals("session"))
+					.findFirst().orElse(null);
+//			IO.println("CustomHttpExchange.getSessionEmail, c=" + c);
+			Map<String, ?> p;
+			try {
+				p = c != null ? Jwt.verifyToken(c.value(), configuration.getProperty("acme-dashboard.jwt.key")) : null;
+			} catch (IllegalArgumentException e) {
+				p = null;
+			}
+//			IO.println("CustomHttpExchange.getSessionEmail, p=" + p);
+			session.put("email", p != null ? p.get("loggedInAs") : null);
+		}
+		return (String) session.get("email");
+	}
+
+	public void requireSessionEmail() {
+		var x = getSessionEmail();
+		if (x == null)
+			throw new UnauthorizedException();
+	}
+
+	@Override
+	public HttpExchange withException(Exception exception) {
+		this.exception = exception;
+		return this;
+	}
+}

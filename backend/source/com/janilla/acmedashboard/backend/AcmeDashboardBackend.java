@@ -1,0 +1,159 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2024-2025 Diego Schivo
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package com.janilla.acmedashboard.backend;
+
+import java.net.InetSocketAddress;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
+
+import javax.net.ssl.SSLContext;
+
+import com.janilla.acmedashboard.base.Configuration;
+import com.janilla.http.HttpHandler;
+import com.janilla.http.HttpServer;
+import com.janilla.java.Java;
+import com.janilla.json.DollarTypeResolver;
+import com.janilla.json.TypeResolver;
+import com.janilla.net.Net;
+import com.janilla.persistence.ApplicationPersistenceBuilder;
+import com.janilla.persistence.Persistence;
+import com.janilla.reflect.ClassAndMethod;
+import com.janilla.reflect.Factory;
+import com.janilla.web.ApplicationHandlerFactory;
+import com.janilla.web.NotFoundException;
+import com.janilla.web.RenderableFactory;
+
+public class AcmeDashboardBackend {
+
+	public static final AtomicReference<AcmeDashboardBackend> INSTANCE = new AtomicReference<>();
+
+	public static void main(String[] args) {
+		try {
+			AcmeDashboardBackend a;
+			{
+				var f = new Factory(Stream.of("backend", "base")
+						.flatMap(x -> Java.getPackageClasses("com.janilla.acmedashboard." + x).stream()).toList(),
+						AcmeDashboardBackend.INSTANCE::get);
+				a = f.create(AcmeDashboardBackend.class,
+						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
+			}
+
+			HttpServer s;
+			{
+				SSLContext c;
+				try (var x = Net.class.getResourceAsStream("testkeys")) {
+					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
+				}
+				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.backend.server.port"));
+				s = a.factory.create(HttpServer.class,
+						Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
+			}
+			s.serve();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected final Configuration configuration;
+
+	protected final Factory factory;
+
+	protected final HttpHandler handler;
+
+	protected final Persistence persistence;
+
+	protected final RenderableFactory renderableFactory;
+
+	protected final TypeResolver typeResolver;
+
+//	protected final Collection<Class<?>> types;
+
+	public AcmeDashboardBackend(Factory factory, String configurationFile) {
+		this.factory = factory;
+		if (!INSTANCE.compareAndSet(null, this))
+			throw new IllegalStateException();
+		configuration = factory.create(Configuration.class, Collections.singletonMap("file", configurationFile));
+		typeResolver = factory.create(DollarTypeResolver.class);
+
+		{
+			var f = configuration.getProperty("acme-dashboard.database.file");
+			if (f.startsWith("~"))
+				f = System.getProperty("user.home") + f.substring(1);
+			var b = factory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(f)));
+			persistence = b.build();
+		}
+
+//		types = factory.types().stream()
+//				.filter(x -> x.getPackageName().equals(AcmeDashboardBackend.class.getPackageName())).toList();
+		renderableFactory = factory.create(RenderableFactory.class);
+
+		{
+			var f = factory.create(ApplicationHandlerFactory.class,
+					Map.of("methods", types().stream()
+							.flatMap(x -> Arrays.stream(x.getMethods()).map(y -> new ClassAndMethod(x, y))).toList(),
+							"files", List.of()));
+			handler = x -> {
+				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
+				if (h == null)
+					throw new NotFoundException(x.request().getMethod() + " " + x.request().getTarget());
+				return h.handle(x);
+			};
+		}
+	}
+
+	public Configuration configuration() {
+		return configuration;
+	}
+
+	public Factory factory() {
+		return factory;
+	}
+
+	public HttpHandler handler() {
+		return handler;
+	}
+
+	public Persistence persistence() {
+		return persistence;
+	}
+
+	public RenderableFactory renderableFactory() {
+		return renderableFactory;
+	}
+
+	public TypeResolver typeResolver() {
+		return typeResolver;
+	}
+
+	public Collection<Class<?>> types() {
+		return factory.types();
+	}
+}
