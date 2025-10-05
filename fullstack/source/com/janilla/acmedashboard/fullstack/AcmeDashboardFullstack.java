@@ -87,14 +87,16 @@ public class AcmeDashboardFullstack {
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		configuration = factory.create(Configuration.class, Collections.singletonMap("file", configurationFile));
-		backend = factory.create(AcmeDashboardBackend.class, Map.of("factory",
+		backend = factory.create(AcmeDashboardBackend.class, Java.hashMap("factory",
 				new Factory(Stream.of("fullstack", "backend", "base")
 						.flatMap(x -> Java.getPackageClasses("com.janilla.acmedashboard." + x).stream()).toList(),
-						AcmeDashboardBackend.INSTANCE::get)));
-		frontend = factory.create(AcmeDashboardFrontend.class, Map.of("factory",
+						AcmeDashboardBackend.INSTANCE::get),
+				"configurationFile", configurationFile));
+		frontend = factory.create(AcmeDashboardFrontend.class, Java.hashMap("factory",
 				new Factory(Stream.of("fullstack", "frontend")
 						.flatMap(x -> Java.getPackageClasses("com.janilla.acmedashboard." + x).stream()).toList(),
-						AcmeDashboardFrontend.INSTANCE::get)));
+						AcmeDashboardFrontend.INSTANCE::get),
+				"configurationFile", configurationFile));
 		handler = x -> {
 //			IO.println("AcmeDashboardFullstack, " + x.request().getPath());
 			var h = switch (Objects.requireNonNullElse(x.exception(), x.request())) {

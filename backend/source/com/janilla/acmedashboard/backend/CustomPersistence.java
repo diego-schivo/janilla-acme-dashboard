@@ -24,23 +24,17 @@
 package com.janilla.acmedashboard.backend;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 
-import com.janilla.acmedashboard.base.Customer;
 import com.janilla.acmedashboard.base.Invoice;
-import com.janilla.acmedashboard.base.Revenue;
-import com.janilla.acmedashboard.base.User;
-import com.janilla.database.Database;
 import com.janilla.json.TypeResolver;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Entity;
 import com.janilla.persistence.Persistence;
+import com.janilla.sqlite.SQLiteDatabase;
 
 public class CustomPersistence extends Persistence {
 
-	public CustomPersistence(Database database, Collection<Class<? extends Entity<?>>> types,
+	public CustomPersistence(SQLiteDatabase database, Collection<Class<? extends Entity<?>>> types,
 			TypeResolver typeResolver) {
 		super(database, types, typeResolver);
 	}
@@ -51,8 +45,8 @@ public class CustomPersistence extends Persistence {
 		return type == Invoice.class ? (Crud<?, E>) new InvoiceCrud(this) : super.newCrud(type);
 	}
 
-	@Override
-	protected <ID extends Comparable<ID>> Function<Map<String, Object>, ID> nextId(Class<?> type) {
-		return Set.of(Customer.class, Revenue.class, User.class).contains(type) ? null : super.nextId(type);
-	}
+//	@Override
+//	protected <ID extends Comparable<ID>> Function<Map<String, Object>, ID> nextId(Class<?> type) {
+//		return Set.of(Customer.class, Revenue.class, User.class).contains(type) ? null : super.nextId(type);
+//	}
 }

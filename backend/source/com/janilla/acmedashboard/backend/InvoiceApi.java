@@ -63,7 +63,7 @@ public class InvoiceApi {
 	}
 
 	@Handle(method = "POST")
-	public Invoice create(Invoice.Default invoice) {
+	public Invoice create(Invoice invoice) {
 		return persistence.crud(Invoice.class).create(invoice.withDate(LocalDate.now()));
 	}
 
@@ -73,7 +73,7 @@ public class InvoiceApi {
 	}
 
 	@Handle(method = "PUT", path = "([^/]+)")
-	public Invoice update(UUID id, Invoice.Default invoice) {
+	public Invoice update(UUID id, Invoice invoice) {
 		return persistence.crud(Invoice.class).update(id,
 				x -> Reflection.copy(invoice, x, y -> !Set.of("id", "date").contains(y)));
 	}
@@ -92,7 +92,7 @@ public class InvoiceApi {
 
 	public static Invoice invoiceWithCustomer(Invoice invoice) {
 		return invoice != null
-				? ((Invoice.Default) invoice)
+				? ((Invoice) invoice)
 						.withCustomer(INSTANCE.get().persistence.crud(Customer.class).read(invoice.customerId()))
 				: null;
 	}

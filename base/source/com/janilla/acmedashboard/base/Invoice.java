@@ -33,59 +33,18 @@ import com.janilla.persistence.Store;
 
 @Store
 @Index(sort = "-date")
-public interface Invoice extends Entity<UUID> {
+public record Invoice(@Index(sort = "-date") UUID id, @Index(sort = "-date") UUID customerId, BigDecimal amount,
+		@Index(sort = "-date") Status status, LocalDate date, Customer customer) implements Entity<UUID> {
 
-	@Index(sort = "-date")
-	UUID customerId();
+	public Invoice withDate(LocalDate date) {
+		return new Invoice(id, customerId, amount, status, date, customer);
+	}
 
-	BigDecimal amount();
-
-	@Index(sort = "-date")
-	Status status();
-
-	LocalDate date();
+	public Invoice withCustomer(Customer customer) {
+		return new Invoice(id, customerId, amount, status, date, customer);
+	}
 
 	public enum Status {
 		PAID, PENDING
 	}
-
-	public record Default(UUID id, UUID customerId, BigDecimal amount, Status status, LocalDate date, Customer customer)
-			implements Invoice {
-
-		public Default withDate(LocalDate date) {
-			return new Default(id, customerId, amount, status, date, customer);
-		}
-
-		public Default withCustomer(Customer customer) {
-			return new Default(id, customerId, amount, status, date, customer);
-		}
-	}
-
-//	public record WithCustomer(@Flatten Invoice invoice, Customer customer) implements Invoice {
-//
-//		@Override
-//		public UUID id() {
-//			return invoice.id();
-//		}
-//
-//		@Override
-//		public UUID customerId() {
-//			return invoice.customerId();
-//		}
-//
-//		@Override
-//		public BigDecimal amount() {
-//			return invoice.amount();
-//		}
-//
-//		@Override
-//		public Status status() {
-//			return invoice.status();
-//		}
-//
-//		@Override
-//		public LocalDate date() {
-//			return invoice.date();
-//		}
-//	}
 }

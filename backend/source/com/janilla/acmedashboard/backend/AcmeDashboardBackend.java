@@ -61,7 +61,7 @@ public class AcmeDashboardBackend {
 			{
 				var f = new Factory(Stream.of("backend", "base")
 						.flatMap(x -> Java.getPackageClasses("com.janilla.acmedashboard." + x).stream()).toList(),
-						AcmeDashboardBackend.INSTANCE::get);
+						INSTANCE::get);
 				a = f.create(AcmeDashboardBackend.class,
 						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
 			}
