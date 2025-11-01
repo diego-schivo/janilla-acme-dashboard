@@ -27,13 +27,13 @@ import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
 import com.janilla.acmedashboard.backend.AcmeDashboardBackend;
-import com.janilla.acmedashboard.base.Configuration;
 import com.janilla.acmedashboard.frontend.AcmeDashboardFrontend;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpRequest;
@@ -50,7 +50,7 @@ public class AcmeDashboardFullstack {
 		try {
 			AcmeDashboardFullstack a;
 			{
-				var f = new Factory(Java.getPackageClasses("com.janilla.acmedashboard.fullstack"),
+				var f = new Factory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
 						AcmeDashboardFullstack.INSTANCE::get);
 				a = f.create(AcmeDashboardFullstack.class,
 						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
@@ -74,7 +74,7 @@ public class AcmeDashboardFullstack {
 
 	protected final AcmeDashboardBackend backend;
 
-	protected final Configuration configuration;
+	protected final Properties configuration;
 
 	protected final Factory factory;
 
@@ -86,17 +86,25 @@ public class AcmeDashboardFullstack {
 		this.factory = factory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
-		configuration = factory.create(Configuration.class, Collections.singletonMap("file", configurationFile));
-		backend = factory.create(AcmeDashboardBackend.class, Java.hashMap("factory",
-				new Factory(Stream.of("fullstack", "backend", "base")
-						.flatMap(x -> Java.getPackageClasses("com.janilla.acmedashboard." + x).stream()).toList(),
-						AcmeDashboardBackend.INSTANCE::get),
-				"configurationFile", configurationFile));
-		frontend = factory.create(AcmeDashboardFrontend.class, Java.hashMap("factory",
-				new Factory(Stream.of("fullstack", "frontend")
-						.flatMap(x -> Java.getPackageClasses("com.janilla.acmedashboard." + x).stream()).toList(),
-						AcmeDashboardFrontend.INSTANCE::get),
-				"configurationFile", configurationFile));
+		configuration = factory.create(Properties.class, Collections.singletonMap("file", configurationFile));
+		backend = factory.create(AcmeDashboardBackend.class,
+				Java.hashMap("factory",
+						new Factory(
+								Stream.of("fullstack", "backend", "base")
+										.flatMap(x -> Java.getPackageClasses(AcmeDashboardBackend.class.getPackageName()
+												.replace(".backend", "." + x)).stream())
+										.toList(),
+								AcmeDashboardBackend.INSTANCE::get),
+						"configurationFile", configurationFile));
+		frontend = factory.create(AcmeDashboardFrontend.class,
+				Java.hashMap("factory",
+						new Factory(
+								Stream.of("fullstack", "frontend")
+										.flatMap(x -> Java.getPackageClasses(AcmeDashboardFrontend.class
+												.getPackageName().replace(".frontend", "." + x)).stream())
+										.toList(),
+								AcmeDashboardFrontend.INSTANCE::get),
+						"configurationFile", configurationFile));
 		handler = x -> {
 //			IO.println("AcmeDashboardFullstack, " + x.request().getPath());
 			var h = switch (Objects.requireNonNullElse(x.exception(), x.request())) {
@@ -112,7 +120,7 @@ public class AcmeDashboardFullstack {
 		return backend;
 	}
 
-	public Configuration configuration() {
+	public Properties configuration() {
 		return configuration;
 	}
 

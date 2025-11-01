@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.fullstack;
+package com.janilla.acmedashboard.frontend;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -29,15 +29,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-import com.janilla.acmedashboard.base.Configuration;
+public class CustomProperties extends Properties {
 
-public class CustomConfiguration extends Properties implements Configuration {
+	private static final long serialVersionUID = -4658964292448434225L;
 
-	private static final long serialVersionUID = -2294199037395154052L;
-
-	public CustomConfiguration(String file) {
+	public CustomProperties(String file) {
 		try {
-			try (var x = AcmeDashboardFullstack.class.getResourceAsStream("configuration.properties")) {
+			try (var x = AcmeDashboardFrontend.class.getResourceAsStream("configuration.properties")) {
 				load(x);
 			}
 			if (file != null) {

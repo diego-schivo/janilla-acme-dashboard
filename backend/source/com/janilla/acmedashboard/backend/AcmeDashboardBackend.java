@@ -23,6 +23,7 @@
  */
 package com.janilla.acmedashboard.backend;
 
+import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -31,12 +32,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
-import com.janilla.acmedashboard.base.Configuration;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
 import com.janilla.java.Java;
@@ -59,8 +60,12 @@ public class AcmeDashboardBackend {
 		try {
 			AcmeDashboardBackend a;
 			{
-				var f = new Factory(Stream.of("backend", "base")
-						.flatMap(x -> Java.getPackageClasses("com.janilla.acmedashboard." + x).stream()).toList(),
+				var f = new Factory(
+						Stream.of("backend", "base")
+								.flatMap(x -> Java.getPackageClasses(
+										AcmeDashboardBackend.class.getPackageName().replace(".backend", "." + x))
+										.stream())
+								.toList(),
 						INSTANCE::get);
 				a = f.create(AcmeDashboardBackend.class,
 						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
@@ -82,7 +87,7 @@ public class AcmeDashboardBackend {
 		}
 	}
 
-	protected final Configuration configuration;
+	protected final Properties configuration;
 
 	protected final Factory factory;
 
@@ -94,13 +99,11 @@ public class AcmeDashboardBackend {
 
 	protected final TypeResolver typeResolver;
 
-//	protected final Collection<Class<?>> types;
-
 	public AcmeDashboardBackend(Factory factory, String configurationFile) {
 		this.factory = factory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
-		configuration = factory.create(Configuration.class, Collections.singletonMap("file", configurationFile));
+		configuration = factory.create(Properties.class, Collections.singletonMap("file", configurationFile));
 		typeResolver = factory.create(DollarTypeResolver.class);
 
 		{
@@ -111,15 +114,14 @@ public class AcmeDashboardBackend {
 			persistence = b.build();
 		}
 
-//		types = factory.types().stream()
-//				.filter(x -> x.getPackageName().equals(AcmeDashboardBackend.class.getPackageName())).toList();
 		renderableFactory = factory.create(RenderableFactory.class);
 
 		{
-			var f = factory.create(ApplicationHandlerFactory.class,
-					Map.of("methods", types().stream()
-							.flatMap(x -> Arrays.stream(x.getMethods()).map(y -> new ClassAndMethod(x, y))).toList(),
-							"files", List.of()));
+			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods",
+					types().stream().flatMap(x -> Arrays.stream(x.getMethods())
+							.filter(y -> !Modifier.isStatic(y.getModifiers())).map(y -> new ClassAndMethod(x, y)))
+							.toList(),
+					"files", List.of()));
 			handler = x -> {
 				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
 				if (h == null)
@@ -129,7 +131,7 @@ public class AcmeDashboardBackend {
 		}
 	}
 
-	public Configuration configuration() {
+	public Properties configuration() {
 		return configuration;
 	}
 

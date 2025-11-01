@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.janilla.acmedashboard.base.Customer;
 import com.janilla.acmedashboard.base.Invoice;
-import com.janilla.persistence.Crud;
+import com.janilla.persistence.IdPage;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Flatten;
 import com.janilla.reflect.Reflection;
@@ -97,6 +97,6 @@ public class InvoiceApi {
 				: null;
 	}
 
-	public record IdPage2(@Flatten Crud.IdPage<UUID> page, List<Invoice> items) {
+	public record IdPage2(@Flatten IdPage<UUID> page, List<Invoice> items) {
 	}
 }

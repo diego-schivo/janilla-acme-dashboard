@@ -23,6 +23,7 @@
  */
 package com.janilla.acmedashboard.testing;
 
+import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -57,7 +58,7 @@ public class AcmeDashboardTesting {
 		try {
 			AcmeDashboardTesting a;
 			{
-				var f = new Factory(Java.getPackageClasses("com.janilla.acmedashboard.testing"),
+				var f = new Factory(Java.getPackageClasses(AcmeDashboardTesting.class.getPackageName()),
 						AcmeDashboardTesting.INSTANCE::get);
 				a = f.create(AcmeDashboardTesting.class,
 						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
@@ -97,10 +98,11 @@ public class AcmeDashboardTesting {
 						AcmeDashboardFullstack.INSTANCE::get)));
 
 		{
-			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods",
-					types().stream().flatMap(x -> Arrays.stream(x.getMethods()).map(y -> new ClassAndMethod(x, y)))
-							.toList(),
-					"files", Stream.of("com.janilla.frontend", AcmeDashboardTesting.class.getPackageName())
+			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
+					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
+							.map(y -> new ClassAndMethod(x, y)))
+					.toList(), "files",
+					Stream.of("com.janilla.frontend", AcmeDashboardTesting.class.getPackageName())
 							.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList()));
 			handler = x -> {
 				var ex = (HttpExchange) x;

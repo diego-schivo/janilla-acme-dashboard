@@ -33,7 +33,7 @@ import com.janilla.persistence.Persistence;
 public class InvoiceCrud extends Crud<UUID, Invoice> {
 
 	public InvoiceCrud(Persistence persistence) {
-		super(Invoice.class, persistence.nextId(Invoice.class), persistence);
+		super(Invoice.class, persistence.idConverter(Invoice.class), persistence);
 	}
 
 	public BigDecimal getAmount(Invoice.Status status) {

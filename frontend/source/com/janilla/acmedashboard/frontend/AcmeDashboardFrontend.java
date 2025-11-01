@@ -23,6 +23,7 @@
  */
 package com.janilla.acmedashboard.frontend;
 
+import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.file.Files;
@@ -31,13 +32,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
-import com.janilla.acmedashboard.base.Configuration;
 import com.janilla.acmedashboard.base.DataFetching;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
@@ -62,7 +63,7 @@ public class AcmeDashboardFrontend {
 		try {
 			AcmeDashboardFrontend a;
 			{
-				var f = new Factory(Java.getPackageClasses("com.janilla.acmedashboard.frontend"),
+				var f = new Factory(Java.getPackageClasses(AcmeDashboardFrontend.class.getPackageName()),
 						AcmeDashboardFrontend.INSTANCE::get);
 				a = f.create(AcmeDashboardFrontend.class,
 						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
@@ -84,7 +85,7 @@ public class AcmeDashboardFrontend {
 		}
 	}
 
-	protected final Configuration configuration;
+	protected final Properties configuration;
 
 	protected final DataFetching dataFetching;
 
@@ -96,14 +97,15 @@ public class AcmeDashboardFrontend {
 		this.factory = factory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
-		configuration = factory.create(Configuration.class, Collections.singletonMap("file", configurationFile));
+		configuration = factory.create(Properties.class, Collections.singletonMap("file", configurationFile));
 		dataFetching = factory.create(DataFetching.class);
 
 		{
-			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods",
-					types().stream().flatMap(x -> Arrays.stream(x.getMethods()).map(y -> new ClassAndMethod(x, y)))
-							.toList(),
-					"files", Stream.of("com.janilla.frontend", AcmeDashboardFrontend.class.getPackageName())
+			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
+					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
+							.map(y -> new ClassAndMethod(x, y)))
+					.toList(), "files",
+					Stream.of("com.janilla.frontend", AcmeDashboardFrontend.class.getPackageName())
 							.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList()));
 			handler = x -> {
 				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
@@ -114,7 +116,7 @@ public class AcmeDashboardFrontend {
 		}
 	}
 
-	public Configuration configuration() {
+	public Properties configuration() {
 		return configuration;
 	}
 

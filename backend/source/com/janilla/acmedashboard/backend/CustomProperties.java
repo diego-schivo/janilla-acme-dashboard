@@ -21,9 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.base;
+package com.janilla.acmedashboard.backend;
 
-public interface Configuration {
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Properties;
 
-	String getProperty(String key);
+public class CustomProperties extends Properties {
+
+	private static final long serialVersionUID = -5374801142499744359L;
+
+	public CustomProperties(String file) {
+		try {
+			try (var x = AcmeDashboardBackend.class.getResourceAsStream("configuration.properties")) {
+				load(x);
+			}
+			if (file != null) {
+				var f = file.startsWith("~") ? System.getProperty("user.home") + file.substring(1) : file;
+				try (var x = Files.newInputStream(Path.of(f))) {
+					load(x);
+				}
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 }
