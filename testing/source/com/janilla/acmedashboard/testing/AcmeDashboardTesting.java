@@ -26,6 +26,7 @@ package com.janilla.acmedashboard.testing;
 import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -88,13 +89,13 @@ public class AcmeDashboardTesting {
 
 	protected final HttpHandler handler;
 
-	public AcmeDashboardTesting(Factory factory, String configurationFile) {
+	public AcmeDashboardTesting(Factory factory, Path configurationFile) {
 		this.factory = factory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		configuration = factory.create(Properties.class, Collections.singletonMap("file", configurationFile));
 		fullstack = factory.create(AcmeDashboardFullstack.class,
-				Map.of("factory", new Factory(Java.getPackageClasses("com.janilla.acmedashboard.fullstack"),
+				Map.of("factory", new Factory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
 						AcmeDashboardFullstack.INSTANCE::get)));
 
 		{

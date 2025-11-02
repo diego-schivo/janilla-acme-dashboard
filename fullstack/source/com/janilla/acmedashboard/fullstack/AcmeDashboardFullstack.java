@@ -24,6 +24,7 @@
 package com.janilla.acmedashboard.fullstack;
 
 import java.net.InetSocketAddress;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -82,7 +83,7 @@ public class AcmeDashboardFullstack {
 
 	protected final HttpHandler handler;
 
-	public AcmeDashboardFullstack(Factory factory, String configurationFile) {
+	public AcmeDashboardFullstack(Factory factory, Path configurationFile) {
 		this.factory = factory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
@@ -135,8 +136,4 @@ public class AcmeDashboardFullstack {
 	public HttpHandler handler() {
 		return handler;
 	}
-
-//	public Collection<Class<?>> types() {
-//		return factory.types();
-//	}
 }

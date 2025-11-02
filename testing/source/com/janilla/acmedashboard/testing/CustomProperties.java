@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.frontend;
+package com.janilla.acmedashboard.testing;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -31,11 +31,11 @@ import java.util.Properties;
 
 public class CustomProperties extends Properties {
 
-	private static final long serialVersionUID = -4658964292448434225L;
+	private static final long serialVersionUID = -7141976523134464282L;
 
 	public CustomProperties(Path file) {
 		try {
-			try (var x = AcmeDashboardFrontend.class.getResourceAsStream("configuration.properties")) {
+			try (var x = AcmeDashboardTesting.class.getResourceAsStream("configuration.properties")) {
 				load(x);
 			}
 			if (file != null)

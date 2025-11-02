@@ -67,8 +67,9 @@ public class AcmeDashboardBackend {
 										.stream())
 								.toList(),
 						INSTANCE::get);
-				a = f.create(AcmeDashboardBackend.class,
-						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
+				a = f.create(AcmeDashboardBackend.class, Java.hashMap("factory", f, "configurationFile", args.length > 0 ? Path
+						.of(args[0].startsWith("~") ? System.getProperty("user.home") + args[0].substring(1) : args[0])
+						: null));
 			}
 
 			HttpServer s;
@@ -99,7 +100,7 @@ public class AcmeDashboardBackend {
 
 	protected final TypeResolver typeResolver;
 
-	public AcmeDashboardBackend(Factory factory, String configurationFile) {
+	public AcmeDashboardBackend(Factory factory, Path configurationFile) {
 		this.factory = factory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();

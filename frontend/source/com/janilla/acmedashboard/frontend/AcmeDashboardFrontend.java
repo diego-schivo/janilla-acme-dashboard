@@ -27,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -93,7 +94,7 @@ public class AcmeDashboardFrontend {
 
 	protected final HttpHandler handler;
 
-	public AcmeDashboardFrontend(Factory factory, String configurationFile) {
+	public AcmeDashboardFrontend(Factory factory, Path configurationFile) {
 		this.factory = factory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
