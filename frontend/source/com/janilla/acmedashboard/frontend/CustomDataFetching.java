@@ -25,12 +25,14 @@ package com.janilla.acmedashboard.frontend;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.AbstractMap;
+import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 
@@ -65,47 +67,41 @@ public class CustomDataFetching implements DataFetching {
 
 	@Override
 	public List<?> customers(String query) {
-		return (List<?>) httpClient.getJson(
-				Net.uriString(baseUrl() + "/customers", new AbstractMap.SimpleImmutableEntry<>("query", query)),
-				cookie());
+		return (List<?>) httpClient.getJson(uri("/customers", "query", query), cookie());
 	}
 
 	@Override
 	public List<?> customerNames() {
-		return (List<?>) httpClient.getJson(baseUrl() + "/customers/names", cookie());
+		return (List<?>) httpClient.getJson(uri("/customers/names"), cookie());
 	}
 
 	@Override
 	public Cards dashboardCards() {
-		return new Converter(null).convert(httpClient.getJson(baseUrl() + "/dashboard/cards", cookie()), Cards.class);
+		return new Converter(null).convert(httpClient.getJson(uri("/dashboard/cards"), cookie()), Cards.class);
 	}
 
 	@Override
 	public List<Invoice> dashboardInvoices() {
 		var c = new Converter(null);
-		return ((List<?>) httpClient.getJson(baseUrl() + "/dashboard/invoices", cookie())).stream()
+		return ((List<?>) httpClient.getJson(uri("/dashboard/invoices"), cookie())).stream()
 				.map(x -> c.<Invoice>convert(x, Invoice.class)).toList();
 	}
 
 	@Override
 	public List<Revenue> dashboardRevenue() {
 		var c = new Converter(null);
-		return ((List<?>) httpClient.getJson(baseUrl() + "/dashboard/revenue", cookie())).stream()
+		return ((List<?>) httpClient.getJson(uri("/dashboard/revenue"), cookie())).stream()
 				.map(x -> c.<Revenue>convert(x, Revenue.class)).toList();
 	}
 
 	@Override
 	public Object invoice(UUID id) {
-		return httpClient.getJson(baseUrl() + "/invoices/" + id.toString(), cookie());
+		return httpClient.getJson(uri("/invoices/" + id.toString()), cookie());
 	}
 
 	@Override
 	public Object invoices(String query, Integer page) {
-		return httpClient
-				.getJson(
-						Net.uriString(baseUrl() + "/invoices", new AbstractMap.SimpleImmutableEntry<>("query", query),
-								new AbstractMap.SimpleImmutableEntry<>("page", Objects.toString(page, null))),
-						cookie());
+		return httpClient.getJson(uri("/invoices", "query", query, "page", page), cookie());
 	}
 
 	protected String cookie() {
@@ -113,7 +109,31 @@ public class CustomDataFetching implements DataFetching {
 				.findFirst().get();
 	}
 
-	protected String baseUrl() {
-		return configuration.getProperty("acme-dashboard.api.url");
+	protected URI uri(String path) {
+		return uri(path, (String[][]) null);
+	}
+
+	protected URI uri(String path, String name, Object value) {
+		return uri(path, new String[] { name, Objects.toString(value, null) });
+	}
+
+	protected URI uri(String path, String name1, Object value1, String name2, Object value2) {
+		return uri(path, new String[] { name1, Objects.toString(value1, null) },
+				new String[] { name2, Objects.toString(value2, null) });
+	}
+
+	protected URI uri(String path, String[]... pairs) {
+		var s = pairs != null
+				? Arrays.stream(pairs).filter(x -> x[1] != null)
+						.map(x -> Net.urlEncode(x[0]) + "=" + Net.urlEncode(x[1])).collect(Collectors.joining("&"))
+				: null;
+		var b = new StringBuilder().append(baseUrl()).append(path);
+		if (s != null && !s.isEmpty())
+			b.append('?').append(s);
+		return URI.create(b.toString());
+	}
+
+	protected URI baseUrl() {
+		return URI.create(configuration.getProperty("acme-dashboard.api.url"));
 	}
 }

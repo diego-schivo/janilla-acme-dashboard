@@ -42,10 +42,10 @@ import com.janilla.acmedashboard.fullstack.AcmeDashboardFullstack;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
+import com.janilla.ioc.DependencyInjector;
 import com.janilla.java.Java;
 import com.janilla.net.Net;
 import com.janilla.reflect.ClassAndMethod;
-import com.janilla.reflect.Factory;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.Handle;
 import com.janilla.web.NotFoundException;
@@ -59,10 +59,14 @@ public class AcmeDashboardTesting {
 		try {
 			AcmeDashboardTesting a;
 			{
-				var f = new Factory(Java.getPackageClasses(AcmeDashboardTesting.class.getPackageName()),
+				var f = new DependencyInjector(Java.getPackageClasses(AcmeDashboardTesting.class.getPackageName()),
 						AcmeDashboardTesting.INSTANCE::get);
 				a = f.create(AcmeDashboardTesting.class,
-						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
+						Java.hashMap("factory", f, "configurationFile",
+								args.length > 0 ? Path.of(
+										args[0].startsWith("~") ? System.getProperty("user.home") + args[0].substring(1)
+												: args[0])
+										: null));
 			}
 
 			HttpServer s;
@@ -72,7 +76,7 @@ public class AcmeDashboardTesting {
 					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.server.port"));
-				s = a.factory.create(HttpServer.class,
+				s = a.injector.create(HttpServer.class,
 						Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 			}
 			s.serve();
@@ -83,23 +87,23 @@ public class AcmeDashboardTesting {
 
 	protected final Properties configuration;
 
-	protected final Factory factory;
+	protected final DependencyInjector injector;
 
 	protected final AcmeDashboardFullstack fullstack;
 
 	protected final HttpHandler handler;
 
-	public AcmeDashboardTesting(Factory factory, Path configurationFile) {
-		this.factory = factory;
+	public AcmeDashboardTesting(DependencyInjector injector, Path configurationFile) {
+		this.injector = injector;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
-		configuration = factory.create(Properties.class, Collections.singletonMap("file", configurationFile));
-		fullstack = factory.create(AcmeDashboardFullstack.class,
-				Map.of("factory", new Factory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
+		configuration = injector.create(Properties.class, Collections.singletonMap("file", configurationFile));
+		fullstack = injector.create(AcmeDashboardFullstack.class,
+				Map.of("factory", new DependencyInjector(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
 						AcmeDashboardFullstack.INSTANCE::get)));
 
 		{
-			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
+			var f = injector.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
 					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
 							.map(y -> new ClassAndMethod(x, y)))
 					.toList(), "files",
@@ -130,8 +134,8 @@ public class AcmeDashboardTesting {
 		return configuration;
 	}
 
-	public Factory factory() {
-		return factory;
+	public DependencyInjector injector() {
+		return injector;
 	}
 
 	public AcmeDashboardFullstack fullstack() {
@@ -143,7 +147,7 @@ public class AcmeDashboardTesting {
 	}
 
 	public Collection<Class<?>> types() {
-		return factory.types();
+		return injector.types();
 	}
 
 	@Render(template = "index.html")
