@@ -30,14 +30,14 @@ import com.janilla.acmedashboard.base.Customer;
 import com.janilla.acmedashboard.base.Invoice;
 import com.janilla.acmedashboard.base.Revenue;
 import com.janilla.acmedashboard.base.User;
-import com.janilla.ioc.DependencyInjector;
+import com.janilla.ioc.DiFactory;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 
 public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
-	public CustomPersistenceBuilder(Path databaseFile, DependencyInjector injector) {
-		super(databaseFile, injector);
+	public CustomPersistenceBuilder(Path databaseFile, DiFactory diFactory) {
+		super(databaseFile, diFactory);
 	}
 
 	@Override

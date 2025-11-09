@@ -43,7 +43,7 @@ import javax.net.ssl.SSLContext;
 import com.janilla.acmedashboard.base.DataFetching;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
-import com.janilla.ioc.DependencyInjector;
+import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
 import com.janilla.json.Json;
 import com.janilla.json.ReflectionJsonIterator;
@@ -64,10 +64,10 @@ public class AcmeDashboardFrontend {
 		try {
 			AcmeDashboardFrontend a;
 			{
-				var f = new DependencyInjector(Java.getPackageClasses(AcmeDashboardFrontend.class.getPackageName()),
+				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardFrontend.class.getPackageName()),
 						AcmeDashboardFrontend.INSTANCE::get);
 				a = f.create(AcmeDashboardFrontend.class,
-						Java.hashMap("factory", f, "configurationFile",
+						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
 										args[0].startsWith("~") ? System.getProperty("user.home") + args[0].substring(1)
 												: args[0])
@@ -81,7 +81,7 @@ public class AcmeDashboardFrontend {
 					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.frontend.server.port"));
-				s = a.injector.create(HttpServer.class,
+				s = a.diFactory.create(HttpServer.class,
 						Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 			}
 			s.serve();
@@ -94,19 +94,19 @@ public class AcmeDashboardFrontend {
 
 	protected final DataFetching dataFetching;
 
-	protected final DependencyInjector injector;
+	protected final DiFactory diFactory;
 
 	protected final HttpHandler handler;
 
-	public AcmeDashboardFrontend(DependencyInjector injector, Path configurationFile) {
-		this.injector = injector;
+	public AcmeDashboardFrontend(DiFactory diFactory, Path configurationFile) {
+		this.diFactory = diFactory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
-		configuration = injector.create(Properties.class, Collections.singletonMap("file", configurationFile));
-		dataFetching = injector.create(DataFetching.class);
+		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
+		dataFetching = diFactory.create(DataFetching.class);
 
 		{
-			var f = injector.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
+			var f = diFactory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
 					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
 							.map(y -> new ClassAndMethod(x, y)))
 					.toList(), "files",
@@ -129,8 +129,8 @@ public class AcmeDashboardFrontend {
 		return dataFetching;
 	}
 
-	public DependencyInjector injector() {
-		return injector;
+	public DiFactory diFactory() {
+		return diFactory;
 	}
 
 	public HttpHandler handler() {
@@ -138,7 +138,7 @@ public class AcmeDashboardFrontend {
 	}
 
 	public Collection<Class<?>> types() {
-		return injector.types();
+		return diFactory.types();
 	}
 
 	@Handle(method = "GET", path = "/")
@@ -195,7 +195,7 @@ public class AcmeDashboardFrontend {
 
 		@Override
 		public String apply(T value) {
-			return Json.format(INSTANCE.get().injector.create(ReflectionJsonIterator.class,
+			return Json.format(INSTANCE.get().diFactory.create(ReflectionJsonIterator.class,
 					Map.of("object", value, "includeType", false)));
 		}
 	}

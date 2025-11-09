@@ -39,7 +39,7 @@ import com.janilla.acmedashboard.frontend.AcmeDashboardFrontend;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
-import com.janilla.ioc.DependencyInjector;
+import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
 import com.janilla.net.Net;
 
@@ -51,10 +51,10 @@ public class AcmeDashboardFullstack {
 		try {
 			AcmeDashboardFullstack a;
 			{
-				var f = new DependencyInjector(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
+				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
 						AcmeDashboardFullstack.INSTANCE::get);
 				a = f.create(AcmeDashboardFullstack.class,
-						Java.hashMap("factory", f, "configurationFile",
+						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
 										args[0].startsWith("~") ? System.getProperty("user.home") + args[0].substring(1)
 												: args[0])
@@ -68,7 +68,7 @@ public class AcmeDashboardFullstack {
 					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.fullstack.server.port"));
-				s = a.injector.create(HttpServer.class,
+				s = a.diFactory.create(HttpServer.class,
 						Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 			}
 			s.serve();
@@ -81,29 +81,29 @@ public class AcmeDashboardFullstack {
 
 	protected final Properties configuration;
 
-	protected final DependencyInjector injector;
+	protected final DiFactory diFactory;
 
 	protected final AcmeDashboardFrontend frontend;
 
 	protected final HttpHandler handler;
 
-	public AcmeDashboardFullstack(DependencyInjector injector, Path configurationFile) {
-		this.injector = injector;
+	public AcmeDashboardFullstack(DiFactory diFactory, Path configurationFile) {
+		this.diFactory = diFactory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
-		configuration = injector.create(Properties.class, Collections.singletonMap("file", configurationFile));
-		backend = injector.create(AcmeDashboardBackend.class,
-				Java.hashMap("factory",
-						new DependencyInjector(
+		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
+		backend = diFactory.create(AcmeDashboardBackend.class,
+				Java.hashMap("diFactory",
+						new DiFactory(
 								Stream.of("fullstack", "backend", "base")
 										.flatMap(x -> Java.getPackageClasses(AcmeDashboardBackend.class.getPackageName()
 												.replace(".backend", "." + x)).stream())
 										.toList(),
 								AcmeDashboardBackend.INSTANCE::get),
 						"configurationFile", configurationFile));
-		frontend = injector.create(AcmeDashboardFrontend.class,
-				Java.hashMap("factory",
-						new DependencyInjector(
+		frontend = diFactory.create(AcmeDashboardFrontend.class,
+				Java.hashMap("diFactory",
+						new DiFactory(
 								Stream.of("fullstack", "frontend")
 										.flatMap(x -> Java.getPackageClasses(AcmeDashboardFrontend.class
 												.getPackageName().replace(".frontend", "." + x)).stream())
@@ -129,8 +129,8 @@ public class AcmeDashboardFullstack {
 		return configuration;
 	}
 
-	public DependencyInjector injector() {
-		return injector;
+	public DiFactory diFactory() {
+		return diFactory;
 	}
 
 	public AcmeDashboardFrontend frontend() {
