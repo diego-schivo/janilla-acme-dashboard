@@ -42,7 +42,7 @@ import com.janilla.acmedashboard.fullstack.AcmeDashboardFullstack;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
-import com.janilla.ioc.DependencyInjector;
+import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
 import com.janilla.net.Net;
 import com.janilla.reflect.ClassAndMethod;
@@ -59,7 +59,7 @@ public class AcmeDashboardTesting {
 		try {
 			AcmeDashboardTesting a;
 			{
-				var f = new DependencyInjector(Java.getPackageClasses(AcmeDashboardTesting.class.getPackageName()),
+				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardTesting.class.getPackageName()),
 						AcmeDashboardTesting.INSTANCE::get);
 				a = f.create(AcmeDashboardTesting.class,
 						Java.hashMap("diFactory", f, "configurationFile",
@@ -87,19 +87,19 @@ public class AcmeDashboardTesting {
 
 	protected final Properties configuration;
 
-	protected final DependencyInjector diFactory;
+	protected final DiFactory diFactory;
 
 	protected final AcmeDashboardFullstack fullstack;
 
 	protected final HttpHandler handler;
 
-	public AcmeDashboardTesting(DependencyInjector diFactory, Path configurationFile) {
+	public AcmeDashboardTesting(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
 		fullstack = diFactory.create(AcmeDashboardFullstack.class,
-				Map.of("diFactory", new DependencyInjector(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
+				Map.of("diFactory", new DiFactory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
 						AcmeDashboardFullstack.INSTANCE::get)));
 
 		{
@@ -134,7 +134,7 @@ public class AcmeDashboardTesting {
 		return configuration;
 	}
 
-	public DependencyInjector diFactory() {
+	public DiFactory diFactory() {
 		return diFactory;
 	}
 
