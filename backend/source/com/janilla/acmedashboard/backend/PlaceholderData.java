@@ -31,7 +31,7 @@ import com.janilla.acmedashboard.base.Customer;
 import com.janilla.acmedashboard.base.Invoice;
 import com.janilla.acmedashboard.base.Revenue;
 import com.janilla.acmedashboard.base.User;
-import com.janilla.json.Converter;
+import com.janilla.java.Converter;
 import com.janilla.json.Json;
 
 public record PlaceholderData(List<Customer> customers, List<Invoice> invoices, List<Revenue> revenue,

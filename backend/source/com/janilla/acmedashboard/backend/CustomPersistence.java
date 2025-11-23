@@ -26,7 +26,7 @@ package com.janilla.acmedashboard.backend;
 import java.util.Collection;
 
 import com.janilla.acmedashboard.base.Invoice;
-import com.janilla.json.TypeResolver;
+import com.janilla.java.TypeResolver;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Entity;
 import com.janilla.persistence.Persistence;

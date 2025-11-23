@@ -42,7 +42,7 @@ import com.janilla.acmedashboard.base.Invoice;
 import com.janilla.acmedashboard.base.Revenue;
 import com.janilla.http.HttpClient;
 import com.janilla.http.HttpServer;
-import com.janilla.json.Converter;
+import com.janilla.java.Converter;
 import com.janilla.net.Net;
 
 public class CustomDataFetching implements DataFetching {
