@@ -48,7 +48,7 @@ import com.janilla.java.Java;
 import com.janilla.json.Json;
 import com.janilla.json.ReflectionJsonIterator;
 import com.janilla.net.Net;
-import com.janilla.reflect.Flatten;
+import com.janilla.reflect.Flat;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.Invocable;
 import com.janilla.web.Handle;
@@ -200,6 +200,6 @@ public class AcmeDashboardFrontend {
 		}
 	}
 
-	public record Invoice2(@Flatten Object invoice, Object customers) {
+	public record Invoice2(@Flat Object invoice, Object customers) {
 	}
 }

@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 import com.janilla.acmedashboard.base.Customer;
 import com.janilla.acmedashboard.base.Invoice;
 import com.janilla.persistence.Persistence;
-import com.janilla.reflect.Flatten;
+import com.janilla.reflect.Flat;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 
@@ -67,7 +67,7 @@ public class CustomerApi {
 				.map(x -> Customer2.of(x)).toList();
 	}
 
-	public record Customer2(@Flatten Customer customer, Long invoiceCount, BigDecimal pendingAmount,
+	public record Customer2(@Flat Customer customer, Long invoiceCount, BigDecimal pendingAmount,
 			BigDecimal paidAmount) {
 
 		public static Customer2 of(Customer customer) {

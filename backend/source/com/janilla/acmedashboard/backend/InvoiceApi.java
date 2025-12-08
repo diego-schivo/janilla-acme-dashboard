@@ -33,7 +33,7 @@ import com.janilla.acmedashboard.base.Customer;
 import com.janilla.acmedashboard.base.Invoice;
 import com.janilla.persistence.IdPage;
 import com.janilla.persistence.Persistence;
-import com.janilla.reflect.Flatten;
+import com.janilla.reflect.Flat;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
@@ -97,6 +97,6 @@ public class InvoiceApi {
 				: null;
 	}
 
-	public record IdPage2(@Flatten IdPage<UUID> page, List<Invoice> items) {
+	public record IdPage2(@Flat IdPage<UUID> page, List<Invoice> items) {
 	}
 }
