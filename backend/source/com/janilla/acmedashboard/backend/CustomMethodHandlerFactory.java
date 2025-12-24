@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -55,7 +56,7 @@ public class CustomMethodHandlerFactory extends InvocationHandlerFactory {
 
 	@Override
 	protected boolean handle(Invocation invocation, HttpExchange exchange) {
-		var ex = (CustomHttpExchange) exchange;
+		var ex = (BackendExchange) exchange;
 		var rq = ex.request();
 		var rs = ex.response();
 

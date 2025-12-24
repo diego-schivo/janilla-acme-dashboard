@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,9 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.base;
-
-import java.math.BigDecimal;
-
-public record Cards(BigDecimal paidAmount, BigDecimal pendingAmount, long invoiceCount, long customerCount) {
-}
+//package com.janilla.acmedashboard.frontend;
+//
+//import java.util.Map;
+//
+//import com.janilla.json.Json;
+//import com.janilla.json.ReflectionJsonIterator;
+//import com.janilla.web.Renderer;
+//
+//public class StateRenderer<T> extends Renderer<T> {
+//
+//	@Override
+//	public String apply(T value) {
+//		return Json.format(AcmeDashboardFrontend.INSTANCE.get().diFactory.create(ReflectionJsonIterator.class,
+//				Map.of("object", value, "includeType", false)));
+//	}
+//}

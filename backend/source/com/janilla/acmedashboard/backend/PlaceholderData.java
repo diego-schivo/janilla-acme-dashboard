@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,10 +28,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 
-import com.janilla.acmedashboard.base.Customer;
-import com.janilla.acmedashboard.base.Invoice;
-import com.janilla.acmedashboard.base.Revenue;
-import com.janilla.acmedashboard.base.User;
 import com.janilla.java.Converter;
 import com.janilla.json.Json;
 

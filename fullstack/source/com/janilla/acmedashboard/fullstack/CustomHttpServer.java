@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -35,7 +36,9 @@ import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpResponse;
 import com.janilla.http.HttpServer;
+import com.janilla.ioc.Context;
 
+@Context("fullstack")
 public class CustomHttpServer extends HttpServer {
 
 	protected final AcmeDashboardBackend backend;

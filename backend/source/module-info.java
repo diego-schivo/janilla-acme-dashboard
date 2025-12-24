@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,5 +28,6 @@ module com.janilla.acmedashboard.backend {
 
 	opens com.janilla.acmedashboard.backend;
 
-	requires transitive com.janilla.acmedashboard.base;
+//	requires transitive com.janilla.acmedashboard.base;
+	requires transitive com.janilla;
 }

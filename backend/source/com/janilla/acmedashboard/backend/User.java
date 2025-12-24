@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,13 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.base;
+package com.janilla.acmedashboard.backend;
 
-import java.math.BigDecimal;
+import java.util.UUID;
 
 import com.janilla.persistence.Entity;
+import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 @Store
-public record Revenue(String id, BigDecimal revenue) implements Entity<String> {
+public record User(UUID id, @Index String name, @Index String email, String password) implements Entity<UUID> {
 }

@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -72,7 +73,7 @@ public class AcmeDashboardTesting {
 			HttpServer s;
 			{
 				SSLContext c;
-				try (var x = Net.class.getResourceAsStream("testkeys")) {
+				try (var x = Net.class.getResourceAsStream("localhost")) {
 					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.server.port"));

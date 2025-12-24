@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,8 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.base;
+package com.janilla.acmedashboard.backend;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import com.janilla.persistence.Entity;
@@ -30,6 +33,18 @@ import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 @Store
-@Index(sort = "name")
-public record Customer(UUID id, @Index String name, String email, String imageUrl) implements Entity<UUID> {
+public record Invoice(UUID id, @Index UUID customerId, BigDecimal amount, @Index Status status, LocalDate date,
+		Customer customer) implements Entity<UUID> {
+
+	public Invoice withDate(LocalDate date) {
+		return new Invoice(id, customerId, amount, status, date, customer);
+	}
+
+	public Invoice withCustomer(Customer customer) {
+		return new Invoice(id, customerId, amount, status, date, customer);
+	}
+
+	public enum Status {
+		PAID, PENDING
+	}
 }

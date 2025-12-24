@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,10 +27,6 @@ package com.janilla.acmedashboard.backend;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.janilla.acmedashboard.base.Customer;
-import com.janilla.acmedashboard.base.Invoice;
-import com.janilla.acmedashboard.base.Revenue;
-import com.janilla.acmedashboard.base.User;
 import com.janilla.ioc.DiFactory;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;

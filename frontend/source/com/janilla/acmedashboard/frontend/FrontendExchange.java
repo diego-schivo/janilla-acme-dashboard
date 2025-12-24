@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,21 +28,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import com.janilla.http.BaseHttpExchange;
+import com.janilla.http.SimpleHttpExchange;
 import com.janilla.http.HttpCookie;
-import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpResponse;
 import com.janilla.json.Jwt;
 import com.janilla.web.UnauthorizedException;
 
-public class CustomHttpExchange extends BaseHttpExchange {
+public class FrontendExchange extends SimpleHttpExchange {
 
 	protected final Properties configuration;
 
 	protected final Map<String, Object> session = new HashMap<>();
 
-	public CustomHttpExchange(HttpRequest request, HttpResponse response, Properties configuration) {
+	public FrontendExchange(HttpRequest request, HttpResponse response, Properties configuration) {
 		super(request, response);
 		this.configuration = configuration;
 	}
@@ -67,11 +67,5 @@ public class CustomHttpExchange extends BaseHttpExchange {
 		var x = getSessionEmail();
 		if (x == null)
 			throw new UnauthorizedException();
-	}
-
-	@Override
-	public HttpExchange withException(Exception exception) {
-		this.exception = exception;
-		return this;
 	}
 }

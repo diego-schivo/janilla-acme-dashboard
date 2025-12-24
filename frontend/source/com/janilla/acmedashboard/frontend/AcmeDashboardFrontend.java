@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,38 +24,34 @@
  */
 package com.janilla.acmedashboard.frontend;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
-import com.janilla.acmedashboard.base.DataFetching;
+import com.janilla.http.HttpClient;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
 import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
-import com.janilla.json.Json;
-import com.janilla.json.ReflectionJsonIterator;
 import com.janilla.net.Net;
-import com.janilla.reflect.Flat;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.Invocable;
-import com.janilla.web.Handle;
 import com.janilla.web.NotFoundException;
-import com.janilla.web.Render;
-import com.janilla.web.Renderer;
+import com.janilla.web.RenderableFactory;
 
 public class AcmeDashboardFrontend {
 
@@ -64,8 +61,8 @@ public class AcmeDashboardFrontend {
 		try {
 			AcmeDashboardFrontend a;
 			{
-				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardFrontend.class.getPackageName()),
-						AcmeDashboardFrontend.INSTANCE::get);
+				var f = new DiFactory(Stream.of(AcmeDashboardFrontend.class.getPackageName(), "com.janilla.web")
+						.flatMap(x -> Java.getPackageClasses(x).stream()).toList(), INSTANCE::get);
 				a = f.create(AcmeDashboardFrontend.class,
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
@@ -77,7 +74,7 @@ public class AcmeDashboardFrontend {
 			HttpServer s;
 			{
 				SSLContext c;
-				try (var x = Net.class.getResourceAsStream("testkeys")) {
+				try (var x = Net.class.getResourceAsStream("localhost")) {
 					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.frontend.server.port"));
@@ -96,22 +93,46 @@ public class AcmeDashboardFrontend {
 
 	protected final DiFactory diFactory;
 
+	protected final List<Path> files;
+
 	protected final HttpHandler handler;
+
+	protected final HttpClient httpClient;
+
+	protected final IndexFactory indexFactory;
+
+	protected final List<Invocable> invocables;
+
+	protected final RenderableFactory renderableFactory;
 
 	public AcmeDashboardFrontend(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
-		dataFetching = diFactory.create(DataFetching.class);
 
 		{
-			var f = diFactory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
-					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
-							.map(y -> new Invocable(x, y)))
-					.toList(), "files",
-					Stream.of("com.janilla.frontend", AcmeDashboardFrontend.class.getPackageName())
-							.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList()));
+			SSLContext c;
+			try (var x = Net.class.getResourceAsStream("localhost")) {
+				c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			httpClient = diFactory.create(HttpClient.class, Map.of("sslContext", c));
+		}
+		dataFetching = diFactory.create(DataFetching.class);
+		indexFactory = diFactory.create(IndexFactory.class);
+
+		files = Stream.of("com.janilla.frontend", AcmeDashboardFrontend.class.getPackageName())
+				.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList();
+		invocables = types().stream()
+				.flatMap(x -> Arrays.stream(x.getMethods())
+						.filter(y -> !Modifier.isStatic(y.getModifiers()) && !y.isBridge())
+						.map(y -> new Invocable(x, y)))
+				.toList();
+		renderableFactory = diFactory.create(RenderableFactory.class);
+		{
+			var f = diFactory.create(ApplicationHandlerFactory.class);
 			handler = x -> {
 				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
 				if (h == null)
@@ -133,73 +154,31 @@ public class AcmeDashboardFrontend {
 		return diFactory;
 	}
 
+	public List<Path> files() {
+		return files;
+	}
+
 	public HttpHandler handler() {
 		return handler;
 	}
 
+	public HttpClient httpClient() {
+		return httpClient;
+	}
+
+	public IndexFactory indexFactory() {
+		return indexFactory;
+	}
+
+	public List<Invocable> invocables() {
+		return invocables;
+	}
+
+	public RenderableFactory renderableFactory() {
+		return renderableFactory;
+	}
+
 	public Collection<Class<?>> types() {
 		return diFactory.types();
-	}
-
-	@Handle(method = "GET", path = "/")
-	public Object root(CustomHttpExchange exchange) {
-		if (exchange.getSessionEmail() != null)
-			return URI.create("/dashboard");
-		var u = configuration.getProperty("acme-dashboard.api.url");
-		return new Index(u, Collections.singletonMap("authentication", null));
-	}
-
-	@Handle(method = "GET", path = "/login")
-	public Index login() {
-		var u = configuration.getProperty("acme-dashboard.api.url");
-		return new Index(u, Map.of());
-	}
-
-	@Handle(method = "GET", path = "/dashboard")
-	public Index dashboard() {
-		var u = configuration.getProperty("acme-dashboard.api.url");
-		return new Index(u, Map.of("cards", dataFetching.dashboardCards(), "revenue", dataFetching.dashboardRevenue(),
-				"invoices", dataFetching.dashboardInvoices()));
-	}
-
-	@Handle(method = "GET", path = "/dashboard/invoices")
-	public Index invoices(String query, Integer page) {
-		var u = configuration.getProperty("acme-dashboard.api.url");
-		return new Index(u, Collections.singletonMap("invoices", dataFetching.invoices(query, page)));
-	}
-
-	@Handle(method = "GET", path = "/dashboard/invoices/create")
-	public Index createInvoice() {
-		var u = configuration.getProperty("acme-dashboard.api.url");
-		return new Index(u, Collections.singletonMap("invoice", new Invoice2(null, dataFetching.customerNames())));
-	}
-
-	@Handle(method = "GET", path = "/dashboard/invoices/([^/]+)/edit")
-	public Index editInvoice(UUID id) {
-		var u = configuration.getProperty("acme-dashboard.api.url");
-		return new Index(u, Collections.singletonMap("invoice",
-				new Invoice2(dataFetching.invoice(id), dataFetching.customerNames())));
-	}
-
-	@Handle(method = "GET", path = "/dashboard/customers")
-	public Index customers(String query) {
-		var u = configuration.getProperty("acme-dashboard.api.url");
-		return new Index(u, Collections.singletonMap("customers", dataFetching.customers(query)));
-	}
-
-	@Render(template = "index.html")
-	public record Index(String apiUrl, @Render(renderer = StateRenderer.class) Map<String, Object> state) {
-	}
-
-	public static class StateRenderer<T> extends Renderer<T> {
-
-		@Override
-		public String apply(T value) {
-			return Json.format(INSTANCE.get().diFactory.create(ReflectionJsonIterator.class,
-					Map.of("object", value, "includeType", false)));
-		}
-	}
-
-	public record Invoice2(@Flat Object invoice, Object customers) {
 	}
 }

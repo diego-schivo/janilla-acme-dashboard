@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,7 +28,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.janilla.acmedashboard.base.User;
 import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.Handle;
@@ -49,7 +49,7 @@ public class AuthenticationApi {
 	}
 
 	@Handle(method = "POST")
-	public User create(User user, CustomHttpExchange exchange) {
+	public User create(User user, BackendExchange exchange) {
 		var c = persistence.crud(User.class);
 		var u = c.read(c.find("email", user.email()));
 		if (u == null || !u.password().equals(user.password()))
@@ -62,12 +62,12 @@ public class AuthenticationApi {
 	}
 
 	@Handle(method = "GET")
-	public User read(CustomHttpExchange exchange) {
+	public User read(BackendExchange exchange) {
 		return exchange.getSessionUser();
 	}
 
 	@Handle(method = "DELETE")
-	public void delete(User user, CustomHttpExchange exchange) {
+	public void delete(User user, BackendExchange exchange) {
 		exchange.setSessionCookie(null);
 	}
 }

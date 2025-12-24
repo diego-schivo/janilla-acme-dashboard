@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +26,6 @@ package com.janilla.acmedashboard.backend;
 
 import java.util.Collection;
 
-import com.janilla.acmedashboard.base.Invoice;
 import com.janilla.java.TypeResolver;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Entity;

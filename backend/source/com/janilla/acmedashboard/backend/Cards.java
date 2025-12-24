@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,24 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.base;
+package com.janilla.acmedashboard.backend;
 
-import java.util.List;
-import java.util.UUID;
+import java.math.BigDecimal;
 
-public interface DataFetching {
-
-	List<?> customers(String query);
-
-	List<?> customerNames();
-
-	Cards dashboardCards();
-
-	List<Invoice> dashboardInvoices();
-
-	List<Revenue> dashboardRevenue();
-
-	Object invoice(UUID id);
-
-	Object invoices(String query, Integer page);
+public record Cards(BigDecimal paidAmount, BigDecimal pendingAmount, long invoiceCount, long customerCount) {
 }

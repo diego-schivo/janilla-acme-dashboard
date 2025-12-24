@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -60,13 +61,15 @@ public class AcmeDashboardBackend {
 		try {
 			AcmeDashboardBackend a;
 			{
-				var f = new DiFactory(
-						Stream.of("backend", "base")
-								.flatMap(x -> Java.getPackageClasses(
-										AcmeDashboardBackend.class.getPackageName().replace(".backend", "." + x))
-										.stream())
-								.toList(),
-						INSTANCE::get);
+//				var f = new DiFactory(
+//						Stream.of("backend", "base")
+//								.flatMap(x -> Java.getPackageClasses(
+//										AcmeDashboardBackend.class.getPackageName().replace(".backend", "." + x))
+//										.stream())
+//								.toList(),
+//						INSTANCE::get);
+				var f = new DiFactory(Stream.of(AcmeDashboardBackend.class.getPackageName(), "com.janilla.web")
+						.flatMap(x -> Java.getPackageClasses(x).stream()).toList(), INSTANCE::get);
 				a = f.create(AcmeDashboardBackend.class,
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
@@ -78,7 +81,7 @@ public class AcmeDashboardBackend {
 			HttpServer s;
 			{
 				SSLContext c;
-				try (var x = Net.class.getResourceAsStream("testkeys")) {
+				try (var x = Net.class.getResourceAsStream("localhost")) {
 					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.backend.server.port"));
@@ -95,7 +98,11 @@ public class AcmeDashboardBackend {
 
 	protected final DiFactory diFactory;
 
+	protected final List<Path> files;
+
 	protected final HttpHandler handler;
+
+	protected final List<Invocable> invocables;
 
 	protected final Persistence persistence;
 
@@ -120,12 +127,14 @@ public class AcmeDashboardBackend {
 
 		renderableFactory = diFactory.create(RenderableFactory.class);
 
+		invocables = types().stream()
+				.flatMap(x -> Arrays.stream(x.getMethods())
+						.filter(y -> !Modifier.isStatic(y.getModifiers()) && !y.isBridge())
+						.map(y -> new Invocable(x, y)))
+				.toList();
+		files = List.of();
 		{
-			var f = diFactory.create(ApplicationHandlerFactory.class, Map.of("methods",
-					types().stream().flatMap(x -> Arrays.stream(x.getMethods())
-							.filter(y -> !Modifier.isStatic(y.getModifiers())).map(y -> new Invocable(x, y)))
-							.toList(),
-					"files", List.of()));
+			var f = diFactory.create(ApplicationHandlerFactory.class);
 			handler = x -> {
 				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
 				if (h == null)
@@ -143,8 +152,16 @@ public class AcmeDashboardBackend {
 		return diFactory;
 	}
 
+	public List<Path> files() {
+		return files;
+	}
+
 	public HttpHandler handler() {
 		return handler;
+	}
+
+	public List<Invocable> invocables() {
+		return invocables;
 	}
 
 	public Persistence persistence() {

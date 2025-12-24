@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,31 +22,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.backend;
+package com.janilla.acmedashboard.frontend;
 
-import java.net.SocketAddress;
 import java.util.Map;
 
-import javax.net.ssl.SSLContext;
+import com.janilla.json.Json;
+import com.janilla.json.ReflectionJsonIterator;
+import com.janilla.web.Render;
+import com.janilla.web.Renderer;
 
-import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpHandler;
-import com.janilla.http.HttpRequest;
-import com.janilla.http.HttpResponse;
-import com.janilla.http.HttpServer;
-import com.janilla.ioc.DiFactory;
+@Render(template = "index.html")
+public record Index(@Render(renderer = JsonRenderer.class) Map<String, String> imports, String apiUrl,
+		@Render(renderer = StateRenderer.class) Map<String, Object> state) {
 
-public class CustomHttpServer extends HttpServer {
+	public static class JsonRenderer<T> extends Renderer<T> {
 
-	protected final DiFactory diFactory;
-
-	public CustomHttpServer(SSLContext sslContext, SocketAddress endpoint, HttpHandler handler, DiFactory diFactory) {
-		super(sslContext, endpoint, handler);
-		this.diFactory = diFactory;
+		@Override
+		public String apply(T value) {
+			return Json.format(value);
+		}
 	}
 
-	@Override
-	protected HttpExchange createExchange(HttpRequest request, HttpResponse response) {
-		return diFactory.create(HttpExchange.class, Map.of("request", request, "response", response));
+	public static class StateRenderer<T> extends Renderer<T> {
+
+		@Override
+		public String apply(T value) {
+			return Json.format(AcmeDashboardFrontend.INSTANCE.get().diFactory.create(ReflectionJsonIterator.class,
+					Map.of("object", value, "includeType", false)));
+		}
 	}
 }

@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,10 +27,6 @@ package com.janilla.acmedashboard.backend;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.janilla.acmedashboard.base.Cards;
-import com.janilla.acmedashboard.base.Customer;
-import com.janilla.acmedashboard.base.Invoice;
-import com.janilla.acmedashboard.base.Revenue;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.Handle;
 
@@ -63,5 +60,6 @@ public class DashboardApi {
 	public List<Invoice> getInvoices() {
 		var x = persistence.crud(Invoice.class);
 		return x.read(x.list(0, 5).ids()).stream().map(InvoiceApi::invoiceWithCustomer).toList();
+//		return List.of();
 	}
 }

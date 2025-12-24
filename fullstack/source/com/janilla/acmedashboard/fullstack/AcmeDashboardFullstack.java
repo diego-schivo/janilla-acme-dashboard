@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,10 +25,11 @@
 package com.janilla.acmedashboard.fullstack;
 
 import java.net.InetSocketAddress;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -35,9 +37,9 @@ import java.util.stream.Stream;
 import javax.net.ssl.SSLContext;
 
 import com.janilla.acmedashboard.backend.AcmeDashboardBackend;
+import com.janilla.acmedashboard.backend.BackendExchange;
 import com.janilla.acmedashboard.frontend.AcmeDashboardFrontend;
 import com.janilla.http.HttpHandler;
-import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
 import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
@@ -52,7 +54,7 @@ public class AcmeDashboardFullstack {
 			AcmeDashboardFullstack a;
 			{
 				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
-						AcmeDashboardFullstack.INSTANCE::get);
+						AcmeDashboardFullstack.INSTANCE::get, "fullstack");
 				a = f.create(AcmeDashboardFullstack.class,
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
@@ -64,7 +66,7 @@ public class AcmeDashboardFullstack {
 			HttpServer s;
 			{
 				SSLContext c;
-				try (var x = Net.class.getResourceAsStream("testkeys")) {
+				try (var x = Net.class.getResourceAsStream("localhost")) {
 					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.fullstack.server.port"));
@@ -92,31 +94,41 @@ public class AcmeDashboardFullstack {
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
-		backend = diFactory.create(AcmeDashboardBackend.class,
-				Java.hashMap("diFactory",
-						new DiFactory(
-								Stream.of("fullstack", "backend", "base")
-										.flatMap(x -> Java.getPackageClasses(AcmeDashboardBackend.class.getPackageName()
-												.replace(".backend", "." + x)).stream())
-										.toList(),
-								AcmeDashboardBackend.INSTANCE::get),
-						"configurationFile", configurationFile));
-		frontend = diFactory.create(AcmeDashboardFrontend.class,
-				Java.hashMap("diFactory",
-						new DiFactory(
-								Stream.of("fullstack", "frontend")
-										.flatMap(x -> Java.getPackageClasses(AcmeDashboardFrontend.class
-												.getPackageName().replace(".frontend", "." + x)).stream())
-										.toList(),
-								AcmeDashboardFrontend.INSTANCE::get),
-						"configurationFile", configurationFile));
+
+		var cf = Optional.ofNullable(configurationFile).orElseGet(() -> {
+			try {
+				return Path.of(AcmeDashboardFullstack.class.getResource("configuration.properties").toURI());
+			} catch (URISyntaxException e) {
+				throw new RuntimeException(e);
+			}
+		});
+		backend = diFactory
+				.create(AcmeDashboardBackend.class,
+						Java.hashMap("diFactory",
+								new DiFactory(
+										Stream.concat(
+												Stream.of("fullstack", "backend")
+														.map(x -> AcmeDashboardBackend.class.getPackageName()
+																.replace(".backend", "." + x)),
+												Stream.of("com.janilla.web"))
+												.flatMap(x -> Java.getPackageClasses(x).stream()).toList(),
+										AcmeDashboardBackend.INSTANCE::get, "backend"),
+								"configurationFile", cf));
+		frontend = diFactory
+				.create(AcmeDashboardFrontend.class,
+						Java.hashMap("diFactory",
+								new DiFactory(
+										Stream.concat(
+												Stream.of("fullstack", "frontend")
+														.map(x -> AcmeDashboardFrontend.class.getPackageName()
+																.replace(".frontend", "." + x)),
+												Stream.of("com.janilla.web"))
+												.flatMap(x -> Java.getPackageClasses(x).stream()).toList(),
+										AcmeDashboardFrontend.INSTANCE::get, "frontend"),
+								"configurationFile", cf));
+
 		handler = x -> {
-//			IO.println("AcmeDashboardFullstack, " + x.request().getPath());
-			var h = switch (Objects.requireNonNullElse(x.exception(), x.request())) {
-			case HttpRequest y -> y.getPath().startsWith("/api/") ? backend.handler() : frontend.handler();
-			case Exception _ -> backend.handler();
-			default -> null;
-			};
+			var h = x instanceof BackendExchange ? backend.handler() : frontend.handler();
 			return h.handle(x);
 		};
 	}

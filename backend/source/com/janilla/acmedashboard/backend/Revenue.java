@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,11 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module com.janilla.acmedashboard.base {
+package com.janilla.acmedashboard.backend;
 
-	exports com.janilla.acmedashboard.base;
+import java.math.BigDecimal;
 
-	opens com.janilla.acmedashboard.base;
+import com.janilla.persistence.Entity;
+import com.janilla.persistence.Store;
 
-	requires transitive com.janilla;
+@Store
+public record Revenue(String id, BigDecimal revenue) implements Entity<String> {
 }

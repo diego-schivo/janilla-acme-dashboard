@@ -1,6 +1,7 @@
 /*
  * MIT License
  *
+ * Copyright (c) 2024 Vercel, Inc.
  * Copyright (c) 2024-2025 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,6 +30,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
+import com.janilla.ioc.Context;
+
+@Context("fullstack")
 public class CustomProperties extends Properties {
 
 	private static final long serialVersionUID = -2294199037395154052L;

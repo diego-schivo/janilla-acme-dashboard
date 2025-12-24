@@ -24,29 +24,41 @@
  */
 package com.janilla.acmedashboard.frontend;
 
-import java.net.SocketAddress;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Stream;
 
-import javax.net.ssl.SSLContext;
+import com.janilla.frontend.Frontend;
 
-import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpHandler;
-import com.janilla.http.HttpRequest;
-import com.janilla.http.HttpResponse;
-import com.janilla.http.HttpServer;
-import com.janilla.ioc.DiFactory;
+public class IndexFactory {
 
-public class CustomHttpServer extends HttpServer {
+	protected final Properties configuration;
 
-	protected final DiFactory diFactory;
+	protected final DataFetching dataFetching;
 
-	public CustomHttpServer(SSLContext sslContext, SocketAddress endpoint, HttpHandler handler, DiFactory diFactory) {
-		super(sslContext, endpoint, handler);
-		this.diFactory = diFactory;
+	public IndexFactory(Properties configuration, DataFetching dataFetching) {
+		this.configuration = configuration;
+		this.dataFetching = dataFetching;
 	}
 
-	@Override
-	protected HttpExchange createExchange(HttpRequest request, HttpResponse response) {
-		return diFactory.create(HttpExchange.class, Map.of("request", request, "response", response));
+	public Index index(FrontendExchange exchange) {
+		return new Index(imports(), configuration.getProperty("acme-dashboard.api.url"), state(exchange));
+	}
+
+	protected Map<String, Object> state(FrontendExchange exchange) {
+		var x = new LinkedHashMap<String, Object>();
+//		x.put("user", exchange.sessionUser());
+		return x;
+	}
+
+	protected Map<String, String> imports() {
+		var m = new LinkedHashMap<String, String>();
+		Frontend.putImports(m);
+		Stream.of("acme-logo", "breadcrumb-nav", "card-wrapper", "customers-page", "dashboard-page", "dashboard-layout",
+				"dashboard-nav", "hero-icon", "intl-format", "invoice-page", "invoice-status", "invoices-layout",
+				"invoices-page", "latest-invoices", "login-page", "pagination-nav", "revenue-chart", "root-layout",
+				"single-card", "welcome-page").forEach(x -> m.put(x, "/" + x + ".js"));
+		return m;
 	}
 }
