@@ -42,7 +42,7 @@ public class Cors {
 	@Handle(method = "OPTIONS", path = "/api/(.*)")
 	public void allow(HttpRequest request, HttpResponse response) {
 		var o = configuration.getProperty("acme-dashboard.api.cors.origin");
-		var m = CustomMethodHandlerFactory.INSTANCE.get().handleMethods(request.getPath());
+		var m = CustomInvocationHandlerFactory.INSTANCE.get().handleMethods(request.getPath());
 		var h = configuration.getProperty("acme-dashboard.api.cors.headers");
 
 		response.setStatus(204);
