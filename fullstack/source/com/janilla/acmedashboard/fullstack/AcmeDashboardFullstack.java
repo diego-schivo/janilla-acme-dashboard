@@ -2,7 +2,7 @@
  * MIT License
  *
  * Copyright (c) 2024 Vercel, Inc.
- * Copyright (c) 2024-2025 Diego Schivo
+ * Copyright (c) 2024-2026 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ public class AcmeDashboardFullstack {
 			AcmeDashboardFullstack a;
 			{
 				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()),
-						AcmeDashboardFullstack.INSTANCE::get, "fullstack");
+						INSTANCE::get, "fullstack");
 				a = f.create(AcmeDashboardFullstack.class,
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(

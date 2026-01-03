@@ -2,7 +2,7 @@
  * MIT License
  *
  * Copyright (c) 2024 Vercel, Inc.
- * Copyright (c) 2024-2025 Diego Schivo
+ * Copyright (c) 2024-2026 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,6 @@ import com.janilla.persistence.Persistence;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.Invocable;
 import com.janilla.web.NotFoundException;
-import com.janilla.web.RenderableFactory;
 
 public class AcmeDashboardBackend {
 
@@ -61,13 +60,6 @@ public class AcmeDashboardBackend {
 		try {
 			AcmeDashboardBackend a;
 			{
-//				var f = new DiFactory(
-//						Stream.of("backend", "base")
-//								.flatMap(x -> Java.getPackageClasses(
-//										AcmeDashboardBackend.class.getPackageName().replace(".backend", "." + x))
-//										.stream())
-//								.toList(),
-//						INSTANCE::get);
 				var f = new DiFactory(Stream.of(AcmeDashboardBackend.class.getPackageName(), "com.janilla.web")
 						.flatMap(x -> Java.getPackageClasses(x).stream()).toList(), INSTANCE::get);
 				a = f.create(AcmeDashboardBackend.class,
@@ -106,7 +98,7 @@ public class AcmeDashboardBackend {
 
 	protected final Persistence persistence;
 
-	protected final RenderableFactory renderableFactory;
+//	protected final RenderableFactory renderableFactory;
 
 	protected final TypeResolver typeResolver;
 
@@ -125,14 +117,13 @@ public class AcmeDashboardBackend {
 			persistence = b.build();
 		}
 
-		renderableFactory = diFactory.create(RenderableFactory.class);
-
 		invocables = types().stream()
 				.flatMap(x -> Arrays.stream(x.getMethods())
 						.filter(y -> !Modifier.isStatic(y.getModifiers()) && !y.isBridge())
 						.map(y -> new Invocable(x, y)))
 				.toList();
 		files = List.of();
+//		renderableFactory = diFactory.create(RenderableFactory.class);
 		{
 			var f = diFactory.create(ApplicationHandlerFactory.class);
 			handler = x -> {
@@ -168,9 +159,9 @@ public class AcmeDashboardBackend {
 		return persistence;
 	}
 
-	public RenderableFactory renderableFactory() {
-		return renderableFactory;
-	}
+//	public RenderableFactory renderableFactory() {
+//		return renderableFactory;
+//	}
 
 	public TypeResolver typeResolver() {
 		return typeResolver;

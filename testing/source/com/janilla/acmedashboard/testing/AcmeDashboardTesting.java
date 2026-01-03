@@ -2,7 +2,7 @@
  * MIT License
  *
  * Copyright (c) 2024 Vercel, Inc.
- * Copyright (c) 2024-2025 Diego Schivo
+ * Copyright (c) 2024-2026 Diego Schivo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,8 +47,8 @@ import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
 import com.janilla.net.Net;
 import com.janilla.web.ApplicationHandlerFactory;
-import com.janilla.web.Invocable;
 import com.janilla.web.Handle;
+import com.janilla.web.Invocable;
 import com.janilla.web.NotFoundException;
 import com.janilla.web.Render;
 
@@ -61,7 +61,7 @@ public class AcmeDashboardTesting {
 			AcmeDashboardTesting a;
 			{
 				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardTesting.class.getPackageName()),
-						AcmeDashboardTesting.INSTANCE::get);
+						INSTANCE::get);
 				a = f.create(AcmeDashboardTesting.class,
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
