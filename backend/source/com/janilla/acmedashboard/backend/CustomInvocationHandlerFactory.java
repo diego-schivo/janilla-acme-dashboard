@@ -79,8 +79,11 @@ public class CustomInvocationHandlerFactory extends InvocationHandlerFactory {
 			rs.setHeaderValue("location", "/login");
 		}
 
-		rs.setHeaderValue("access-control-allow-origin", configuration.getProperty("acme-dashboard.api.cors.origin"));
-		rs.setHeaderValue("access-control-allow-credentials", "true");
+		var o = configuration.getProperty("acme-dashboard.api.cors.origin");
+		if (o != null && !o.isEmpty()) {
+			rs.setHeaderValue("access-control-allow-credentials", "true");
+			rs.setHeaderValue("access-control-allow-origin", o);
+		}
 
 //		if (rq.getPath().startsWith("/api/"))
 //			try {
