@@ -20,13 +20,6 @@
 				<artifactId>janilla-acme-dashboard-backend</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
 			</dependency>
-			<!--
-			<dependency>
-				<groupId>com.janilla</groupId>
-				<artifactId>janilla-acme-dashboard-base</artifactId>
-				<version>1.0.0-SNAPSHOT</version>
-			</dependency>
-			-->
 			<dependency>
 				<groupId>com.janilla</groupId>
 				<artifactId>janilla-acme-dashboard-frontend</artifactId>
@@ -41,7 +34,6 @@
 	</dependencyManagement>
 	<modules>
 		<module>backend</module>
-		<module>base</module>
 		<module>frontend</module>
 		<module>fullstack</module>
 		<module>testing</module>
