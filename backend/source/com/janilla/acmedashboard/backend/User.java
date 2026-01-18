@@ -26,9 +26,9 @@ package com.janilla.acmedashboard.backend;
 
 import java.util.UUID;
 
-import com.janilla.persistence.Entity;
-import com.janilla.persistence.Index;
-import com.janilla.persistence.Store;
+import com.janilla.backend.persistence.Entity;
+import com.janilla.backend.persistence.Index;
+import com.janilla.backend.persistence.Store;
 
 @Store
 public record User(UUID id, @Index String name, @Index String email, String password) implements Entity<UUID> {

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.janilla.persistence.Persistence;
+import com.janilla.backend.persistence.Persistence;
 import com.janilla.reflect.Flat;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;

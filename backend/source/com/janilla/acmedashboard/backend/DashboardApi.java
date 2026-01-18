@@ -27,7 +27,7 @@ package com.janilla.acmedashboard.backend;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.janilla.persistence.Persistence;
+import com.janilla.backend.persistence.Persistence;
 import com.janilla.web.Handle;
 
 @Handle(path = "/api/dashboard")

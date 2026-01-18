@@ -27,8 +27,8 @@ package com.janilla.acmedashboard.backend;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import com.janilla.persistence.Crud;
-import com.janilla.persistence.Persistence;
+import com.janilla.backend.persistence.Crud;
+import com.janilla.backend.persistence.Persistence;
 
 public class InvoiceCrud extends Crud<UUID, Invoice> {
 

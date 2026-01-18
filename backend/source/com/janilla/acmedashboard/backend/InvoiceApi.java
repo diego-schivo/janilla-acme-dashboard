@@ -30,8 +30,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.janilla.persistence.IdPage;
-import com.janilla.persistence.Persistence;
+import com.janilla.backend.persistence.IdPage;
+import com.janilla.backend.persistence.Persistence;
 import com.janilla.reflect.Flat;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Bind;

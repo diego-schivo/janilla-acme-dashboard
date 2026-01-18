@@ -29,7 +29,7 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.janilla.json.Jwt;
-import com.janilla.persistence.Persistence;
+import com.janilla.backend.persistence.Persistence;
 import com.janilla.web.Handle;
 
 @Handle(path = "/api/authentication")

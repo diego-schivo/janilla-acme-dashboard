@@ -28,5 +28,5 @@ module com.janilla.acmedashboard.frontend {
 
 	opens com.janilla.acmedashboard.frontend;
 
-	requires transitive com.janilla;
+	requires transitive com.janilla.frontend;
 }
