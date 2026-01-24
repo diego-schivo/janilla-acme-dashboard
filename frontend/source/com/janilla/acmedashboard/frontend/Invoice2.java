@@ -24,7 +24,7 @@
  */
 package com.janilla.acmedashboard.frontend;
 
-import com.janilla.reflect.Flat;
+import com.janilla.java.Flat;
 
 public record Invoice2(@Flat Object invoice, Object customers) {
 }

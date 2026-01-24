@@ -31,7 +31,7 @@ import java.util.UUID;
 
 import com.janilla.http.HttpClient;
 import com.janilla.http.HttpServer;
-import com.janilla.net.UriQueryBuilder;
+import com.janilla.java.UriQueryBuilder;
 
 public class DataFetching {
 

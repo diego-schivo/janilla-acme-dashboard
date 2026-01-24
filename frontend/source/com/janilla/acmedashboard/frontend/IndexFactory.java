@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import com.janilla.frontend.Frontend;
+import com.janilla.frontend.ImportMaps;
 
 public class IndexFactory {
 
@@ -54,7 +54,7 @@ public class IndexFactory {
 
 	protected Map<String, String> imports() {
 		var m = new LinkedHashMap<String, String>();
-		Frontend.putImports(m);
+		ImportMaps.putImports(m);
 		Stream.of("acme-logo", "breadcrumb-nav", "card-wrapper", "customers-page", "dashboard-page", "dashboard-layout",
 				"dashboard-nav", "hero-icon", "intl-format", "invoice-page", "invoice-status", "invoices-layout",
 				"invoices-page", "latest-invoices", "login-page", "pagination-nav", "revenue-chart", "root-layout",

@@ -24,18 +24,15 @@
  */
 package com.janilla.acmedashboard.fullstack;
 
-import java.util.Map;
-
-import com.janilla.acmedashboard.backend.AcmeDashboardBackend;
 import com.janilla.http.DirectHttpClient;
-import com.janilla.http.HttpServer;
 import com.janilla.ioc.Context;
 
 @Context("frontend")
 public class CustomHttpClient extends DirectHttpClient {
 
 	public CustomHttpClient() {
-		var b = AcmeDashboardBackend.INSTANCE.get();
-		super(b.diFactory().create(HttpServer.class, Map.of("handler", b.handler())));
+//		var b = AcmeDashboardBackend.INSTANCE.get();
+//		super(b.diFactory().create(HttpServer.class, Map.of("handler", b.handler())));
+		super(null);
 	}
 }

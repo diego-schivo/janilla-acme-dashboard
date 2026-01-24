@@ -27,7 +27,6 @@ package com.janilla.acmedashboard.frontend;
 import java.util.Map;
 
 import com.janilla.json.Json;
-import com.janilla.json.ReflectionJsonIterator;
 import com.janilla.web.Render;
 import com.janilla.web.Renderer;
 
@@ -47,8 +46,9 @@ public record Index(@Render(renderer = JsonRenderer.class) Map<String, String> i
 
 		@Override
 		public String apply(T value) {
-			return Json.format(AcmeDashboardFrontend.INSTANCE.get().diFactory.create(ReflectionJsonIterator.class,
-					Map.of("object", value, "includeType", false)));
+//			return Json.format(AcmeDashboardFrontend.INSTANCE.get().diFactory.create(ReflectionJsonIterator.class,
+//					Map.of("object", value, "includeType", false)));
+			throw new RuntimeException();
 		}
 	}
 }

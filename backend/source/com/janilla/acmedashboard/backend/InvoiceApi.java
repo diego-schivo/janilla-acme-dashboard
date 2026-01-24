@@ -32,8 +32,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.janilla.backend.persistence.IdPage;
 import com.janilla.backend.persistence.Persistence;
-import com.janilla.reflect.Flat;
-import com.janilla.reflect.Reflection;
+import com.janilla.java.Flat;
+import com.janilla.java.Reflection;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 

@@ -38,7 +38,7 @@ export default class HeroIcon extends WebComponent {
 	}
 
 	async updateDisplay() {
-		const s = this.state;
+		const s = this.customState;
 		if (this.dataset.name === s.name)
 			return;
 		s.name = this.dataset.name;

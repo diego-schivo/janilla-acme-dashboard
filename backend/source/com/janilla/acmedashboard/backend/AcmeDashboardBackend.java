@@ -34,34 +34,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
+import com.janilla.backend.persistence.ApplicationPersistenceBuilder;
+import com.janilla.backend.persistence.Persistence;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
 import com.janilla.ioc.DiFactory;
 import com.janilla.java.DollarTypeResolver;
 import com.janilla.java.Java;
 import com.janilla.java.TypeResolver;
-import com.janilla.net.Net;
-import com.janilla.backend.persistence.ApplicationPersistenceBuilder;
-import com.janilla.backend.persistence.Persistence;
+import com.janilla.net.SecureServer;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.Invocable;
 import com.janilla.web.NotFoundException;
 
 public class AcmeDashboardBackend {
 
-	public static final AtomicReference<AcmeDashboardBackend> INSTANCE = new AtomicReference<>();
-
 	public static void main(String[] args) {
 		try {
 			AcmeDashboardBackend a;
 			{
-				var f = new DiFactory(Stream.of(AcmeDashboardBackend.class.getPackageName(), "com.janilla.web")
-						.flatMap(x -> Java.getPackageClasses(x).stream()).toList(), INSTANCE::get);
+				var f = new DiFactory(Stream.of("com.janilla.web", AcmeDashboardBackend.class.getPackageName())
+						.flatMap(x -> Java.getPackageClasses(x).stream()).toList());
 				a = f.create(AcmeDashboardBackend.class,
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
@@ -73,8 +70,8 @@ public class AcmeDashboardBackend {
 			HttpServer s;
 			{
 				SSLContext c;
-				try (var x = Net.class.getResourceAsStream("localhost")) {
-					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
+				try (var x = SecureServer.class.getResourceAsStream("localhost")) {
+					c = Java.sslContext(x, "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.backend.server.port"));
 				s = a.diFactory.create(HttpServer.class,
@@ -104,8 +101,7 @@ public class AcmeDashboardBackend {
 
 	public AcmeDashboardBackend(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
-		if (!INSTANCE.compareAndSet(null, this))
-			throw new IllegalStateException();
+		diFactory.context(this);
 		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
 		typeResolver = diFactory.create(DollarTypeResolver.class);
 
