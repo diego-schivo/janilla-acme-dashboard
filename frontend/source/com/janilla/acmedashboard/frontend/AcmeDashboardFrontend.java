@@ -31,7 +31,6 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +50,7 @@ import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.Invocable;
 import com.janilla.web.NotFoundException;
 import com.janilla.web.RenderableFactory;
+import com.janilla.web.ResourceMap;
 
 public class AcmeDashboardFrontend {
 
@@ -59,7 +59,7 @@ public class AcmeDashboardFrontend {
 			AcmeDashboardFrontend a;
 			{
 				var f = new DiFactory(Stream.of("com.janilla.web", AcmeDashboardFrontend.class.getPackageName())
-						.flatMap(x -> Java.getPackageClasses(x).stream()).toList());
+						.flatMap(x -> Java.getPackageClasses(x, true).stream()).toList());
 				a = f.create(AcmeDashboardFrontend.class,
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
@@ -90,8 +90,6 @@ public class AcmeDashboardFrontend {
 
 	protected final DiFactory diFactory;
 
-	protected final List<Path> files;
-
 	protected final HttpHandler handler;
 
 	protected final HttpClient httpClient;
@@ -101,6 +99,8 @@ public class AcmeDashboardFrontend {
 	protected final List<Invocable> invocables;
 
 	protected final RenderableFactory renderableFactory;
+
+	protected final ResourceMap resourceMap;
 
 	public AcmeDashboardFrontend(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
@@ -119,13 +119,15 @@ public class AcmeDashboardFrontend {
 		dataFetching = diFactory.create(DataFetching.class);
 		indexFactory = diFactory.create(IndexFactory.class);
 
-		invocables = types().stream()
+		invocables = diFactory.types().stream()
 				.flatMap(x -> Arrays.stream(x.getMethods())
 						.filter(y -> !Modifier.isStatic(y.getModifiers()) && !y.isBridge())
 						.map(y -> new Invocable(x, y)))
 				.toList();
-		files = Stream.of("com.janilla.frontend", AcmeDashboardFrontend.class.getPackageName())
-				.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList();
+		resourceMap = diFactory.create(ResourceMap.class,
+				Map.of("paths",
+						Map.of("", Stream.of("com.janilla.frontend", AcmeDashboardFrontend.class.getPackageName())
+								.flatMap(x -> Java.getPackagePaths(x, false).filter(Files::isRegularFile)).toList())));
 		renderableFactory = diFactory.create(RenderableFactory.class);
 		{
 			var f = diFactory.create(ApplicationHandlerFactory.class);
@@ -150,10 +152,6 @@ public class AcmeDashboardFrontend {
 		return diFactory;
 	}
 
-	public List<Path> files() {
-		return files;
-	}
-
 	public HttpHandler handler() {
 		return handler;
 	}
@@ -174,7 +172,7 @@ public class AcmeDashboardFrontend {
 		return renderableFactory;
 	}
 
-	public Collection<Class<?>> types() {
-		return diFactory.types();
+	public ResourceMap resourceMap() {
+		return resourceMap;
 	}
 }

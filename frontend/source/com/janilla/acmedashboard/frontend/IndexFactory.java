@@ -27,9 +27,6 @@ package com.janilla.acmedashboard.frontend;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Stream;
-
-import com.janilla.frontend.ImportMaps;
 
 public class IndexFactory {
 
@@ -43,7 +40,9 @@ public class IndexFactory {
 	}
 
 	public Index index(FrontendExchange exchange) {
-		return new Index(imports(), configuration.getProperty("acme-dashboard.api.url"), state(exchange));
+		return new Index(
+//				imports(), 
+				configuration.getProperty("acme-dashboard.api.url"), state(exchange));
 	}
 
 	protected Map<String, Object> state(FrontendExchange exchange) {
@@ -52,13 +51,13 @@ public class IndexFactory {
 		return x;
 	}
 
-	protected Map<String, String> imports() {
-		var m = new LinkedHashMap<String, String>();
-		ImportMaps.putImports(m);
-		Stream.of("acme-logo", "breadcrumb-nav", "card-wrapper", "customers-page", "dashboard-page", "dashboard-layout",
-				"dashboard-nav", "hero-icon", "intl-format", "invoice-page", "invoice-status", "invoices-layout",
-				"invoices-page", "latest-invoices", "login-page", "pagination-nav", "revenue-chart", "root-layout",
-				"single-card", "welcome-page").forEach(x -> m.put(x, "/" + x + ".js"));
-		return m;
-	}
+//	protected Map<String, String> imports() {
+//		var m = new LinkedHashMap<String, String>();
+	////		ImportMaps.putImports(m);
+//		Stream.of("acme-logo", "breadcrumb-nav", "card-wrapper", "customers-page", "dashboard-page", "dashboard-layout",
+//				"dashboard-nav", "hero-icon", "intl-format", "invoice-page", "invoice-status", "invoices-layout",
+//				"invoices-page", "latest-invoices", "login-page", "pagination-nav", "revenue-chart", "root-layout",
+//				"single-card", "welcome-page").forEach(x -> m.put(x, "/" + x + ".js"));
+//		return m;
+//	}
 }

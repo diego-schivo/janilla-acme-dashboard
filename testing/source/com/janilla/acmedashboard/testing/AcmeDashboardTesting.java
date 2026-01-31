@@ -57,7 +57,7 @@ public class AcmeDashboardTesting {
 		try {
 			AcmeDashboardTesting a;
 			{
-				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardTesting.class.getPackageName()));
+				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardTesting.class.getPackageName(), true));
 				a = f.create(AcmeDashboardTesting.class,
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
@@ -95,7 +95,7 @@ public class AcmeDashboardTesting {
 		diFactory.context(this);
 		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
 		fullstack = diFactory.create(AcmeDashboardFullstack.class, Map.of("diFactory",
-				new DiFactory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName()))));
+				new DiFactory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName(), true))));
 
 		{
 			var f = diFactory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
@@ -103,7 +103,7 @@ public class AcmeDashboardTesting {
 							.map(y -> new Invocable(x, y)))
 					.toList(), "files",
 					Stream.of("com.janilla.frontend", AcmeDashboardTesting.class.getPackageName())
-							.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList()));
+							.flatMap(x -> Java.getPackagePaths(x, true).filter(Files::isRegularFile)).toList()));
 			handler = x -> {
 				var ex = (HttpExchange) x;
 //				IO.println(
