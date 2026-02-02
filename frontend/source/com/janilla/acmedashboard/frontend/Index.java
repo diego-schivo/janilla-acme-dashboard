@@ -33,10 +33,7 @@ import com.janilla.web.Render;
 import com.janilla.web.Renderer;
 
 @Render(template = "index.html")
-public record Index(
-//		@Render(renderer = JsonRenderer.class) Map<String, String> imports, 
-		String apiUrl,
-		@Render(renderer = StateRenderer.class) Map<String, Object> state) {
+public record Index(String apiUrl, @Render(renderer = StateRenderer.class) Map<String, Object> state) {
 
 	public static class JsonRenderer<T> extends Renderer<T> {
 
@@ -56,8 +53,7 @@ public record Index(
 
 		@Override
 		public String apply(T value) {
-			return Json.format(
-					diFactory.create(ReflectionJsonIterator.class, Map.of("object", value, "includeType", true)));
+			return Json.format(diFactory.create(ReflectionJsonIterator.class, Map.of("object", value)));
 		}
 	}
 }

@@ -48,6 +48,8 @@ import com.janilla.java.Java;
 
 public class AcmeDashboardFullstack {
 
+	public static final ScopedValue<AcmeDashboardFullstack> INSTANCE = ScopedValue.newInstance();
+
 	public static void main(String[] args) {
 		IO.println(ProcessHandle.current().pid());
 		var f = new DiFactory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName(), false),
@@ -112,8 +114,8 @@ public class AcmeDashboardFullstack {
 				throw new RuntimeException(e);
 			}
 		});
-		backend = diFactory
-				.create(AcmeDashboardBackend.class,
+		backend = ScopedValue.where(INSTANCE, this)
+				.call(() -> diFactory.create(AcmeDashboardBackend.class,
 						Java.hashMap("diFactory",
 								new DiFactory(Stream
 										.concat(Stream.of("com.janilla.web"),
@@ -121,16 +123,17 @@ public class AcmeDashboardFullstack {
 														.map(x -> AcmeDashboardBackend.class.getPackageName()
 																.replace(".backend", "." + x)))
 										.flatMap(x -> Java.getPackageClasses(x, true).stream()).toList(), "backend"),
-								"configurationFile", cf));
-		frontend = diFactory.create(AcmeDashboardFrontend.class,
-				Java.hashMap("diFactory",
-						new DiFactory(Stream
-								.concat(Stream.of("com.janilla.web"),
-										Stream.of("frontend", "fullstack")
-												.map(x -> AcmeDashboardFrontend.class.getPackageName()
-														.replace(".frontend", "." + x)))
-								.flatMap(x -> Java.getPackageClasses(x, true).stream()).toList(), "frontend"),
-						"configurationFile", cf));
+								"configurationFile", cf)));
+		frontend = ScopedValue.where(INSTANCE, this)
+				.call(() -> diFactory.create(AcmeDashboardFrontend.class,
+						Java.hashMap("diFactory",
+								new DiFactory(Stream
+										.concat(Stream.of("com.janilla.web"),
+												Stream.of("frontend", "fullstack")
+														.map(x -> AcmeDashboardFrontend.class.getPackageName()
+																.replace(".frontend", "." + x)))
+										.flatMap(x -> Java.getPackageClasses(x, true).stream()).toList(), "frontend"),
+								"configurationFile", cf)));
 
 		handler = x -> {
 			var h = x instanceof BackendExchange ? backend.handler() : frontend.handler();
