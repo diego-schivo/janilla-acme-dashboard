@@ -75,7 +75,7 @@ public class AcmeDashboardFrontend {
 
 		HttpServer s;
 		{
-			var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.frontend.server.port"));
+			var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.server.port"));
 			s = a.diFactory.create(HttpServer.class,
 					Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 		}
@@ -85,8 +85,8 @@ public class AcmeDashboardFrontend {
 	protected static SSLContext sslContext(Properties configuration) {
 		SSLContext c;
 		{
-			var p = configuration.getProperty("acme-dashboard.frontend.server.keystore.path");
-			var w = configuration.getProperty("acme-dashboard.frontend.server.keystore.password");
+			var p = configuration.getProperty("acme-dashboard.server.keystore.path");
+			var w = configuration.getProperty("acme-dashboard.server.keystore.password");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
 			var f = Path.of(p);
