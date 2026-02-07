@@ -26,48 +26,49 @@ import WebComponent from "./web-component.js";
 
 export default class LoginPage extends WebComponent {
 
-	static get observedAttributes() {
-		return ["slot"];
-	}
+    static get observedAttributes() {
+        return ["slot"];
+    }
 
-	static get templateNames() {
-		return ["login-page"];
-	}
+    static get templateNames() {
+        return ["login-page"];
+    }
 
-	constructor() {
-		super();
-	}
+    constructor() {
+        super();
+    }
 
-	connectedCallback() {
-		super.connectedCallback();
-		this.addEventListener("submit", this.handleSubmit);
-	}
+    connectedCallback() {
+        super.connectedCallback();
+        this.addEventListener("submit", this.handleSubmit);
+    }
 
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this.removeEventListener("submit", this.handleSubmit);
-	}
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.removeEventListener("submit", this.handleSubmit);
+    }
 
-	handleSubmit = async event => {
-		event.preventDefault();
-		if (event.submitter.getAttribute("aria-disabled") === "true")
-			return;
-		event.submitter.setAttribute("aria-disabled", "true");
-		try {
-			const a = this.closest("root-layout");
-			const d = new FormData(event.target);
-			const u = await (await fetch(`${a.dataset.apiUrl}/authentication`, {
-				method: "POST",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify(Object.fromEntries(d))
-			})).json();
-			this.querySelector(".error").innerHTML = u ? "" : "Invalid credentials.";
-			if (u) {
-				location.href = "/dashboard";
-				dispatchEvent(new CustomEvent("popstate"));
-			}
-		} finally {
-			event.submitter.setAttribute("aria-disabled", "false");
-		}
-	}
+    handleSubmit = async event => {
+        event.preventDefault();
+        if (event.submitter.getAttribute("aria-disabled") === "true")
+            return;
+        event.submitter.setAttribute("aria-disabled", "true");
+        try {
+            const a = this.closest("root-layout");
+            const d = new FormData(event.target);
+            const u = await (await fetch(`${a.dataset.apiUrl}/authentication`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify(Object.fromEntries(d))
+            })).json();
+            this.querySelector(".error").innerHTML = u ? "" : "Invalid credentials.";
+            if (u) {
+                location.href = "/dashboard";
+                dispatchEvent(new CustomEvent("popstate"));
+            }
+        } finally {
+            event.submitter.setAttribute("aria-disabled", "false");
+        }
+    }
 }

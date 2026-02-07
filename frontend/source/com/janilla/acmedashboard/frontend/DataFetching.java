@@ -82,34 +82,6 @@ public class DataFetching {
 
 	protected String cookie() {
 		return HttpServer.HTTP_EXCHANGE.get().request().getHeaderValues("cookie").filter(x -> x.startsWith("session="))
-				.findFirst().get();
+				.findFirst().orElse(null);
 	}
-
-//	protected URI uri(String path) {
-//		return uri(path, (String[][]) null);
-//	}
-//
-//	protected URI uri(String path, String name, Object value) {
-//		return uri(path, new String[] { name, Objects.toString(value, null) });
-//	}
-//
-//	protected URI uri(String path, String name1, Object value1, String name2, Object value2) {
-//		return uri(path, new String[] { name1, Objects.toString(value1, null) },
-//				new String[] { name2, Objects.toString(value2, null) });
-//	}
-//
-//	protected URI uri(String path, String[]... pairs) {
-//		var s = pairs != null
-//				? Arrays.stream(pairs).filter(x -> x[1] != null)
-//						.map(x -> Net.urlEncode(x[0]) + "=" + Net.urlEncode(x[1])).collect(Collectors.joining("&"))
-//				: null;
-//		var b = new StringBuilder().append(baseUrl()).append(path);
-//		if (s != null && !s.isEmpty())
-//			b.append('?').append(s);
-//		return URI.create(b.toString());
-//	}
-//
-//	protected URI baseUrl() {
-//		return URI.create(configuration.getProperty("acme-dashboard.api.url"));
-//	}
 }

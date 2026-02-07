@@ -46,13 +46,12 @@ export default class LatestInvoices extends WebComponent {
 		}));
 		if (d.slot && !s.invoices) {
 			const a = this.closest("root-layout");
-			fetch(`${a.dataset.apiUrl}/dashboard/invoices`, { credentials: "include" }).then(x => x.json()).then(x => {
-				history.replaceState({
-					...history.state,
-					invoices: x
-				}, "");
-				this.requestDisplay();
-			});
+			const x = await (await fetch(`${a.dataset.apiUrl}/dashboard/invoices`, { credentials: "include" })).json();
+			history.replaceState({
+				...history.state,
+				invoices: x ?? []
+			}, "");
+			this.requestDisplay(0);
 		}
 	}
 }

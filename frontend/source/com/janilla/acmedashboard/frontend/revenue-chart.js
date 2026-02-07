@@ -52,13 +52,12 @@ export default class RevenueChart extends WebComponent {
 		}));
 		if (d.slot && !s.revenue) {
 			const a = this.closest("root-layout");
-			fetch(`${a.dataset.apiUrl}/dashboard/revenue`, { credentials: "include" }).then(x => x.json()).then(x => {
-				history.replaceState({
-					...history.state,
-					revenue: x
-				}, "");
-				this.requestDisplay();
-			});
+			const x = await (await fetch(`${a.dataset.apiUrl}/dashboard/revenue`, { credentials: "include" })).json();
+			history.replaceState({
+				...history.state,
+				revenue: x ?? {}
+			}, "");
+			this.requestDisplay(0);
 		}
 	}
 }

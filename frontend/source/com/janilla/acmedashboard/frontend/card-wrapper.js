@@ -46,7 +46,7 @@ export default class CardWrapper extends WebComponent {
 			const x = await (await fetch(`${a.dataset.apiUrl}/dashboard/cards`, { credentials: "include" })).json();
 			history.replaceState({
 				...history.state,
-				cards: x
+				cards: x ?? {}
 			}, "");
 			this.requestDisplay(0);
 		}

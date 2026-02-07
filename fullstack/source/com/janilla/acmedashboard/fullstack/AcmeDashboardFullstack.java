@@ -122,7 +122,7 @@ public class AcmeDashboardFullstack {
 												Stream.of("backend", "fullstack")
 														.map(x -> AcmeDashboardBackend.class.getPackageName()
 																.replace(".backend", "." + x)))
-										.flatMap(x -> Java.getPackageClasses(x, true).stream()).toList(), "backend"),
+										.flatMap(x -> Java.getPackageClasses(x, false).stream()).toList(), "backend"),
 								"configurationFile", cf)));
 		frontend = ScopedValue.where(INSTANCE, this)
 				.call(() -> diFactory.create(AcmeDashboardFrontend.class,
@@ -132,7 +132,7 @@ public class AcmeDashboardFullstack {
 												Stream.of("frontend", "fullstack")
 														.map(x -> AcmeDashboardFrontend.class.getPackageName()
 																.replace(".frontend", "." + x)))
-										.flatMap(x -> Java.getPackageClasses(x, true).stream()).toList(), "frontend"),
+										.flatMap(x -> Java.getPackageClasses(x, false).stream()).toList(), "frontend"),
 								"configurationFile", cf)));
 
 		handler = x -> {

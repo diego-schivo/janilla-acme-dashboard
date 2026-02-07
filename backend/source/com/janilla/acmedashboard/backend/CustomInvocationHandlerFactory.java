@@ -24,34 +24,25 @@
  */
 package com.janilla.acmedashboard.backend;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandlerFactory;
 import com.janilla.web.HandleException;
-import com.janilla.web.Invocable;
 import com.janilla.web.Invocation;
 import com.janilla.web.InvocationHandlerFactory;
+import com.janilla.web.InvocationResolver;
 import com.janilla.web.RenderableFactory;
 
 public class CustomInvocationHandlerFactory extends InvocationHandlerFactory {
 
-	public static final AtomicReference<CustomInvocationHandlerFactory> INSTANCE = new AtomicReference<>();
-
 	protected final Properties configuration;
 
-	public CustomInvocationHandlerFactory(List<Invocable> invocables, Function<Class<?>, Object> instanceResolver,
-			Comparator<Invocation> invocationComparator, RenderableFactory renderableFactory,
+	public CustomInvocationHandlerFactory(InvocationResolver invocationResolver, RenderableFactory renderableFactory,
 			HttpHandlerFactory rootFactory, Properties configuration) {
-		super(invocables, instanceResolver, invocationComparator, renderableFactory, rootFactory);
+		super(invocationResolver, renderableFactory, rootFactory);
 		this.configuration = configuration;
-		if (!INSTANCE.compareAndSet(null, this))
-			throw new IllegalStateException();
 	}
 
 	@Override
@@ -93,9 +84,5 @@ public class CustomInvocationHandlerFactory extends InvocationHandlerFactory {
 //			}
 
 		return super.handle(invocation, exchange);
-	}
-
-	protected List<String> handleMethods(String path) {
-		return invocationGroups(path).flatMap(x -> x.methods().keySet().stream()).toList();
 	}
 }

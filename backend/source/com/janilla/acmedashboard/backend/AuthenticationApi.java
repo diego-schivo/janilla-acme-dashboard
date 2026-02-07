@@ -50,10 +50,10 @@ public class AuthenticationApi {
 
 	@Handle(method = "POST")
 	public User create(User user, BackendExchange exchange) {
-		IO.println("AuthenticationApi.create, user=" + user);
+//		IO.println("AuthenticationApi.create, user=" + user);
 		var c = persistence.crud(User.class);
 		var u = c.read(c.find("email", user.email()));
-		IO.println("AuthenticationApi.create, u=" + u);
+//		IO.println("AuthenticationApi.create, u=" + u);
 		if (u == null || !u.password().equals(user.password()))
 			return null;
 		var h = Map.of("alg", "HS256", "typ", "JWT");
@@ -65,13 +65,13 @@ public class AuthenticationApi {
 
 	@Handle(method = "GET")
 	public User read(BackendExchange exchange) {
-		IO.println("AuthenticationApi.read");
+//		IO.println("AuthenticationApi.read");
 		return exchange.getSessionUser();
 	}
 
 	@Handle(method = "DELETE")
 	public void delete(User user, BackendExchange exchange) {
-		IO.println("AuthenticationApi.delete, user=" + user);
+//		IO.println("AuthenticationApi.delete, user=" + user);
 		exchange.setSessionCookie(null);
 	}
 }

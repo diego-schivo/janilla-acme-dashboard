@@ -27,20 +27,20 @@ package com.janilla.acmedashboard.backend;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.janilla.ioc.DiFactory;
-import com.janilla.backend.persistence.ApplicationPersistenceBuilder;
+import com.janilla.backend.persistence.PersistenceBuilder;
 import com.janilla.backend.persistence.Persistence;
+import com.janilla.ioc.DiFactory;
 
-public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+public class CustomPersistenceBuilder extends PersistenceBuilder {
 
-	public CustomPersistenceBuilder(Path databaseFile, DiFactory diFactory) {
-		super(databaseFile, diFactory);
+	public CustomPersistenceBuilder(Path databaseFile) {
+		super(databaseFile);
 	}
 
 	@Override
-	public Persistence build() {
+	public Persistence build(DiFactory diFactory) {
 		var e = Files.exists(databaseFile);
-		var p = super.build();
+		var p = super.build(diFactory);
 		if (!e) {
 			var d = PlaceholderData.read();
 			d.customers().forEach(p.crud(Customer.class)::create);

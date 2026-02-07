@@ -30,19 +30,23 @@ import java.util.stream.Collectors;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpResponse;
 import com.janilla.web.Handle;
+import com.janilla.web.InvocationResolver;
 
 public class Cors {
 
 	protected final Properties configuration;
 
-	public Cors(Properties configuration) {
+	protected final InvocationResolver invocationResolver;
+
+	public Cors(Properties configuration, InvocationResolver invocationResolver) {
 		this.configuration = configuration;
+		this.invocationResolver = invocationResolver;
 	}
 
 	@Handle(method = "OPTIONS", path = "/api/(.*)")
 	public void allow(HttpRequest request, HttpResponse response) {
 		var o = configuration.getProperty("acme-dashboard.api.cors.origin");
-		var m = CustomInvocationHandlerFactory.INSTANCE.get().handleMethods(request.getPath());
+		var m = invocationResolver.groups(request.getPath()).flatMap(x -> x.methods().keySet().stream()).toList();
 		var h = configuration.getProperty("acme-dashboard.api.cors.headers");
 
 		response.setStatus(204);

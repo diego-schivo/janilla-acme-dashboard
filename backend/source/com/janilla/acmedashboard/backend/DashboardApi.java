@@ -60,6 +60,5 @@ public class DashboardApi {
 	public List<Invoice> getInvoices() {
 		var x = persistence.crud(Invoice.class);
 		return x.read(x.list(0, 5).ids()).stream().map(InvoiceApi::invoiceWithCustomer).toList();
-//		return List.of();
 	}
 }
