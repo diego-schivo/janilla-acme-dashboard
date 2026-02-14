@@ -22,72 +22,71 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class DashboardNav extends WebComponent {
 
-	static get templateNames() {
-		return ["dashboard-nav"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	constructor() {
-		super();
-	}
+    static get templateNames() {
+        return ["dashboard-nav"];
+    }
 
-	connectedCallback() {
-		super.connectedCallback();
-		addEventListener("popstate", this.handlePopState);
-		this.addEventListener("submit", this.handleSubmit);
-	}
+    connectedCallback() {
+        super.connectedCallback();
+        addEventListener("statepushed", this.handleStatePushed);
+        this.addEventListener("submit", this.handleSubmit);
+    }
 
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		removeEventListener("popstate", this.handlePopState);
-		this.removeEventListener("submit", this.handleSubmit);
-	}
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        removeEventListener("statepushed", this.handleStatePushed);
+        this.removeEventListener("submit", this.handleSubmit);
+    }
 
-	handlePopState = () => {
-		this.requestDisplay();
-	}
+    async updateDisplay() {
+        this.appendChild(this.interpolateDom({
+            $template: "",
+            items: [{
+                href: "/dashboard",
+                icon: "home",
+                text: "Home"
+            }, {
+                href: "/dashboard/invoices",
+                icon: "document-duplicate",
+                text: "Invoices"
+            }, {
+                href: "/dashboard/customers",
+                icon: "user-group",
+                text: "Customers"
+            }].map(x => ({
+                $template: "item",
+                ...x,
+                active: x.href === location.pathname ? "active" : ""
+            }))
+        }));
+    }
 
-	handleSubmit = async event => {
-		event.preventDefault();
-		if (event.submitter.getAttribute("aria-disabled") === "true")
-			return;
-		event.submitter.setAttribute("aria-disabled", "true");
-		try {
-			const a = this.getRootNode().host.closest("root-layout");
-			await fetch(`${a.dataset.apiUrl}/authentication`, {
-				method: "DELETE",
-				credentials: "include"
-			});
-			history.pushState(undefined, "", "/login");
-			dispatchEvent(new CustomEvent("popstate"));
-		} finally {
-			event.submitter.setAttribute("aria-disabled", "false");
-		}
-	}
+    handleStatePushed = () => {
+        this.requestDisplay();
+    }
 
-	async updateDisplay() {
-		this.appendChild(this.interpolateDom({
-			$template: "",
-			items: [{
-				href: "/dashboard",
-				icon: "home",
-				text: "Home"
-			}, {
-				href: "/dashboard/invoices",
-				icon: "document-duplicate",
-				text: "Invoices"
-			}, {
-				href: "/dashboard/customers",
-				icon: "user-group",
-				text: "Customers"
-			}].map(x => ({
-				$template: "item",
-				...x,
-				active: x.href === location.pathname ? "active" : ""
-			}))
-		}));
-	}
+    handleSubmit = async event => {
+        event.preventDefault();
+        if (event.submitter.getAttribute("aria-disabled") === "true")
+            return;
+        event.submitter.setAttribute("aria-disabled", "true");
+        try {
+            const a = this.getRootNode().host.closest("app-element");
+            await fetch(`${a.dataset.apiUrl}/authentication`, {
+                method: "DELETE",
+                credentials: "include"
+            });
+			a.navigate(new URL("/login", location.href));
+        } finally {
+            event.submitter.setAttribute("aria-disabled", "false");
+        }
+    }
 }

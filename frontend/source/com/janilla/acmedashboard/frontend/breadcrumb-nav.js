@@ -22,31 +22,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class BreadcrumbNav extends WebComponent {
 
-	static get observedAttributes() {
-		return ["data-uri"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	static get templateNames() {
-		return ["breadcrumb-nav"];
-	}
+    static get templateNames() {
+        return ["breadcrumb-nav"];
+    }
 
-	constructor() {
-		super();
-		this.attachShadow({ mode: "open" });
-	}
+    static get observedAttributes() {
+        return ["data-uri"];
+    }
 
-	async updateDisplay() {
-		const l = this.children.length;
-		this.shadowRoot.appendChild(this.interpolateDom({
-			$template: "",
-			items: Array.from({ length: l }, (_, i) => ({
-				$template: i === l - 1 ? "last-item" : "item",
-				slot: `item-${i}`
-			}))
-		}));
-	}
+    constructor() {
+        super();
+        this.attachShadow({ mode: "open" });
+    }
+
+    async updateDisplay() {
+        const l = this.children.length;
+        this.shadowRoot.appendChild(this.interpolateDom({
+            $template: "",
+            items: Array.from({ length: l }, (_, i) => ({
+                $template: i === l - 1 ? "last-item" : "item",
+                slot: `item-${i}`
+            }))
+        }));
+    }
 }

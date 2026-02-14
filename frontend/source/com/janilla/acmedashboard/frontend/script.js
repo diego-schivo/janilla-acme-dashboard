@@ -22,28 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import AcmeLogo from "./acme-logo.js";
-import BreadcrumbNav from "./breadcrumb-nav.js";
-import CardWrapper from "./card-wrapper.js";
-import CustomersPage from "./customers-page.js";
-import DashboardPage from "./dashboard-page.js";
-import DashboardLayout from "./dashboard-layout.js";
-import DashboardNav from "./dashboard-nav.js";
-import HeroIcon from "./hero-icon.js";
-import IntlFormat from "./intl-format.js";
-import InvoicePage from "./invoice-page.js";
-import InvoiceStatus from "./invoice-status.js";
-import InvoicesLayout from "./invoices-layout.js";
-import InvoicesPage from "./invoices-page.js";
-import LatestInvoices from "./latest-invoices.js";
-import LoginPage from "./login-page.js";
-import PaginationNav from "./pagination-nav.js";
-import RevenueChart from "./revenue-chart.js";
-import RootLayout from "./root-layout.js";
-import SingleCard from "./single-card.js";
-import WelcomePage from "./welcome-page.js";
+import AcmeLogo from "acme-logo";
+import App from "app";
+import BreadcrumbNav from "breadcrumb-nav";
+import CardWrapper from "card-wrapper";
+import CustomersPage from "customers-page";
+import DashboardPage from "dashboard-page";
+import DashboardLayout from "dashboard-layout";
+import DashboardNav from "dashboard-nav";
+import HeroIcon from "hero-icon";
+import IntlFormat from "base/intl-format";
+import InvoicePage from "invoice-page";
+import InvoiceStatus from "invoice-status";
+import InvoicesLayout from "invoices-layout";
+import InvoicesPage from "invoices-page";
+import LatestInvoices from "latest-invoices";
+import LoginPage from "login-page";
+import PaginationNav from "pagination-nav";
+import RevenueChart from "revenue-chart";
+import SingleCard from "single-card";
+import WelcomePage from "welcome-page";
 
 customElements.define("acme-logo", AcmeLogo);
+customElements.define("app-element", App);
 customElements.define("breadcrumb-nav", BreadcrumbNav);
 customElements.define("card-wrapper", CardWrapper);
 customElements.define("customers-page", CustomersPage);
@@ -60,6 +61,5 @@ customElements.define("latest-invoices", LatestInvoices);
 customElements.define("login-page", LoginPage);
 customElements.define("pagination-nav", PaginationNav);
 customElements.define("revenue-chart", RevenueChart);
-customElements.define("root-layout", RootLayout);
 customElements.define("single-card", SingleCard);
 customElements.define("welcome-page", WelcomePage);

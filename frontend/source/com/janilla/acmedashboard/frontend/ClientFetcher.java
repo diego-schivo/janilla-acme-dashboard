@@ -30,58 +30,73 @@ import java.util.Properties;
 import java.util.UUID;
 
 import com.janilla.http.HttpClient;
-import com.janilla.http.HttpServer;
+import com.janilla.http.HttpRequest;
 import com.janilla.java.UriQueryBuilder;
 
-public class DataFetching {
+public class ClientFetcher implements Fetcher {
+
+	protected final HttpClient client;
 
 	protected final Properties configuration;
 
-	protected final HttpClient httpClient;
+	protected final HttpRequest request;
 
-	public DataFetching(Properties configuration, HttpClient httpClient) {
+	public ClientFetcher(HttpClient httpClient, Properties configuration, HttpRequest request) {
+		this.client = httpClient;
 		this.configuration = configuration;
-		this.httpClient = httpClient;
+		this.request = request;
 	}
 
+	@Override
+	public Object authentication() {
+		return client.getJson(URI.create(configuration.getProperty("acme-dashboard.api.url") + "/authentication"),
+				cookie());
+	}
+
+	@Override
 	public List<?> customers(String query) {
-		return (List<?>) httpClient.getJson(URI.create(configuration.getProperty("acme-dashboard.api.url")
-				+ "/customers?" + new UriQueryBuilder().append("query", query)), cookie());
+		return (List<?>) client.getJson(URI.create(configuration.getProperty("acme-dashboard.api.url") + "/customers?"
+				+ new UriQueryBuilder().append("query", query)), cookie());
 	}
 
+	@Override
 	public List<?> customerNames() {
-		return (List<?>) httpClient.getJson(
+		return (List<?>) client.getJson(
 				URI.create(configuration.getProperty("acme-dashboard.api.url") + "/customers/names"), cookie());
 	}
 
+	@Override
 	public Object dashboardCards() {
-		return httpClient.getJson(URI.create(configuration.getProperty("acme-dashboard.api.url") + "/dashboard/cards"),
+		return client.getJson(URI.create(configuration.getProperty("acme-dashboard.api.url") + "/dashboard/cards"),
 				cookie());
 	}
 
+	@Override
 	public List<?> dashboardInvoices() {
-		return (List<?>) httpClient.getJson(
+		return (List<?>) client.getJson(
 				URI.create(configuration.getProperty("acme-dashboard.api.url") + "/dashboard/invoices"), cookie());
 	}
 
+	@Override
 	public List<?> dashboardRevenue() {
-		return (List<?>) httpClient.getJson(
+		return (List<?>) client.getJson(
 				URI.create(configuration.getProperty("acme-dashboard.api.url") + "/dashboard/revenue"), cookie());
 	}
 
+	@Override
 	public Object invoice(UUID id) {
-		return httpClient.getJson(URI.create(configuration.getProperty("acme-dashboard.api.url") + "/invoices/" + id),
+		return client.getJson(URI.create(configuration.getProperty("acme-dashboard.api.url") + "/invoices/" + id),
 				cookie());
 	}
 
+	@Override
 	public Object invoices(String query, Integer page) {
-		return httpClient.getJson(URI.create(configuration.getProperty("acme-dashboard.api.url") + "/invoices?"
+		return client.getJson(URI.create(configuration.getProperty("acme-dashboard.api.url") + "/invoices?"
 				+ new UriQueryBuilder().append("query", query).append("page", page != null ? page.toString() : null)),
 				cookie());
 	}
 
 	protected String cookie() {
-		return HttpServer.HTTP_EXCHANGE.get().request().getHeaderValues("cookie").filter(x -> x.startsWith("session="))
-				.findFirst().orElse(null);
+		return request.getHeaderValues("cookie").filter(x -> x.startsWith("session=")).findFirst().orElse(null);
 	}
 }

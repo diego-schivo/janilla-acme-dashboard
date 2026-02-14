@@ -30,5 +30,5 @@ import com.janilla.backend.persistence.Entity;
 import com.janilla.backend.persistence.Store;
 
 @Store
-public record Revenue(String id, BigDecimal revenue) implements Entity<String> {
+public record Revenue(Long id, String month, BigDecimal revenue) implements Entity<Long> {
 }

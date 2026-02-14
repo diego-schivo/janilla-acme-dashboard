@@ -103,7 +103,7 @@ public class AcmeDashboardFrontend {
 
 	protected final Properties configuration;
 
-	protected final DataFetching dataFetching;
+	protected final ClientFetcher dataFetching;
 
 	protected final DiFactory diFactory;
 
@@ -125,7 +125,7 @@ public class AcmeDashboardFrontend {
 		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
 
 		httpClient = diFactory.create(HttpClient.class, Map.of("sslContext", sslContext(configuration)));
-		dataFetching = diFactory.create(DataFetching.class);
+		dataFetching = diFactory.create(ClientFetcher.class);
 		indexFactory = diFactory.create(IndexFactory.class);
 
 		invocationResolver = diFactory.create(InvocationResolver.class,
@@ -140,10 +140,11 @@ public class AcmeDashboardFrontend {
 //							IO.println("x=" + x + ", y=" + y);
 							return x.isAssignableFrom(y.getClass()) ? diFactory.context() : diFactory.create(x);
 						}));
-		resourceMap = diFactory.create(ResourceMap.class,
-				Map.of("paths",
-						Map.of("", Stream.of("com.janilla.frontend", AcmeDashboardFrontend.class.getPackageName())
-								.flatMap(x -> Java.getPackagePaths(x, false).filter(Files::isRegularFile)).toList())));
+		resourceMap = diFactory.create(ResourceMap.class, Map.of("paths",
+				Map.of("/base",
+						Java.getPackagePaths("com.janilla.frontend", false).filter(Files::isRegularFile).toList(), "",
+						Java.getPackagePaths(AcmeDashboardFrontend.class.getPackageName(), false)
+								.filter(Files::isRegularFile).toList())));
 		renderableFactory = diFactory.create(RenderableFactory.class);
 		{
 			var f = diFactory.create(ApplicationHandlerFactory.class);
@@ -160,7 +161,7 @@ public class AcmeDashboardFrontend {
 		return configuration;
 	}
 
-	public DataFetching dataFetching() {
+	public ClientFetcher dataFetching() {
 		return dataFetching;
 	}
 

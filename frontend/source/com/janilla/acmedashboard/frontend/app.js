@@ -1,8 +1,8 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024 Vercel, Inc.
- * Copyright (c) 2024-2026 Diego Schivo
+ * Copyright (c) 2018-2025 Payload CMS, Inc. <info@payloadcms.com>
+ * Copyright (c) 2024-2026 Diego Schivo <diego.schivo@janilla.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "base/web-component";
+import BaseApp from "base/app";
 
-export default class DashboardLayout extends WebComponent {
+const adminRegex = /^\/admin(\/.*)?$/;
+
+export default class App extends BaseApp {
 
     static get moduleUrl() {
         return import.meta.url;
     }
 
     static get templateNames() {
-        return ["dashboard-layout"];
-    }
-
-    static get observedAttributes() {
-        return ["data-uri", "slot"];
+        return ["app"];
     }
 
     constructor() {
@@ -43,32 +41,46 @@ export default class DashboardLayout extends WebComponent {
         this.attachShadow({ mode: "open" });
     }
 
+    get currentUser() {
+        return this.customState.user;
+    }
+
+    set currentUser(currentUser) {
+        this.customState.user = currentUser;
+        this.dispatchEvent(new CustomEvent("userchanged", { detail: currentUser }));
+    }
+
     async updateDisplay() {
+        const s = this.customState;
+        const ss = this.serverState;
+
+        if (!Object.hasOwn(s, "user"))
+            s.user = ss && Object.hasOwn(ss, "user")
+                ? ss.user
+                : await (await fetch(`${this.dataset.apiUrl}/authentication`,
+                    { credentials: "include" })).json();
+
         const p = location.pathname;
-        const pp = new URLSearchParams(location.search);
         const f = this.interpolateDom({
             $template: "",
-            dashboard: {
-                $template: "dashboard",
-                slot: p === "/dashboard" ? "content" : null
+            welcome: {
+                $template: "welcome",
+                slot: p === "/" ? "content" : null
             },
-            invoices: (() => {
-                const nn = p.split("/");
-                const x = {
-                    $template: "invoices",
-                    slot: nn[1] === "dashboard" && nn[2] === "invoices" ? "content" : null
+            login: {
+                $template: "login",
+                slot: p === "/login" ? "content" : null
+            },
+            dashboard: (() => {
+                const a = p.split("/")[1] === "dashboard";
+                return {
+                    $template: "dashboard",
+                    slot: a ? "content" : null,
+                    uri: a ? p + location.search : null
                 };
-                if (x.slot)
-                    x.uri = p + location.search;
-                return x;
-            })(),
-            customers: {
-                $template: "customers",
-                slot: p === "/dashboard/customers" ? "content" : null,
-                query: pp.get("query")
-            }
+            })()
         });
-        this.shadowRoot.append(...f.querySelectorAll("link, aside, main"));
+        this.shadowRoot.append(...f.querySelectorAll("slot"));
         this.appendChild(f);
     }
 }

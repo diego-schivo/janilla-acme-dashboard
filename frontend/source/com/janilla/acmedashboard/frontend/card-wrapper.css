@@ -23,22 +23,22 @@
  * SOFTWARE.
  */
 card-wrapper {
-	> article {
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
+  > article {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 
-		@media (min-width: 768px) {
-			flex-direction: row;
-			gap: 1rem;
-		}
-	}
+    @media (min-width: 768px) {
+      flex-direction: row;
+      gap: 1rem;
+    }
+  }
 
-	single-card intl-format:empty {
-		background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
-		border-radius: 0.25rem;
-		display: inline-block;
-		height: 1.5rem;
-		width: 4rem;
-	}
+  single-card intl-format:empty {
+    background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
+    border-radius: 0.25rem;
+    display: inline-block;
+    height: 1.5rem;
+    width: 4rem;
+  }
 }

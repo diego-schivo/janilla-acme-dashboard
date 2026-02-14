@@ -22,121 +22,121 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class InvoicesPage extends WebComponent {
 
-	static get observedAttributes() {
-		return ["data-page", "data-query", "slot"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	static get templateNames() {
-		return ["invoices-page"];
-	}
+    static get templateNames() {
+        return ["invoices-page"];
+    }
 
-	constructor() {
-		super();
-	}
+    static get observedAttributes() {
+        return ["data-page", "data-query", "slot"];
+    }
 
-	connectedCallback() {
-		super.connectedCallback();
-		this.addEventListener("input", this.handleInput);
-		this.addEventListener("submit", this.handleSubmit);
-	}
+    connectedCallback() {
+        super.connectedCallback();
+        this.addEventListener("input", this.handleInput);
+        this.addEventListener("submit", this.handleSubmit);
+    }
 
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this.removeEventListener("input", this.handleInput);
-		this.removeEventListener("submit", this.handleSubmit);
-	}
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.removeEventListener("input", this.handleInput);
+        this.removeEventListener("submit", this.handleSubmit);
+    }
 
-	handleInput = event => {
-		if (typeof this.inputTimeout === "number")
-			clearTimeout(this.inputTimeout);
-		const q = event.target.value;
-		this.inputTimeout = setTimeout(() => {
-			this.inputTimeout = undefined;
-			const u = new URL(location.href);
-			u.searchParams.delete("page");
-			const q0 = u.searchParams.get("query");
-			if (q)
-				u.searchParams.set("query", q);
-			else
-				u.searchParams.delete("query");
-			history[q0 ? "replaceState" : "pushState"]({
-				...history.state,
-				invoices: undefined
-			}, "", u.pathname + u.search);
-			dispatchEvent(new CustomEvent("popstate"));
-		}, 1000);
-	}
+    async updateDisplay() {
+        const s = history.state ?? {};
+        const u = new URL("/dashboard/invoices", location.href);
+        const q = this.dataset.query;
+        if (q)
+            u.searchParams.append("query", q);
+        const p = this.dataset.page;
+        this.appendChild(this.interpolateDom({
+            $template: "",
+            ...this.dataset,
+            articles: this.slot && s.invoices ? s.invoices.items?.map(x => ({
+                $template: "article",
+                ...x,
+                href: `/dashboard/invoices/${x.id}/edit`
+            })) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
+            rows: this.slot && s.invoices ? s.invoices.items?.map(x => ({
+                $template: "row",
+                ...x,
+                href: `/dashboard/invoices/${x.id}/edit`
+            })) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" })),
+            pagination: this.slot && s.invoices ? {
+                href: u.pathname + u.search,
+                page: p ?? 1,
+                pageCount: Math.ceil((s.invoices.total ?? 0) / 6)
+            } : null
+        }));
+        if (this.slot && !s.invoices) {
+            const a = this.closest("app-element");
+            const u = new URL(`${a.dataset.apiUrl}/invoices`, a.dataset.apiUrl.startsWith("/") ? location.href : undefined);
+            ["query", "page"].forEach(x => {
+                if (this.dataset[x])
+                    u.searchParams.append(x, this.dataset[x]);
+            });
+            const x = await (await fetch(u, { credentials: "include" })).json();
+            history.replaceState({
+                ...history.state,
+                invoices: x
+            }, "");
+            this.requestDisplay();
+        }
+    }
 
-	handleSubmit = async event => {
-		event.preventDefault();
-		if (event.submitter.getAttribute("aria-disabled") === "true")
-			return;
-		event.submitter.setAttribute("aria-disabled", "true");
-		try {
-			const a = this.closest("root-layout");
-			const fd = new FormData(event.target);
-			const r = await fetch(`${a.dataset.apiUrl}/invoices/${fd.get("id")}`, {
-				method: "DELETE",
-				credentials: "include"
-			});
-			if (r.ok) {
-				history.replaceState({
-					...history.state,
-					invoices: undefined
-				}, "");
-				await this.updateDisplay();
-			} else {
-				const x = await r.text();
-				alert(x);
-			}
-		} finally {
-			event.submitter.setAttribute("aria-disabled", "false");
-		}
-	}
+    handleInput = event => {
+        if (typeof this.inputTimeout === "number")
+            clearTimeout(this.inputTimeout);
+        const q = event.target.value;
+        this.inputTimeout = setTimeout(() => {
+            this.inputTimeout = undefined;
+            const u = new URL(location.href);
+            u.searchParams.delete("page");
+            const q0 = u.searchParams.get("query");
+            if (q)
+                u.searchParams.set("query", q);
+            else
+                u.searchParams.delete("query");
+            history[q0 ? "replaceState" : "pushState"]({
+                ...history.state,
+                invoices: undefined
+            }, "", u.pathname + u.search);
+            dispatchEvent(new CustomEvent("popstate"));
+        }, 1000);
+    }
 
-	async updateDisplay() {
-		const s = history.state ?? {};
-		const u = new URL("/dashboard/invoices", location.href);
-		const q = this.dataset.query;
-		if (q)
-			u.searchParams.append("query", q);
-		const p = this.dataset.page;
-		this.appendChild(this.interpolateDom({
-			$template: "",
-			...this.dataset,
-			articles: this.slot && s.invoices ? s.invoices.items?.map(x => ({
-				$template: "article",
-				...x,
-				href: `/dashboard/invoices/${x.id}/edit`
-			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-			rows: this.slot && s.invoices ? s.invoices.items?.map(x => ({
-				$template: "row",
-				...x,
-				href: `/dashboard/invoices/${x.id}/edit`
-			})) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" })),
-			pagination: this.slot && s.invoices ? {
-				href: u.pathname + u.search,
-				page: p ?? 1,
-				pageCount: Math.ceil((s.invoices.total ?? 0) / 6)
-			} : null
-		}));
-		if (this.slot && !s.invoices) {
-			const a = this.closest("root-layout");
-			const u = new URL(`${a.dataset.apiUrl}/invoices`, a.dataset.apiUrl.startsWith("/") ? location.href : undefined);
-			["query", "page"].forEach(x => {
-				if (this.dataset[x])
-					u.searchParams.append(x, this.dataset[x]);
-			});
-			const x = await (await fetch(u, { credentials: "include" })).json();
-			history.replaceState({
-				...history.state,
-				invoices: x
-			}, "");
-			this.requestDisplay();
-		}
-	}
+    handleSubmit = async event => {
+        event.preventDefault();
+        if (event.submitter.getAttribute("aria-disabled") === "true")
+            return;
+        event.submitter.setAttribute("aria-disabled", "true");
+        try {
+            const a = this.closest("app-element");
+            const fd = new FormData(event.target);
+            const r = await fetch(`${a.dataset.apiUrl}/invoices/${fd.get("id")}`, {
+                method: "DELETE",
+                credentials: "include"
+            });
+            if (r.ok) {
+                history.replaceState({
+                    ...history.state,
+                    invoices: undefined
+                }, "");
+                await this.updateDisplay();
+            } else {
+                const x = await r.text();
+                alert(x);
+            }
+        } finally {
+            event.submitter.setAttribute("aria-disabled", "false");
+        }
+    }
 }

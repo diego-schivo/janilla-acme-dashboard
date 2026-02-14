@@ -22,15 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class AcmeLogo extends WebComponent {
 
-	static get templateNames() {
-		return ["acme-logo"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	constructor() {
-		super();
-	}
+    static get templateNames() {
+        return ["acme-logo"];
+    }
+
+    constructor() {
+        super();
+    }
 }

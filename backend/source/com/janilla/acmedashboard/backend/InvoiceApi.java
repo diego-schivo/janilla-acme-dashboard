@@ -25,14 +25,11 @@
 package com.janilla.acmedashboard.backend;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
-import com.janilla.backend.persistence.IdPage;
+import com.janilla.backend.persistence.ListPortion;
 import com.janilla.backend.persistence.Persistence;
-import com.janilla.java.Flat;
 import com.janilla.java.Reflection;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
@@ -40,25 +37,25 @@ import com.janilla.web.Handle;
 @Handle(path = "/api/invoices")
 public class InvoiceApi {
 
-	public static final AtomicReference<InvoiceApi> INSTANCE = new AtomicReference<>();
-
 	protected final Persistence persistence;
 
 	public InvoiceApi(Persistence persistence) {
 		this.persistence = persistence;
-		if (!INSTANCE.compareAndSet(null, this))
-			throw new IllegalStateException();
 	}
 
 	@Handle(method = "GET")
-	public IdPage2 list(@Bind("query") String query, @Bind("page") Integer page) {
-		var p = page != null ? page.intValue() : 1;
+	public ListPortion<Invoice> list(@Bind("query") String query, @Bind("page") Integer page) {
 		var c = persistence.crud(Invoice.class);
-		var s = (p - 1) * 6;
-		var q = query == null || query.isEmpty() ? c.list(s, 6)
-				: c.filter("customerId", s, 6, persistence.crud(Customer.class)
-						.filter("name", x -> ((String) x).toLowerCase().contains(query.toLowerCase())).toArray());
-		return new IdPage2(q, c.read(q.ids()).stream().map(InvoiceApi::invoiceWithCustomer).toList());
+		var ii = c.filter("date", new Object[0], true).stream().map(x -> c.read(x, 1));
+
+		if (query != null && !query.isBlank())
+			ii = ii.filter(x -> x.customer().name().toLowerCase().contains(query.toLowerCase()));
+
+		var l = ii.toList();
+		var p = page != null ? page.intValue() : 1;
+		var i1 = (p - 1) * 6;
+		var i2 = Math.min(i1 + 6, l.size());
+		return new ListPortion<>(l.subList(i1, i2), l.size());
 	}
 
 	@Handle(method = "POST")
@@ -80,22 +77,5 @@ public class InvoiceApi {
 	@Handle(method = "DELETE", path = "([^/]+)")
 	public Invoice delete(UUID id) {
 		return persistence.crud(Invoice.class).delete(id);
-	}
-
-//	public static Invoice.WithCustomer invoiceAndCustomer(Invoice invoice) {
-//		return invoice != null
-//				? new Invoice.WithCustomer(invoice,
-//						InvoiceApi.INSTANCE.get().persistence.crud(Customer.class).read(invoice.customerId()))
-//				: null;
-//	}
-
-	public static Invoice invoiceWithCustomer(Invoice invoice) {
-		return invoice != null
-				? ((Invoice) invoice)
-						.withCustomer(INSTANCE.get().persistence.crud(Customer.class).read(invoice.customerId()))
-				: null;
-	}
-
-	public record IdPage2(@Flat IdPage<UUID> page, List<Invoice> items) {
 	}
 }

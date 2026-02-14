@@ -22,33 +22,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class CardWrapper extends WebComponent {
 
-	static get templateNames() {
-		return ["card-wrapper"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	constructor() {
-		super();
-	}
+    static get templateNames() {
+        return ["card-wrapper"];
+    }
 
-	async updateDisplay() {
-		const d = this.closest("dashboard-page");
-		const s = history.state ?? {};
-		this.appendChild(this.interpolateDom({
-			$template: "",
-			...(d.slot ? s.cards : null)
-		}));
-		if (d.slot && !s.cards) {
-			const a = this.closest("root-layout");
-			const x = await (await fetch(`${a.dataset.apiUrl}/dashboard/cards`, { credentials: "include" })).json();
-			history.replaceState({
-				...history.state,
-				cards: x ?? {}
-			}, "");
-			this.requestDisplay(0);
-		}
-	}
+    static get observedAttributes() {
+        return ["data-state"];
+    }
+
+    async updateDisplay() {
+        const d = this.closest("dashboard-page");
+        const hs = history.state;
+        this.appendChild(this.interpolateDom({
+            $template: "",
+            ...(d.slot ? hs.cards : null)
+        }));
+        if (this.dataset.state === "loading") {
+            const a = this.closest("app-element");
+            const x = a.serverState?.cards ?? await (await fetch(`${a.dataset.apiUrl}/dashboard/cards`,
+                { credentials: "include" })).json();
+            history.replaceState({
+                ...history.state,
+                cards: x
+            }, "");
+            delete this.dataset.state;
+        }
+    }
 }

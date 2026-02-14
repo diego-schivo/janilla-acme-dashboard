@@ -40,6 +40,11 @@ public class CustomReflectionJsonIterator extends ReflectionJsonIterator {
 		super(object, includeType);
 	}
 
+//	@Override
+//	public Iterator<JsonToken<?>> newObjectIterator(Stream<Entry<String, Object>> entries) {
+//		return super.newObjectIterator(entries.filter(x -> !x.getKey().equals("customerOptional")));
+//	}
+
 	@Override
 	public Iterator<JsonToken<?>> newValueIterator(Object object) {
 		if (stack().peek() instanceof Map.Entry x && x.getKey().equals("password"))

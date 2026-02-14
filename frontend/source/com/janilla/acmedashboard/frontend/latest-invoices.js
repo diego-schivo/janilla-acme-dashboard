@@ -22,36 +22,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class LatestInvoices extends WebComponent {
 
-	static get templateNames() {
-		return ["latest-invoices"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	constructor() {
-		super();
-	}
+    static get templateNames() {
+        return ["latest-invoices"];
+    }
 
-	async updateDisplay() {
-		const d = this.closest("dashboard-page");
-		const s = history.state;
-		this.appendChild(this.interpolateDom({
-			$template: "",
-			articles: d.slot && s.invoices ? s.invoices.map(x => ({
-				$template: "article",
-				...x
-			})) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" }))
-		}));
-		if (d.slot && !s.invoices) {
-			const a = this.closest("root-layout");
-			const x = await (await fetch(`${a.dataset.apiUrl}/dashboard/invoices`, { credentials: "include" })).json();
-			history.replaceState({
-				...history.state,
-				invoices: x ?? []
-			}, "");
-			this.requestDisplay(0);
-		}
-	}
+    static get observedAttributes() {
+        return ["data-state"];
+    }
+
+    async updateDisplay() {
+        const d = this.closest("dashboard-page");
+        const hs = history.state;
+        this.appendChild(this.interpolateDom({
+            $template: "",
+            articles: d.slot && hs.invoices ? hs.invoices.map(x => ({
+                $template: "article",
+                ...x
+            })) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" }))
+        }));
+        if (this.dataset.state === "loading") {
+            const a = this.closest("app-element");
+            const x = a.serverState?.invoices ?? await (await fetch(`${a.dataset.apiUrl}/dashboard/invoices`,
+                { credentials: "include" })).json();
+            history.replaceState({
+                ...history.state,
+                invoices: x
+            }, "");
+            delete this.dataset.state;
+        }
+    }
 }

@@ -24,70 +24,86 @@
  */
 package com.janilla.acmedashboard.frontend;
 
-import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import com.janilla.http.HttpRequest;
+import com.janilla.ioc.DiFactory;
 import com.janilla.web.Handle;
 
 public class WebHandling {
 
-	protected final DataFetching dataFetching;
-
 	protected final IndexFactory indexFactory;
 
-	public WebHandling(DataFetching dataFetching, IndexFactory indexFactory) {
-		this.dataFetching = dataFetching;
+	protected final DiFactory diFactory;
+
+	public WebHandling(IndexFactory indexFactory, DiFactory diFactory) {
 		this.indexFactory = indexFactory;
+		this.diFactory = diFactory;
 	}
 
 	@Handle(method = "GET", path = "/")
 	public Object root(FrontendExchange exchange) {
-		if (exchange.getSessionEmail() != null)
-			return URI.create("/dashboard");
-		var i = indexFactory.index(exchange);
-		i.state().put("authentication", null);
-		return i;
+		return indexFactory.index(exchange);
 	}
 
 	@Handle(method = "GET", path = "/login")
-	public Object login() {
-		return indexFactory.index(null);
+	public Object login(FrontendExchange exchange) {
+		return indexFactory.index(exchange);
 	}
 
 	@Handle(method = "GET", path = "/dashboard")
-	public Object dashboard() {
-		var i = indexFactory.index(null);
-		i.state().put("cards", dataFetching.dashboardCards());
-		i.state().put("revenue", dataFetching.dashboardRevenue());
-		i.state().put("invoices", dataFetching.dashboardInvoices());
+	public Object dashboard(FrontendExchange exchange) {
+		var i = indexFactory.index(exchange);
+		var f = fetcher(exchange.request());
+		var oo = new Object[3];
+//		IO.println(LocalDateTime.now() + ", 1");
+		for (var t : List.of(Thread.startVirtualThread(() -> oo[0] = f.dashboardCards()),
+				Thread.startVirtualThread(() -> oo[1] = f.dashboardRevenue()),
+				Thread.startVirtualThread(() -> oo[2] = f.dashboardInvoices())))
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+//		IO.println(LocalDateTime.now() + ", 2");
+		i.state().put("cards", oo[0]);
+		i.state().put("revenue", oo[1]);
+		i.state().put("invoices", oo[2]);
 		return i;
 	}
 
 	@Handle(method = "GET", path = "/dashboard/invoices")
-	public Object invoices(String query, Integer page) {
-		var i = indexFactory.index(null);
-		i.state().put("invoices", dataFetching.invoices(query, page));
+	public Object invoices(String query, Integer page, FrontendExchange exchange) {
+		var i = indexFactory.index(exchange);
+		i.state().put("invoices", fetcher(exchange.request()).invoices(query, page));
 		return i;
 	}
 
 	@Handle(method = "GET", path = "/dashboard/invoices/create")
-	public Object createInvoice() {
-		var i = indexFactory.index(null);
-		i.state().put("invoice", new Invoice2(null, dataFetching.customerNames()));
+	public Object createInvoice(FrontendExchange exchange) {
+		var i = indexFactory.index(exchange);
+		i.state().put("invoice", new Invoice2(null, fetcher(exchange.request()).customerNames()));
 		return i;
 	}
 
 	@Handle(method = "GET", path = "/dashboard/invoices/([^/]+)/edit")
-	public Object editInvoice(UUID id) {
-		var i = indexFactory.index(null);
-		i.state().put("invoice", new Invoice2(dataFetching.invoice(id), dataFetching.customerNames()));
+	public Object editInvoice(UUID id, FrontendExchange exchange) {
+		var i = indexFactory.index(exchange);
+		var f = fetcher(exchange.request());
+		i.state().put("invoice", new Invoice2(f.invoice(id), f.customerNames()));
 		return i;
 	}
 
 	@Handle(method = "GET", path = "/dashboard/customers")
-	public Object customers(String query) {
-		var i = indexFactory.index(null);
-		i.state().put("customers", dataFetching.customers(query));
+	public Object customers(String query, FrontendExchange exchange) {
+		var i = indexFactory.index(exchange);
+		i.state().put("customers", fetcher(exchange.request()).customers(query));
 		return i;
+	}
+
+	protected Fetcher fetcher(HttpRequest request) {
+		return diFactory.create(Fetcher.class, Map.of("request", request));
 	}
 }

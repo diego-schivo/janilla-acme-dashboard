@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.janilla.backend.persistence.Persistence;
@@ -40,14 +39,14 @@ import com.janilla.web.Handle;
 @Handle(path = "/api/customers")
 public class CustomerApi {
 
-	public static final AtomicReference<CustomerApi> INSTANCE = new AtomicReference<>();
+//	public static final AtomicReference<CustomerApi> INSTANCE = new AtomicReference<>();
 
 	protected final Persistence persistence;
 
 	public CustomerApi(Persistence persistence) {
 		this.persistence = persistence;
-		if (!INSTANCE.compareAndSet(null, this))
-			throw new IllegalStateException();
+//		if (!INSTANCE.compareAndSet(null, this))
+//			throw new IllegalStateException();
 	}
 
 	@Handle(method = "GET", path = "names")
@@ -70,10 +69,11 @@ public class CustomerApi {
 			BigDecimal paidAmount) {
 
 		public static Customer2 of(Customer customer) {
-			var c = (InvoiceCrud) INSTANCE.get().persistence.crud(Invoice.class);
-			return new Customer2(customer, c.count("customerId", customer.id()),
-					c.getAmount(customer.id(), Invoice.Status.PENDING),
-					c.getAmount(customer.id(), Invoice.Status.PAID));
+//			var c = (InvoiceCrud) INSTANCE.get().persistence.crud(Invoice.class);
+//			return new Customer2(customer, c.count("customerId", customer.id()),
+//					c.getAmount(customer.id(), InvoiceStatus.PENDING),
+//					c.getAmount(customer.id(), InvoiceStatus.PAID));
+			throw new RuntimeException();
 		}
 	}
 }

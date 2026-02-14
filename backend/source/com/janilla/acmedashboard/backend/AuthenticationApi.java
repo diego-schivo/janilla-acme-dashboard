@@ -26,7 +26,6 @@ package com.janilla.acmedashboard.backend;
 
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.janilla.backend.persistence.Persistence;
 import com.janilla.json.Jwt;
@@ -35,7 +34,7 @@ import com.janilla.web.Handle;
 @Handle(path = "/api/authentication")
 public class AuthenticationApi {
 
-	public static final AtomicReference<AuthenticationApi> INSTANCE = new AtomicReference<>();
+//	public static final AtomicReference<AuthenticationApi> INSTANCE = new AtomicReference<>();
 
 	protected final Properties configuration;
 
@@ -44,8 +43,8 @@ public class AuthenticationApi {
 	public AuthenticationApi(Properties configuration, Persistence persistence) {
 		this.configuration = configuration;
 		this.persistence = persistence;
-		if (!INSTANCE.compareAndSet(null, this))
-			throw new IllegalStateException();
+//		if (!INSTANCE.compareAndSet(null, this))
+//			throw new IllegalStateException();
 	}
 
 	@Handle(method = "POST")

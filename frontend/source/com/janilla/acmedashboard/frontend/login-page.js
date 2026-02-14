@@ -22,20 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class LoginPage extends WebComponent {
 
-    static get observedAttributes() {
-        return ["slot"];
+    static get moduleUrl() {
+        return import.meta.url;
     }
 
     static get templateNames() {
         return ["login-page"];
     }
 
-    constructor() {
-        super();
+    static get observedAttributes() {
+        return ["slot"];
     }
 
     connectedCallback() {
@@ -54,7 +54,7 @@ export default class LoginPage extends WebComponent {
             return;
         event.submitter.setAttribute("aria-disabled", "true");
         try {
-            const a = this.closest("root-layout");
+            const a = this.closest("app-element");
             const d = new FormData(event.target);
             const u = await (await fetch(`${a.dataset.apiUrl}/authentication`, {
                 method: "POST",

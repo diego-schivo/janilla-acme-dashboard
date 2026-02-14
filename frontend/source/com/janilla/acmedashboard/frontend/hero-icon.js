@@ -22,35 +22,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 const documents = {};
 const parser = new DOMParser();
 
 export default class HeroIcon extends WebComponent {
 
-	static get observedAttributes() {
-		return ["data-name"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	constructor() {
-		super();
-	}
+    static get observedAttributes() {
+        return ["data-name"];
+    }
 
-	async updateDisplay() {
-		const s = this.customState;
-		if (this.dataset.name === s.name)
-			return;
-		s.name = this.dataset.name;
-		while (this.firstChild)
-			this.removeChild(this.lastChild);
-		if (!s.name)
-			return;
-		documents[s.name] ??= fetch(`/images/heroicons/${s.name}.svg`).then(x => x.text()).then(x => {
-			x = x.replace("#0F172A", "currentColor");
-			return parser.parseFromString(x, "image/svg+xml");
-		});
-		const d = await documents[s.name];
-		this.appendChild(d.firstChild.cloneNode(true));
-	}
+    async updateDisplay() {
+        const s = this.customState;
+        if (this.dataset.name === s.name)
+            return;
+        s.name = this.dataset.name;
+        while (this.firstChild)
+            this.removeChild(this.lastChild);
+        if (!s.name)
+            return;
+        documents[s.name] ??= fetch(`/images/heroicons/${s.name}.svg`).then(x => x.text()).then(x => {
+            x = x.replace("#0F172A", "currentColor");
+            return parser.parseFromString(x, "image/svg+xml");
+        });
+        const d = await documents[s.name];
+        this.appendChild(d.firstChild.cloneNode(true));
+    }
 }

@@ -23,73 +23,73 @@
  * SOFTWARE.
  */
 @media (min-width: 768px) {
-	root-layout:has(login-page[slot]) {
-		align-items: center;
-		display: flex;
-		height: 100vh;
-		justify-content: center;
-	}
+  root-layout:has(login-page[slot]) {
+    align-items: center;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+  }
 }
 
 login-page {
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	max-width: 400px;
-	padding: 1rem;
-	width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  padding: 1rem;
+  width: 100%;
 
-	@media (min-width: 768px) {
-		transform: translateY(-5rem);
-	}
+  @media (min-width: 768px) {
+    transform: translateY(-5rem);
+  }
 
-	header {
-		align-items: flex-end;
-		background-color: light-dark(rgb(0, 112, 243), rgb(255, 143, 12));
-		border-radius: 0.5rem;
-		box-sizing: border-box;
-		display: flex;
-		height: 5rem;
-		padding: 0.75rem;
-		
-		@media (min-width: 768px) {
-			height: 9rem;
-		}
-	}
-	
-	form {
-		background-color: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
-		border-radius: 0.5rem;
-		display: flex;
-		flex-direction: column;
-		font-size: 0.875rem;
-		gap: 1rem;
-		line-height: 1.25rem;
-		padding: 2rem 1.5rem;
-	
-		> div {
-			display: flex;
-			flex-direction: column;
-			gap: 0.75rem;
-		}
-	}
-	
-	h1 {
-		font-family: "Lusitana";
-		font-size: 1.5rem;
-		line-height: 2rem;
-	}
-	
-	label {
-		font-size: 0.75rem;
-		font-weight: 500;
-		line-height: 1rem;
-	}
-	
-	.primary-button {
-		height: 2.5rem;
-		justify-content: space-between;
-		padding: 0 1rem;
-	}
+  header {
+    align-items: flex-end;
+    background-color: light-dark(rgb(0, 112, 243), rgb(255, 143, 12));
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    display: flex;
+    height: 5rem;
+    padding: 0.75rem;
+    
+    @media (min-width: 768px) {
+      height: 9rem;
+    }
+  }
+  
+  form {
+    background-color: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.875rem;
+    gap: 1rem;
+    line-height: 1.25rem;
+    padding: 2rem 1.5rem;
+  
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+  
+  h1 {
+    font-family: "Lusitana";
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1rem;
+  }
+  
+  .primary-button {
+    height: 2.5rem;
+    justify-content: space-between;
+    padding: 0 1rem;
+  }
 }

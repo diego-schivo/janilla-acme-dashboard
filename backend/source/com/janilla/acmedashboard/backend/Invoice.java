@@ -33,18 +33,14 @@ import com.janilla.backend.persistence.Index;
 import com.janilla.backend.persistence.Store;
 
 @Store
-public record Invoice(UUID id, @Index UUID customerId, BigDecimal amount, @Index Status status, LocalDate date,
-		Customer customer) implements Entity<UUID> {
+public record Invoice(UUID id, @Index Customer customer, BigDecimal amount, @Index InvoiceStatus status,
+		@Index LocalDate date) implements Entity<UUID> {
+
+//	public Invoice withCustomer(Customer customer) {
+//		return new Invoice(id, customer, amount, status, date);
+//	}
 
 	public Invoice withDate(LocalDate date) {
-		return new Invoice(id, customerId, amount, status, date, customer);
-	}
-
-	public Invoice withCustomer(Customer customer) {
-		return new Invoice(id, customerId, amount, status, date, customer);
-	}
-
-	public enum Status {
-		PAID, PENDING
+		return new Invoice(id, customer, amount, status, date);
 	}
 }

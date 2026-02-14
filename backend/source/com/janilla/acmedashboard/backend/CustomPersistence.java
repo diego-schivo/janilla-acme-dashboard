@@ -30,6 +30,7 @@ import com.janilla.backend.persistence.Crud;
 import com.janilla.backend.persistence.Entity;
 import com.janilla.backend.persistence.Persistence;
 import com.janilla.backend.sqlite.SqliteDatabase;
+import com.janilla.backend.sqlite.TableColumn;
 import com.janilla.java.TypeResolver;
 
 public class CustomPersistence extends Persistence {
@@ -39,14 +40,26 @@ public class CustomPersistence extends Persistence {
 		super(database, storables, typeResolver);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings("unchecked")
 	protected <E extends Entity<?>> Crud<?, E> newCrud(Class<E> type) {
 		return type == Invoice.class ? (Crud<?, E>) new InvoiceCrud(this) : super.newCrud(type);
 	}
 
-//	@Override
-//	protected <ID extends Comparable<ID>> Function<Map<String, Object>, ID> nextId(Class<?> type) {
-//		return Set.of(Customer.class, Revenue.class, User.class).contains(type) ? null : super.nextId(type);
-//	}
+	@Override
+	protected void createStoresAndIndexes() {
+		database.perform(() -> {
+			super.createStoresAndIndexes();
+
+			database.createTable("StatusAmount", new TableColumn[] { new TableColumn("status", "TEXT", false),
+					new TableColumn("amount", "NUMERIC", false) }, true);
+
+			database.createTable("CustomerStatusAmount",
+					new TableColumn[] { new TableColumn("customer", "TEXT", false),
+							new TableColumn("status", "TEXT", false), new TableColumn("amount", "NUMERIC", false) },
+					true);
+
+			return null;
+		}, true);
+	}
 }

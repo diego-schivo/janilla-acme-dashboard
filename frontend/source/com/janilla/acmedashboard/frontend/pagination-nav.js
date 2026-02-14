@@ -22,61 +22,61 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class PaginationNav extends WebComponent {
 
-	static get observedAttributes() {
-		return ["data-href", "data-page", "data-page-count"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	static get templateNames() {
-		return ["pagination-nav"];
-	}
+    static get templateNames() {
+        return ["pagination-nav"];
+    }
 
-	constructor() {
-		super();
-	}
+    static get observedAttributes() {
+        return ["data-href", "data-page", "data-page-count"];
+    }
 
-	async updateDisplay() {
-		const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount) : 0;
-		const u = new URL(this.dataset.href, location.href);
-		const p = this.dataset.page ? parseInt(this.dataset.page) : 1;
-		this.appendChild(this.interpolateDom({
-			$template: "",
-			links: pc > 1 ? [(() => {
-				u.searchParams.set("page", p - 1);
-				return {
-					$template: "link",
-					href: p > 1 ? u.pathname + u.search : null,
-					content: {
-						$template: "icon",
-						icon: "arrow-left"
-					}
-				};
-			})(), ...Array.from({ length: pc }, (_, i) => i + 1)
-				.map(x => {
-					u.searchParams.set("page", x);
-					return {
-						$template: "link",
-						href: u.pathname + u.search,
-						class: x === p ? "active" : "",
-						content: {
-							$template: "text",
-							text: x
-						}
-					};
-				}), (() => {
-					u.searchParams.set("page", p + 1);
-					return {
-						$template: "link",
-						href: p < pc ? u.pathname + u.search : null,
-						content: {
-							$template: "icon",
-							icon: "arrow-right"
-						}
-					};
-				})()] : null
-		}));
-	}
+    async updateDisplay() {
+        const pc = this.dataset.pageCount ? parseInt(this.dataset.pageCount) : 0;
+        const u = new URL(this.dataset.href, location.href);
+        const p = this.dataset.page ? parseInt(this.dataset.page) : 1;
+        this.appendChild(this.interpolateDom({
+            $template: "",
+            links: pc > 1 ? [(() => {
+                u.searchParams.set("page", p - 1);
+                return {
+                    $template: "link",
+                    href: p > 1 ? u.pathname + u.search : null,
+                    content: {
+                        $template: "icon",
+                        icon: "arrow-left"
+                    }
+                };
+            })(), ...Array.from({ length: pc }, (_, i) => i + 1)
+                .map(x => {
+                    u.searchParams.set("page", x);
+                    return {
+                        $template: "link",
+                        href: u.pathname + u.search,
+                        class: x === p ? "active" : "",
+                        content: {
+                            $template: "text",
+                            text: x
+                        }
+                    };
+                }), (() => {
+                    u.searchParams.set("page", p + 1);
+                    return {
+                        $template: "link",
+                        href: p < pc ? u.pathname + u.search : null,
+                        content: {
+                            $template: "icon",
+                            icon: "arrow-right"
+                        }
+                    };
+                })()] : null
+        }));
+    }
 }

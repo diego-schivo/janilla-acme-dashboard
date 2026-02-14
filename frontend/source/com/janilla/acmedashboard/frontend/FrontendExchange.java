@@ -28,10 +28,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import com.janilla.http.SimpleHttpExchange;
 import com.janilla.http.HttpCookie;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpResponse;
+import com.janilla.http.SimpleHttpExchange;
+import com.janilla.ioc.DiFactory;
 import com.janilla.json.Jwt;
 import com.janilla.web.UnauthorizedException;
 
@@ -39,11 +40,14 @@ public class FrontendExchange extends SimpleHttpExchange {
 
 	protected final Properties configuration;
 
+	protected final DiFactory diFactory;
+
 	protected final Map<String, Object> session = new HashMap<>();
 
-	public FrontendExchange(HttpRequest request, HttpResponse response, Properties configuration) {
+	public FrontendExchange(HttpRequest request, HttpResponse response, Properties configuration, DiFactory diFactory) {
 		super(request, response);
 		this.configuration = configuration;
+		this.diFactory = diFactory;
 	}
 
 	public String getSessionEmail() {
@@ -61,6 +65,14 @@ public class FrontendExchange extends SimpleHttpExchange {
 			session.put("email", p != null ? p.get("loggedInAs") : null);
 		}
 		return (String) session.get("email");
+	}
+
+	public Object getSessionUser() {
+		if (!session.containsKey("user")) {
+			var u = diFactory.create(Fetcher.class, Map.of("request", request)).authentication();
+			session.put("user", u);
+		}
+		return session.get("user");
 	}
 
 	public void requireSessionEmail() {

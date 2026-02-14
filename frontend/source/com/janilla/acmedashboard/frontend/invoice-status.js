@@ -22,36 +22,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class InvoiceStatus extends WebComponent {
 
-	static get observedAttributes() {
-		return ["data-value"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	static get templateNames() {
-		return ["invoice-status"];
-	}
+    static get templateNames() {
+        return ["invoice-status"];
+    }
 
-	constructor() {
-		super();
-	}
+    static get observedAttributes() {
+        return ["data-value"];
+    }
 
-	async updateDisplay() {
-		const x = ({
-			"PAID": {
-				icon: "check",
-				text: "Paid"
-			},
-			"PENDING": {
-				icon: "clock",
-				text: "Pending"
-			}
-		})[this.dataset.value];
-		this.appendChild(this.interpolateDom(x ? {
-			$template: "",
-			...x
-		} : null));
-	}
+    async updateDisplay() {
+        const x = ({
+            "PAID": {
+                icon: "check",
+                text: "Paid"
+            },
+            "PENDING": {
+                icon: "clock",
+                text: "Pending"
+            }
+        })[this.dataset.value];
+        this.appendChild(this.interpolateDom(x ? {
+            $template: "",
+            ...x
+        } : null));
+    }
 }

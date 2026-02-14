@@ -22,19 +22,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class DashboardPage extends WebComponent {
 
-	static get observedAttributes() {
-		return ["slot"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	static get templateNames() {
-		return ["dashboard-page"];
-	}
+    static get templateNames() {
+        return ["dashboard-page"];
+    }
 
-	constructor() {
-		super();
-	}
+    static get observedAttributes() {
+        return ["slot"];
+    }
+
+    async updateDisplay() {
+        const hs = history.state;
+        this.appendChild(this.interpolateDom({
+            $template: "",
+            cards: {
+                $template: "cards",
+                state: this.slot
+                    ? Object.hasOwn(hs, "cards") ? undefined : "loading"
+                    : "disabled"
+            },
+            revenue: {
+                $template: "revenue",
+                state: this.slot
+                    ? Object.hasOwn(hs, "revenue") ? undefined : "loading"
+                    : "disabled"
+            },
+            invoices: {
+                $template: "invoices",
+                state: this.slot
+                    ? Object.hasOwn(hs, "invoices") ? undefined : "loading"
+                    : "disabled"
+            }
+        }));
+    }
 }

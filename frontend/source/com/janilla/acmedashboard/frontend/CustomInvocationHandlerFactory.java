@@ -22,14 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.backend;
+package com.janilla.acmedashboard.frontend;
 
+import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandlerFactory;
-import com.janilla.web.HandleException;
 import com.janilla.web.Invocation;
 import com.janilla.web.InvocationHandlerFactory;
 import com.janilla.web.InvocationResolver;
@@ -47,44 +46,18 @@ public class CustomInvocationHandlerFactory extends InvocationHandlerFactory {
 
 	@Override
 	protected boolean handle(Invocation invocation, HttpExchange exchange) {
-		var ex = (BackendExchange) exchange;
+		var ex = (FrontendExchange) exchange;
 		var rq = ex.request();
 		var rs = ex.response();
 
-		if (Boolean.parseBoolean(configuration.getProperty("acme-dashboard.live-demo")))
-			if (rq.getMethod().equals("GET") || rq.getPath().equals("/api/authentication"))
-				;
-			else
-				throw new HandleException(new MethodBlockedException());
-
-		if (rq.getPath().startsWith("/api/")) {
-			if (rq.getMethod().equals("OPTIONS") || rq.getPath().equals("/api/authentication"))
-				;
-			else
-				ex.requireSessionEmail();
-		} else if (Set.of("/", "/login").contains(rq.getPath()) || rq.getPath().contains("."))
-			;
-		else if (ex.getSessionEmail() == null) {
-			rs.setStatus(302);
+		if ((rq.getPath() + "/").startsWith("/dashboard/"))
+			ex.requireSessionEmail();
+		else if (!Objects.requireNonNullElse(ex.getSessionEmail(), "").isEmpty()) {
+			rs.setStatus(303);
 			rs.setHeaderValue("cache-control", "no-cache");
-			rs.setHeaderValue("location", "/login");
+			rs.setHeaderValue("location", "/dashboard");
+			return true;
 		}
-
-		var o = configuration.getProperty("acme-dashboard.api.cors.origin");
-		if (o != null && !o.isEmpty()) {
-			rs.setHeaderValue("access-control-allow-credentials", "true");
-			rs.setHeaderValue("access-control-allow-origin", o);
-		}
-
-//		if (rq.getPath().startsWith("/api/")) {
-		//// IO.println(LocalDateTime.now() + ", " + rq.getPath() + ", 1");
-//			try {
-//				TimeUnit.SECONDS.sleep(1);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-		//// IO.println(LocalDateTime.now() + ", " + rq.getPath() + ", 2");
-//		}
 
 		return super.handle(invocation, exchange);
 	}

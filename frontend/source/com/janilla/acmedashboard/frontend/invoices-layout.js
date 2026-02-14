@@ -22,54 +22,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class InvoicesLayout extends WebComponent {
 
-	static get observedAttributes() {
-		return ["data-uri", "slot"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	static get templateNames() {
-		return ["invoices-layout"];
-	}
+    static get templateNames() {
+        return ["invoices-layout"];
+    }
 
-	constructor() {
-		super();
-		this.attachShadow({ mode: "open" });
-	}
+    static get observedAttributes() {
+        return ["data-uri", "slot"];
+    }
 
-	async updateDisplay() {
-		const p = location.pathname;
-		const pp = new URLSearchParams(location.search);
-		const o = {
-			$template: "",
-			...this.dataset,
-			invoices: {
-				$template: "invoices",
-				slot: p === "/dashboard/invoices" ? "content" : null,
-				title: "Invoices",
-				href: "/dashboard/invoices",
-				query: pp.get("query"),
-				page: pp.get("page")
-			},
-			invoice: (() => {
-				const m = p === "/dashboard/invoices/create" ? [] : p?.match(/\/dashboard\/invoices\/([^/]+)\/edit/);
-				return {
-					$template: "invoice",
-					slot: m ? "content" : null,
-					title: m ? (m[1] ? "Edit Invoice" : "Create Invoice") : null,
-					id: m?.[1]
-				};
-			})()
-		};
-		o.breadcrumbItems = [o.invoices, o.invoice].slice(0, o.invoice.slot ? 2 : 1).map((x, i, xx) => ({
-			...x,
-			$template: i < xx.length - 1 ? "breadcrumb-link" : "breadcrumb-heading",
-			slot: `item-${i}`
-		}));
-		const f = this.interpolateDom(o);
-		this.shadowRoot.append(...f.querySelectorAll("link, breadcrumb-nav, slot"));
-		this.appendChild(f);
-	}
+    constructor() {
+        super();
+        this.attachShadow({ mode: "open" });
+    }
+
+    async updateDisplay() {
+        const p = location.pathname;
+        const pp = new URLSearchParams(location.search);
+        const o = {
+            $template: "",
+            ...this.dataset,
+            invoices: {
+                $template: "invoices",
+                slot: p === "/dashboard/invoices" ? "content" : null,
+                title: "Invoices",
+                href: "/dashboard/invoices",
+                query: pp.get("query"),
+                page: pp.get("page")
+            },
+            invoice: (() => {
+                const m = p === "/dashboard/invoices/create" ? [] : p?.match(/\/dashboard\/invoices\/([^/]+)\/edit/);
+                return {
+                    $template: "invoice",
+                    slot: m ? "content" : null,
+                    title: m ? (m[1] ? "Edit Invoice" : "Create Invoice") : null,
+                    id: m?.[1]
+                };
+            })()
+        };
+        o.breadcrumbItems = [o.invoices, o.invoice].slice(0, o.invoice.slot ? 2 : 1).map((x, i, xx) => ({
+            ...x,
+            $template: i < xx.length - 1 ? "breadcrumb-link" : "breadcrumb-heading",
+            slot: `item-${i}`
+        }));
+        const f = this.interpolateDom(o);
+        this.shadowRoot.append(...f.querySelectorAll("link, breadcrumb-nav, slot"));
+        this.appendChild(f);
+    }
 }

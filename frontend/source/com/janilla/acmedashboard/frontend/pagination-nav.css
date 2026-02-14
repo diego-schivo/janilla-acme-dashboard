@@ -23,68 +23,68 @@
  * SOFTWARE.
  */
 pagination-nav {
-	color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));
-	display: flex;
-	gap: 1rem;
-	justify-content: center;
-	
-	> a {
-		border-radius: 0.375rem;
-	}
-	
-	nav {
-		display: flex;
-	}
-	
-	a {
-		align-items: center;
-		border: 1px solid rgb(229, 231, 235);
-		display: flex;
-		height: 2.5rem;
-		justify-content: center;
-		width: 2.5rem;
-	
-		&:first-child {
-			border-radius: 0.375rem;
-			margin-right: 1rem;
-		}
-	
-		&:nth-child(2) {
-			border-top-left-radius: 0.375rem;
-			border-bottom-left-radius: 0.375rem;
-		}
-	
-		&:nth-child(n + 3):not(:last-child) {
-			border-left: 0;
-		}
-	
-		&:nth-last-child(2) {
-			border-top-right-radius: 0.375rem;
-			border-bottom-right-radius: 0.375rem;
-		}
-	
-		&:last-child {
-			border-radius: 0.375rem;
-			margin-left: 1rem;
-		}
-	
-		&:not([href]) {
-			color: light-dark(rgb(209, 213, 219), rgb(46, 42, 36));
-		}
-	
-	
-		&[href]:hover {
-			background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
-		}
-	
-		&.active {
-			background: light-dark(rgb(47, 111, 235), rgb(208, 144, 20));
-			border-color: light-dark(rgb(47, 111, 235), rgb(208, 144, 20));
-			color: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
-		}
-	}
-	
-	hero-icon {
-		width: 1rem;
-	}
+  color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  
+  > a {
+    border-radius: 0.375rem;
+  }
+  
+  nav {
+    display: flex;
+  }
+  
+  a {
+    align-items: center;
+    border: 1px solid rgb(229, 231, 235);
+    display: flex;
+    height: 2.5rem;
+    justify-content: center;
+    width: 2.5rem;
+  
+    &:first-child {
+      border-radius: 0.375rem;
+      margin-right: 1rem;
+    }
+  
+    &:nth-child(2) {
+      border-top-left-radius: 0.375rem;
+      border-bottom-left-radius: 0.375rem;
+    }
+  
+    &:nth-child(n + 3):not(:last-child) {
+      border-left: 0;
+    }
+  
+    &:nth-last-child(2) {
+      border-top-right-radius: 0.375rem;
+      border-bottom-right-radius: 0.375rem;
+    }
+  
+    &:last-child {
+      border-radius: 0.375rem;
+      margin-left: 1rem;
+    }
+  
+    &:not([href]) {
+      color: light-dark(rgb(209, 213, 219), rgb(46, 42, 36));
+    }
+  
+  
+    &[href]:hover {
+      background: light-dark(rgb(243, 244, 246), rgb(12, 11, 9));
+    }
+  
+    &.active {
+      background: light-dark(rgb(47, 111, 235), rgb(208, 144, 20));
+      border-color: light-dark(rgb(47, 111, 235), rgb(208, 144, 20));
+      color: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
+    }
+  }
+  
+  hero-icon {
+    width: 1rem;
+  }
 }

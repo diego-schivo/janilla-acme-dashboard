@@ -25,7 +25,12 @@
 package com.janilla.acmedashboard.backend;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.janilla.backend.persistence.Crud;
 import com.janilla.backend.persistence.Persistence;
@@ -36,96 +41,72 @@ public class InvoiceCrud extends Crud<UUID, Invoice> {
 		super(Invoice.class, persistence.idConverter(Invoice.class), persistence);
 	}
 
-	public BigDecimal getAmount(Invoice.Status status) {
-//		var a = persistence.database().perform((_, ii) -> ii.perform("Invoice.status", i -> i.apply(status, (aa, _) -> {
-//			var d = (Double) aa.get("amount");
-//			return d != null ? BigDecimal.valueOf(d) : null;
-//		}, false)), false);
-//		return a != null ? a : BigDecimal.ZERO;
-		return BigDecimal.ZERO;
+	public BigDecimal getAmount(InvoiceStatus status) {
+		return persistence.database().perform(() -> {
+			var i = persistence.database().index("StatusAmount", "table");
+			var a = new BigDecimal[1];
+			i.select(new Object[] { toDatabaseValue(status) }, false,
+					x -> x.forEach(y -> a[0] = BigDecimal.valueOf((double) y.reduce((_, z) -> z).get())));
+			return Objects.requireNonNullElse(a[0], BigDecimal.ZERO);
+		}, false);
 	}
 
-	public BigDecimal getAmount(UUID customerId, Invoice.Status status) {
-//		var a = persistence.database()
-//				.perform((_, ii) -> ii.perform("Invoice.customerId", i -> i.apply(customerId, (aa, _) -> {
-//					@SuppressWarnings("unchecked")
-//					var m = (Map<String, Double>) aa.get("amount");
-//					var d = m != null ? m.get(status.name()) : null;
-//					return d != null ? BigDecimal.valueOf(d) : null;
-//				}, false)), false);
-//		return a != null ? a : BigDecimal.ZERO;
-		return BigDecimal.ZERO;
+	public BigDecimal getAmount(UUID customerId, InvoiceStatus status) {
+		return persistence.database().perform(() -> {
+			var i = persistence.database().index("CustomerStatusAmount", "table");
+			var a = new BigDecimal[1];
+			i.select(new Object[] { toDatabaseValue(customerId), toDatabaseValue(status) }, false,
+					x -> x.forEach(y -> a[0] = BigDecimal.valueOf((double) y.reduce((_, z) -> z).get())));
+			return Objects.requireNonNullElse(a[0], BigDecimal.ZERO);
+		}, false);
 	}
 
 	@Override
-	protected void updateIndexes(Invoice entity1, Invoice entity2, UUID id) {
-		super.updateIndexes(entity1, entity2, id);
+	protected void updateIndexes(Invoice entity1, Invoice entity2) {
+		super.updateIndexes(entity1, entity2);
 
-//		if (entity1 != null) {
-//			var x = entity1.amount();
-//			if (entity2 != null && entity1.status().equals(entity2.status()))
-//				x = x.subtract(entity2.amount());
-//			if (x.compareTo(BigDecimal.ZERO) > 0) {
-//				var y = x;
-//				persistence.database()
-//						.perform(
-//								(_, ii) -> ii.perform("Invoice.status",
-//										i -> i.apply(entity1.status(),
-//												(aa, _) -> aa.compute("amount",
-//														(_, v) -> BigDecimal.valueOf((double) v).subtract(y)),
-//												false)),
-//								true);
-//			}
-//		}
-//
-//		if (entity2 != null) {
-//			var x = entity2.amount();
-//			if (entity1 != null && entity2.status().equals(entity1.status()))
-//				x = x.subtract(entity1.amount());
-//			if (x.compareTo(BigDecimal.ZERO) > 0) {
-//				var y = x;
-//				persistence.database().perform(
-//						(_, ii) -> ii.perform("Invoice.status", i -> i.apply(entity2.status(),
-//								(aa, _) -> aa.compute("amount",
-//										(_, v) -> v != null ? BigDecimal.valueOf((double) v).add(y) : y),
-//								false)),
-//						true);
-//			}
-//		}
-//
-//		if (entity1 != null) {
-//			var x = entity1.amount();
-//			if (entity2 != null && entity1.customerId().equals(entity2.customerId())
-//					&& entity1.status().equals(entity2.status()))
-//				x = x.subtract(entity2.amount());
-//			if (x.compareTo(BigDecimal.ZERO) > 0) {
-//				var y = x;
-//				persistence.database().perform(
-//						(_, ii) -> ii.perform("Invoice.customerId", i -> i.apply(entity1.customerId(), (aa, _) -> {
-//							@SuppressWarnings("unchecked")
-//							var m = (Map<String, Double>) aa.get("amount");
-//							m.compute(entity1.status().name(), (_, v) -> v - y.doubleValue());
-//							return null;
-//						}, false)), true);
-//			}
-//		}
-//
-//		if (entity2 != null) {
-//			var x = entity2.amount();
-//			if (entity1 != null && entity2.customerId().equals(entity1.customerId())
-//					&& entity2.status().equals(entity1.status()))
-//				x = x.subtract(entity1.amount());
-//			if (x.compareTo(BigDecimal.ZERO) > 0) {
-//				var y = x;
-//				persistence.database().perform(
-//						(_, ii) -> ii.perform("Invoice.customerId", i -> i.apply(entity2.customerId(), (aa, _) -> {
-//							@SuppressWarnings("unchecked")
-//							var m = (Map<String, Double>) aa.computeIfAbsent("amount", _ -> new LinkedHashMap<>());
-//							m.compute(entity2.status().name(),
-//									(_, v) -> v != null ? v + y.doubleValue() : y.doubleValue());
-//							return null;
-//						}, false)), true);
-//			}
-//		}
+		{
+			var dd = Stream.of(entity1, entity2).filter(Objects::nonNull)
+					.collect(Collectors.toMap(x -> x.status(), _ -> BigDecimal.ZERO, (x, _) -> x, LinkedHashMap::new));
+			if (entity1 != null)
+				dd.compute(entity1.status(), (_, x) -> x.subtract(entity1.amount()));
+			if (entity2 != null)
+				dd.compute(entity2.status(), (_, x) -> x.add(entity2.amount()));
+			var i = persistence.database().index("StatusAmount", "table");
+			dd.entrySet().forEach(sd -> {
+				var s = sd.getKey();
+				var d = sd.getValue();
+				if (d.compareTo(BigDecimal.ZERO) != 0) {
+					var k = new Object[] { toDatabaseValue(s) };
+					var a = new BigDecimal[1];
+					i.delete(k, x -> x.forEach(y -> a[0] = BigDecimal.valueOf((double) y.reduce((_, z) -> z).get())));
+					a[0] = a[0] != null ? a[0].add(d) : d;
+					i.insert(k, new Object[] { toDatabaseValue(a[0]) });
+				}
+			});
+		}
+
+		{
+			var dd = Stream.of(entity1, entity2).filter(Objects::nonNull)
+					.collect(Collectors.toMap(x -> List.of(x.customer().id(), x.status()), _ -> BigDecimal.ZERO,
+							(x, _) -> x, LinkedHashMap::new));
+			if (entity1 != null)
+				dd.compute(List.of(entity1.customer().id(), entity1.status()), (_, x) -> x.subtract(entity1.amount()));
+			if (entity2 != null)
+				dd.compute(List.of(entity2.customer().id(), entity2.status()), (_, x) -> x.add(entity2.amount()));
+			var i = persistence.database().index("CustomerStatusAmount", "table");
+			dd.entrySet().forEach(csd -> {
+				var c = csd.getKey().getFirst();
+				var s = csd.getKey().get(1);
+				var d = csd.getValue();
+				if (d.compareTo(BigDecimal.ZERO) != 0) {
+					var k = new Object[] { toDatabaseValue(c), toDatabaseValue(s) };
+					var a = new BigDecimal[1];
+					i.delete(k, x -> x.forEach(y -> a[0] = BigDecimal.valueOf((double) y.reduce((_, z) -> z).get())));
+					a[0] = a[0] != null ? a[0].add(d) : d;
+					i.insert(k, new Object[] { toDatabaseValue(a[0]) });
+				}
+			});
+		}
 	}
 }

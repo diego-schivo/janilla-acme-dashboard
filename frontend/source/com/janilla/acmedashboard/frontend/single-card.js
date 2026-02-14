@@ -22,30 +22,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class SingleCard extends WebComponent {
 
-	static get templateNames() {
-		return ["single-card"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	constructor() {
-		super();
-		this.attachShadow({ mode: "open" });
-	}
+    static get templateNames() {
+        return ["single-card"];
+    }
 
-	async updateDisplay() {
-		const x = ({
-			collected: "banknotes",
-			pending: "clock",
-			invoices: "inbox",
-			customers: "user-group"
-		})[this.dataset.type];
-		this.shadowRoot.appendChild(this.interpolateDom({
-			$template: "",
-			...this.dataset,
-			icon: x
-		}));
-	}
+    constructor() {
+        super();
+        this.attachShadow({ mode: "open" });
+    }
+
+    async updateDisplay() {
+        const x = ({
+            collected: "banknotes",
+            pending: "clock",
+            invoices: "inbox",
+            customers: "user-group"
+        })[this.dataset.type];
+        this.shadowRoot.appendChild(this.interpolateDom({
+            $template: "",
+            ...this.dataset,
+            icon: x
+        }));
+    }
 }

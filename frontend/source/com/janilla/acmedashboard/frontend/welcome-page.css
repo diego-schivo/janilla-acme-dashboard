@@ -23,101 +23,101 @@
  * SOFTWARE.
  */
 welcome-page {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-	padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
 
-	header {
-		align-items: flex-end;
-		background-color: light-dark(rgb(0, 112, 243), rgb(255, 143, 12));
-		border-radius: 0.5rem;
-		box-sizing: border-box;
-		display: flex;
-		height: 5rem;
-		padding: 1rem;
+  header {
+    align-items: flex-end;
+    background-color: light-dark(rgb(0, 112, 243), rgb(255, 143, 12));
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    display: flex;
+    height: 5rem;
+    padding: 1rem;
 
-		@media (min-width: 768px) {
-			height: 13rem;
-		}
-	}
-	
-	main {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+    @media (min-width: 768px) {
+      height: 13rem;
+    }
+  }
+  
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 
-		@media (min-width: 768px) {
-			display: grid;
-			grid-template-columns: 40% 60%;
-		}
-	
-		div {
-			display: flex;
-			flex-direction: column;
-			gap: 1.5rem;
-			justify-content: center;
-			
-			&:first-child {
-				background-color: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
-				border-radius: 0.5rem;
-				padding: 2.5rem 1.5rem;
+    @media (min-width: 768px) {
+      display: grid;
+      grid-template-columns: 40% 60%;
+    }
+  
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      justify-content: center;
+      
+      &:first-child {
+        background-color: light-dark(rgb(249, 250, 251), rgb(6, 5, 4));
+        border-radius: 0.5rem;
+        padding: 2.5rem 1.5rem;
 
-				@media (min-width: 768px) {
-					padding: 2.5rem 5rem;
-				}
-			}
-			
-			&:nth-child(2) {
-				padding: 1.5rem;
+        @media (min-width: 768px) {
+          padding: 2.5rem 5rem;
+        }
+      }
+      
+      &:nth-child(2) {
+        padding: 1.5rem;
 
-				@media (min-width: 768px) {
-					padding: 3rem 7rem;
-				}
-			}
-		}
-	
-		p {
-			font-family: "Lusitana";
-			font-size: 1.25rem;
-			line-height: 1.75rem;
+        @media (min-width: 768px) {
+          padding: 3rem 7rem;
+        }
+      }
+    }
+  
+    p {
+      font-family: "Lusitana";
+      font-size: 1.25rem;
+      line-height: 1.75rem;
 
-			@media (min-width: 768px) {
-				font-size: 1.875rem;
-				line-height: 1.5;
-			}
-			
-			a {
-				color: light-dark(rgb(0, 112, 243), rgb(255, 143, 12));
-			}
-		}
-		
-		.primary-button {
-			align-self: flex-start;
-			gap: 1.25rem;
-			padding: 0.75rem 1.5rem;
-	
-			svg {
-				width: 1.5rem;
-			}
-		}
-		
-		img {
-			width: 100%;
+      @media (min-width: 768px) {
+        font-size: 1.875rem;
+        line-height: 1.5;
+      }
+      
+      a {
+        color: light-dark(rgb(0, 112, 243), rgb(255, 143, 12));
+      }
+    }
+    
+    .primary-button {
+      align-self: flex-start;
+      gap: 1.25rem;
+      padding: 0.75rem 1.5rem;
+  
+      svg {
+        width: 1.5rem;
+      }
+    }
+    
+    img {
+      width: 100%;
 
-			&:not(:first-child) {
-				display: none;
-			}
+      &:not(:first-child) {
+        display: none;
+      }
 
-			@media (min-width: 768px) {
-				&:first-child {
-					display: none;
-				}
+      @media (min-width: 768px) {
+        &:first-child {
+          display: none;
+        }
 
-				&:not(:first-child) {
-					display: block;
-				}
-			}
-		}
-	}
+        &:not(:first-child) {
+          display: block;
+        }
+      }
+    }
+  }
 }

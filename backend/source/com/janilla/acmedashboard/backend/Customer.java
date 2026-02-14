@@ -32,4 +32,10 @@ import com.janilla.backend.persistence.Store;
 
 @Store
 public record Customer(UUID id, @Index String name, String email, String imageUrl) implements Entity<UUID> {
+
+//	public static final Customer EMPTY = new Customer(null, null, null, null);
+//
+//	public Customer withId(UUID id) {
+//		return new Customer(id, name, email, imageUrl);
+//	}
 }

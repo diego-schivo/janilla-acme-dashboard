@@ -25,15 +25,15 @@
 @import "base.css";
 
 :host {
-	font-family: "Lusitana";
-	font-size: 1.5rem;
-	line-height: 2rem;
+  font-family: "Lusitana";
+  font-size: 1.5rem;
+  line-height: 2rem;
 }
 
 ol {
-	display: flex;
+  display: flex;
 }
 
 span {
-	margin: 0 0.75rem;
+  margin: 0 0.75rem;
 }

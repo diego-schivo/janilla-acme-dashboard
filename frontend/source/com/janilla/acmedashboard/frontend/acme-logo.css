@@ -23,18 +23,18 @@
  * SOFTWARE.
  */
 acme-logo {
-	align-items: center;
-	color: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
-	display: flex;
-	font-family: "Lusitana";
-	line-height: 1;
+  align-items: center;
+  color: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
+  display: flex;
+  font-family: "Lusitana";
+  line-height: 1;
 
-	hero-icon {
-		transform: rotate(15deg);
-		width: 3rem;
-	}
-	
-	p {
-		font-size: 44px;
-	}
+  hero-icon {
+    transform: rotate(15deg);
+    width: 3rem;
+  }
+  
+  p {
+    font-size: 44px;
+  }
 }

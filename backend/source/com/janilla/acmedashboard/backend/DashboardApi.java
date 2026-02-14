@@ -25,7 +25,6 @@
 package com.janilla.acmedashboard.backend;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.janilla.backend.persistence.Persistence;
 import com.janilla.web.Handle;
@@ -33,32 +32,28 @@ import com.janilla.web.Handle;
 @Handle(path = "/api/dashboard")
 public class DashboardApi {
 
-	public static final AtomicReference<DashboardApi> INSTANCE = new AtomicReference<>();
-
 	protected final Persistence persistence;
 
 	public DashboardApi(Persistence persistence) {
 		this.persistence = persistence;
-		if (!INSTANCE.compareAndSet(null, this))
-			throw new IllegalStateException();
 	}
 
 	@Handle(method = "GET", path = "cards")
 	public Cards getCards() {
-		var x = (InvoiceCrud) persistence.crud(Invoice.class);
-		return new Cards(x.getAmount(Invoice.Status.PAID), x.getAmount(Invoice.Status.PENDING), x.count(),
+		var c = (InvoiceCrud) persistence.crud(Invoice.class);
+		return new Cards(c.getAmount(InvoiceStatus.PAID), c.getAmount(InvoiceStatus.PENDING), c.count(),
 				persistence.crud(Customer.class).count());
 	}
 
 	@Handle(method = "GET", path = "revenue")
 	public List<Revenue> getRevenue() {
-		var x = persistence.crud(Revenue.class);
-		return x.read(x.list());
+		var c = persistence.crud(Revenue.class);
+		return c.read(c.list());
 	}
 
 	@Handle(method = "GET", path = "invoices")
 	public List<Invoice> getInvoices() {
-		var x = persistence.crud(Invoice.class);
-		return x.read(x.list(0, 5).ids()).stream().map(InvoiceApi::invoiceWithCustomer).toList();
+		var c = persistence.crud(Invoice.class);
+		return c.filter("date", new Object[0], true, 0, 5).stream().map(x -> c.read(x, 1)).toList();
 	}
 }

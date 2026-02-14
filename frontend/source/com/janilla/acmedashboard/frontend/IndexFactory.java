@@ -27,37 +27,56 @@ package com.janilla.acmedashboard.frontend;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 public class IndexFactory {
 
 	protected final Properties configuration;
 
-	protected final DataFetching dataFetching;
+	protected final ClientFetcher dataFetching;
 
-	public IndexFactory(Properties configuration, DataFetching dataFetching) {
+	protected Map<String, String> imports;
+
+	public IndexFactory(Properties configuration, ClientFetcher dataFetching) {
 		this.configuration = configuration;
 		this.dataFetching = dataFetching;
 	}
 
 	public Index index(FrontendExchange exchange) {
-		return new Index(
-//				imports(), 
-				configuration.getProperty("acme-dashboard.api.url"), state(exchange));
+		return new Index(imports(), configuration.getProperty("acme-dashboard.api.url"), state(exchange));
+	}
+
+	protected Map<String, String> imports() {
+		if (imports == null)
+			synchronized (this) {
+				if (imports == null) {
+					imports = new LinkedHashMap<String, String>();
+					putImports(imports);
+				}
+			}
+		return imports;
+	}
+
+	protected void putImports(Map<String, String> map) {
+		Stream.of("app", "intl-format", "web-component").map(this::baseImportKey)
+				.forEach(x -> map.put(x, "/" + x + ".js"));
+		Stream.of("acme-logo", "app", "breadcrumb-nav", "card-wrapper", "customers-page", "dashboard-page",
+				"dashboard-layout", "dashboard-nav", "hero-icon", "invoice-page", "invoice-status", "invoices-layout",
+				"invoices-page", "latest-invoices", "login-page", "pagination-nav", "revenue-chart", "single-card",
+				"welcome-page").map(this::acmeImportKey).forEach(x -> map.put(x, "/" + x + ".js"));
+	}
+
+	protected String baseImportKey(String name) {
+		return "base/" + name;
+	}
+
+	protected String acmeImportKey(String name) {
+		return name;
 	}
 
 	protected Map<String, Object> state(FrontendExchange exchange) {
 		var x = new LinkedHashMap<String, Object>();
-//		x.put("user", exchange.sessionUser());
+		x.put("user", exchange.getSessionUser());
 		return x;
 	}
-
-//	protected Map<String, String> imports() {
-//		var m = new LinkedHashMap<String, String>();
-	////		ImportMaps.putImports(m);
-//		Stream.of("acme-logo", "breadcrumb-nav", "card-wrapper", "customers-page", "dashboard-page", "dashboard-layout",
-//				"dashboard-nav", "hero-icon", "intl-format", "invoice-page", "invoice-status", "invoices-layout",
-//				"invoices-page", "latest-invoices", "login-page", "pagination-nav", "revenue-chart", "root-layout",
-//				"single-card", "welcome-page").forEach(x -> m.put(x, "/" + x + ".js"));
-//		return m;
-//	}
 }

@@ -22,42 +22,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import WebComponent from "./web-component.js";
+import WebComponent from "base/web-component";
 
 export default class RevenueChart extends WebComponent {
 
-	static get templateNames() {
-		return ["revenue-chart"];
-	}
+    static get moduleUrl() {
+        return import.meta.url;
+    }
 
-	constructor() {
-		super();
-	}
+    static get templateNames() {
+        return ["revenue-chart"];
+    }
 
-	async updateDisplay() {
-		const d = this.closest("dashboard-page");
-		const s = history.state;
-		var k = d.slot && s.revenue ? Math.ceil(Math.max(...s.revenue.map(x => x.revenue)) / 1000) : 0;
-		this.appendChild(this.interpolateDom({
-			$template: "",
-			y: d.slot && s.revenue ? Array.from({ length: k + 1 }, (_, i) => ({
-				$template: "y",
-				y: `$${i}K`
-			})) : null,
-			x: d.slot && s.revenue ? s.revenue.map(x => ({
-				$template: "x",
-				...x,
-				style: `height: ${x.revenue / (1000 * k) * 100}%`
-			})) : null
-		}));
-		if (d.slot && !s.revenue) {
-			const a = this.closest("root-layout");
-			const x = await (await fetch(`${a.dataset.apiUrl}/dashboard/revenue`, { credentials: "include" })).json();
-			history.replaceState({
-				...history.state,
-				revenue: x ?? {}
-			}, "");
-			this.requestDisplay(0);
-		}
-	}
+    static get observedAttributes() {
+        return ["data-state"];
+    }
+
+    async updateDisplay() {
+        const d = this.closest("dashboard-page");
+        const hs = history.state;
+        var k = d.slot && hs.revenue ? Math.ceil(Math.max(...hs.revenue.map(x => x.revenue)) / 1000) : 0;
+        this.appendChild(this.interpolateDom({
+            $template: "",
+            y: d.slot && hs.revenue ? Array.from({ length: k + 1 }, (_, i) => ({
+                $template: "y",
+                y: `$${i}K`
+            })) : null,
+            x: d.slot && hs.revenue ? hs.revenue.map(x => ({
+                $template: "x",
+                ...x,
+                style: `height: ${x.revenue / (1000 * k) * 100}%`
+            })) : null
+        }));
+        if (this.dataset.state === "loading") {
+            const a = this.closest("app-element");
+            const x = a.serverState?.revenue ?? await (await fetch(`${a.dataset.apiUrl}/dashboard/revenue`,
+                { credentials: "include" })).json();
+            history.replaceState({
+                ...history.state,
+                revenue: x
+            }, "");
+            delete this.dataset.state;
+        }
+    }
 }
