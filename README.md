@@ -2,6 +2,10 @@
 
 This is a porting of [Next.js App Router Course](https://github.com/vercel/next-learn/tree/main/dashboard).
 
+### View a live demo
+
+Open a browser and navigate to <https://acmedashboard.janilla.com/>.
+
 ### How you can get started
 
 > **_Note:_**  if you are unfamiliar with the terminal, you can set up the project in an IDE (section below).
