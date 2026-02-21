@@ -26,8 +26,8 @@ package com.janilla.acmedashboard.backend;
 
 import java.math.BigDecimal;
 
-import com.janilla.backend.persistence.Entity;
-import com.janilla.backend.persistence.Store;
+import com.janilla.persistence.Entity;
+import com.janilla.persistence.Store;
 
 @Store
 public record Revenue(Long id, String month, BigDecimal revenue) implements Entity<Long> {

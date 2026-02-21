@@ -34,8 +34,6 @@ import com.janilla.web.Handle;
 @Handle(path = "/api/authentication")
 public class AuthenticationApi {
 
-//	public static final AtomicReference<AuthenticationApi> INSTANCE = new AtomicReference<>();
-
 	protected final Properties configuration;
 
 	protected final Persistence persistence;
@@ -43,8 +41,6 @@ public class AuthenticationApi {
 	public AuthenticationApi(Properties configuration, Persistence persistence) {
 		this.configuration = configuration;
 		this.persistence = persistence;
-//		if (!INSTANCE.compareAndSet(null, this))
-//			throw new IllegalStateException();
 	}
 
 	@Handle(method = "POST")

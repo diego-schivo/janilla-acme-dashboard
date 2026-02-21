@@ -28,9 +28,9 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
-import com.janilla.backend.persistence.ListPortion;
 import com.janilla.backend.persistence.Persistence;
 import com.janilla.java.Reflection;
+import com.janilla.persistence.ListPortion;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 

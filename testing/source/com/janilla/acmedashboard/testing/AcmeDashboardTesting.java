@@ -58,7 +58,7 @@ public class AcmeDashboardTesting {
 			AcmeDashboardTesting a;
 			{
 				var f = new DiFactory(Java.getPackageClasses(AcmeDashboardTesting.class.getPackageName(), true));
-				a = f.create(AcmeDashboardTesting.class,
+				a = f.create(f.actualType(AcmeDashboardTesting.class),
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
 										args[0].startsWith("~") ? System.getProperty("user.home") + args[0].substring(1)
@@ -73,7 +73,7 @@ public class AcmeDashboardTesting {
 					c = Java.sslContext(x, "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.server.port"));
-				s = a.diFactory.create(HttpServer.class,
+				s = a.diFactory.create(a.diFactory.actualType(HttpServer.class),
 						Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 			}
 			s.serve();
@@ -93,17 +93,21 @@ public class AcmeDashboardTesting {
 	public AcmeDashboardTesting(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
 		diFactory.context(this);
-		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
-		fullstack = diFactory.create(AcmeDashboardFullstack.class, Map.of("diFactory",
-				new DiFactory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName(), true))));
+		configuration = diFactory.create(diFactory.actualType(Properties.class),
+				Collections.singletonMap("file", configurationFile));
+		fullstack = diFactory.create(diFactory.actualType(AcmeDashboardFullstack.class),
+				Map.of("diFactory",
+						new DiFactory(Java.getPackageClasses(AcmeDashboardFullstack.class.getPackageName(), true))));
 
 		{
-			var f = diFactory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
-					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
-							.map(y -> new Invocable(x, y)))
-					.toList(), "files",
-					Stream.of("com.janilla.frontend", AcmeDashboardTesting.class.getPackageName())
-							.flatMap(x -> Java.getPackagePaths(x, true).filter(Files::isRegularFile)).toList()));
+			var f = diFactory.create(diFactory.actualType(ApplicationHandlerFactory.class),
+					Map.of("methods", types().stream()
+							.flatMap(x -> Arrays.stream(x.getMethods())
+									.filter(y -> !Modifier.isStatic(y.getModifiers())).map(y -> new Invocable(x, y)))
+							.toList(), "files",
+							Stream.of("com.janilla.frontend", AcmeDashboardTesting.class.getPackageName())
+									.flatMap(x -> Java.getPackagePaths(x, true).filter(Files::isRegularFile))
+									.toList()));
 			handler = x -> {
 				var ex = (HttpExchange) x;
 //				IO.println(

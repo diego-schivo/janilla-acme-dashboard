@@ -104,6 +104,6 @@ public class WebHandling {
 	}
 
 	protected Fetcher fetcher(HttpRequest request) {
-		return diFactory.create(Fetcher.class, Map.of("request", request));
+		return diFactory.create(diFactory.actualType(Fetcher.class), Map.of("request", request));
 	}
 }

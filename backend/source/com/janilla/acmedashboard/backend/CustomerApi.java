@@ -39,14 +39,10 @@ import com.janilla.web.Handle;
 @Handle(path = "/api/customers")
 public class CustomerApi {
 
-//	public static final AtomicReference<CustomerApi> INSTANCE = new AtomicReference<>();
-
 	protected final Persistence persistence;
 
 	public CustomerApi(Persistence persistence) {
 		this.persistence = persistence;
-//		if (!INSTANCE.compareAndSet(null, this))
-//			throw new IllegalStateException();
 	}
 
 	@Handle(method = "GET", path = "names")

@@ -33,13 +33,13 @@ public class IndexFactory {
 
 	protected final Properties configuration;
 
-	protected final ClientFetcher dataFetching;
+	protected final Fetcher fetcher;
 
 	protected Map<String, String> imports;
 
-	public IndexFactory(Properties configuration, ClientFetcher dataFetching) {
+	public IndexFactory(Properties configuration, Fetcher fetcher) {
 		this.configuration = configuration;
-		this.dataFetching = dataFetching;
+		this.fetcher = fetcher;
 	}
 
 	public Index index(FrontendExchange exchange) {

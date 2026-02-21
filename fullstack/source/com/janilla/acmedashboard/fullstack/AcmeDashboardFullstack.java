@@ -41,6 +41,7 @@ import javax.net.ssl.SSLContext;
 import com.janilla.acmedashboard.backend.AcmeDashboardBackend;
 import com.janilla.acmedashboard.backend.BackendExchange;
 import com.janilla.acmedashboard.frontend.AcmeDashboardFrontend;
+import com.janilla.http.HttpClient;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
 import com.janilla.ioc.DiFactory;
@@ -60,7 +61,7 @@ public class AcmeDashboardFullstack {
 	protected static void serve(DiFactory diFactory, String configurationPath) {
 		AcmeDashboardFullstack a;
 		{
-			a = diFactory.create(AcmeDashboardFullstack.class,
+			a = diFactory.create(diFactory.actualType(AcmeDashboardFullstack.class),
 					Java.hashMap("diFactory", diFactory, "configurationFile",
 							configurationPath != null ? Path.of(configurationPath.startsWith("~")
 									? System.getProperty("user.home") + configurationPath.substring(1)
@@ -70,23 +71,26 @@ public class AcmeDashboardFullstack {
 		SSLContext c;
 		{
 			var p = a.configuration.getProperty("acme-dashboard.server.keystore.path");
-			var w = a.configuration.getProperty("acme-dashboard.server.keystore.password");
-			if (p.startsWith("~"))
-				p = System.getProperty("user.home") + p.substring(1);
-			var f = Path.of(p);
-			if (!Files.exists(f))
-				Java.generateKeyPair(f, w);
-			try (var s = Files.newInputStream(f)) {
-				c = Java.sslContext(s, w.toCharArray());
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			if (p != null) {
+				var w = a.configuration.getProperty("acme-dashboard.server.keystore.password");
+				if (p.startsWith("~"))
+					p = System.getProperty("user.home") + p.substring(1);
+				var f = Path.of(p);
+				if (!Files.exists(f))
+					Java.generateKeyPair(f, w);
+				try (var s = Files.newInputStream(f)) {
+					c = Java.sslContext(s, w.toCharArray());
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			} else
+				c = HttpClient.sslContext("TLSv1.3");
 		}
 
 		HttpServer s;
 		{
 			var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.server.port"));
-			s = a.diFactory.create(HttpServer.class,
+			s = a.diFactory.create(a.diFactory.actualType(HttpServer.class),
 					Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 		}
 		s.serve();
@@ -105,7 +109,8 @@ public class AcmeDashboardFullstack {
 	public AcmeDashboardFullstack(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
 		diFactory.context(this);
-		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
+		configuration = diFactory.create(diFactory.actualType(Properties.class),
+				Collections.singletonMap("file", configurationFile));
 
 		var cf = Optional.ofNullable(configurationFile).orElseGet(() -> {
 			try {
@@ -115,7 +120,7 @@ public class AcmeDashboardFullstack {
 			}
 		});
 		backend = ScopedValue.where(INSTANCE, this)
-				.call(() -> diFactory.create(AcmeDashboardBackend.class,
+				.call(() -> diFactory.create(diFactory.actualType(AcmeDashboardBackend.class),
 						Java.hashMap("diFactory",
 								new DiFactory(Stream
 										.concat(Stream.of("com.janilla.web"),
@@ -125,7 +130,7 @@ public class AcmeDashboardFullstack {
 										.flatMap(x -> Java.getPackageClasses(x, false).stream()).toList(), "backend"),
 								"configurationFile", cf)));
 		frontend = ScopedValue.where(INSTANCE, this)
-				.call(() -> diFactory.create(AcmeDashboardFrontend.class,
+				.call(() -> diFactory.create(diFactory.actualType(AcmeDashboardFrontend.class),
 						Java.hashMap("diFactory",
 								new DiFactory(Stream
 										.concat(Stream.of("com.janilla.web"),

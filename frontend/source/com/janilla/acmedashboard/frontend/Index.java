@@ -54,7 +54,7 @@ public record Index(@Render(renderer = JsonRenderer.class) Map<String, String> i
 
 		@Override
 		public String apply(T value) {
-			return Json.format(diFactory.create(ReflectionJsonIterator.class, Map.of("object", value)));
+			return Json.format(diFactory.create(diFactory.actualType(ReflectionJsonIterator.class), Map.of("object", value)));
 		}
 	}
 }
