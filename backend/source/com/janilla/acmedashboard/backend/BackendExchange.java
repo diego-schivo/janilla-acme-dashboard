@@ -74,7 +74,7 @@ public class BackendExchange extends SimpleHttpExchange {
 		if (!session.containsKey("user")) {
 			var c = persistence.crud(User.class);
 			var e = getSessionEmail();
-			var i = e != null ? c.find("email", e) : null;
+			var i = e != null ? c.find("email", new Object[] { e }) : null;
 			session.put("user", i != null ? c.read(i) : null);
 		}
 		return (User) session.get("user");

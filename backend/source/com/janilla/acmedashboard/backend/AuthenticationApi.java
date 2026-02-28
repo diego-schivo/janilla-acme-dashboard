@@ -47,7 +47,7 @@ public class AuthenticationApi {
 	public User create(User user, BackendExchange exchange) {
 //		IO.println("AuthenticationApi.create, user=" + user);
 		var c = persistence.crud(User.class);
-		var u = c.read(c.find("email", user.email()));
+		var u = c.read(c.find("email", new Object[] { user.email() }));
 //		IO.println("AuthenticationApi.create, u=" + u);
 		if (u == null || !u.password().equals(user.password()))
 			return null;
