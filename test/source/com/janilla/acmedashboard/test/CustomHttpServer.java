@@ -22,39 +22,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.frontend;
+package com.janilla.acmedashboard.test;
 
+import java.net.SocketAddress;
 import java.util.Map;
 
-import com.janilla.ioc.DiFactory;
-import com.janilla.json.Json;
-import com.janilla.json.ReflectionJsonIterator;
-import com.janilla.web.Render;
-import com.janilla.web.Renderer;
+import javax.net.ssl.SSLContext;
 
-@Render(template = "index.html")
-public record Index(@Render(renderer = JsonRenderer.class) Map<String, String> imports, String apiUrl,
-		@Render(renderer = StateRenderer.class) Map<String, Object> state) {
+import com.janilla.acmedashboard.fullstack.AcmeDashboardFullstack;
+import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHandler;
+import com.janilla.http.HttpRequest;
+import com.janilla.http.HttpResponse;
+import com.janilla.http.HttpServer;
 
-	public static class JsonRenderer<T> extends Renderer<T> {
+public class CustomHttpServer extends HttpServer {
 
-		@Override
-		public String apply(T value) {
-			return Json.format(value);
-		}
+	protected final AcmeDashboardFullstack fullstack;
+
+	public CustomHttpServer(SSLContext sslContext, SocketAddress endpoint, HttpHandler handler,
+			AcmeDashboardFullstack fullstack) {
+		super(sslContext, endpoint, handler);
+		this.fullstack = fullstack;
 	}
 
-	public static class StateRenderer<T> extends Renderer<T> {
-
-		protected final DiFactory diFactory;
-
-		public StateRenderer(DiFactory diFactory) {
-			this.diFactory = diFactory;
+	@Override
+	protected HttpExchange createExchange(HttpRequest request, HttpResponse response) {
+		if (Test.ONGOING.get()) {
+			var f = request.getPath().startsWith("/api/") ? fullstack.backend().diFactory()
+					: fullstack.frontend().diFactory();
+			return f.newInstance(f.classFor(HttpExchange.class), Map.of("request", request, "response", response));
 		}
-
-		@Override
-		public String apply(T value) {
-			return Json.format(diFactory.create(diFactory.actualType(ReflectionJsonIterator.class), Map.of("object", value)));
-		}
+		return super.createExchange(request, response);
 	}
 }

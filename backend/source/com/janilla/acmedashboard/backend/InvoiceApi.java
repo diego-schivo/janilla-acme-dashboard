@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.janilla.backend.persistence.Persistence;
-import com.janilla.java.Reflection;
+import com.janilla.java.JavaReflect;
 import com.janilla.persistence.ListPortion;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
@@ -71,7 +71,7 @@ public class InvoiceApi {
 	@Handle(method = "PUT", path = "([^/]+)")
 	public Invoice update(UUID id, Invoice invoice) {
 		return persistence.crud(Invoice.class).update(id,
-				x -> Reflection.copy(invoice, x, y -> !Set.of("id", "date").contains(y)));
+				x -> JavaReflect.copy(invoice, x, y -> !Set.of("id", "date").contains(y)));
 	}
 
 	@Handle(method = "DELETE", path = "([^/]+)")

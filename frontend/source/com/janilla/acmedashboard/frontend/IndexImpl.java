@@ -22,29 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.testing;
+package com.janilla.acmedashboard.frontend;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Properties;
+import java.util.List;
+import java.util.Map;
 
-public class CustomProperties extends Properties {
+import com.janilla.frontend.App;
+import com.janilla.frontend.Index;
+import com.janilla.frontend.Script;
+import com.janilla.frontend.Template;
+import com.janilla.web.Render;
 
-	private static final long serialVersionUID = -7141976523134464282L;
-
-	public CustomProperties(Path file) {
-		try {
-			try (var x = AcmeDashboardTesting.class.getResourceAsStream("configuration.properties")) {
-				load(x);
-			}
-			if (file != null)
-				try (var x = Files.newInputStream(file)) {
-					load(x);
-				}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+@Render(template = "index", resource = "/base/index.html")
+record IndexImpl(String title, Map<String, String> imports, List<Script> scripts, App app, List<Template> templates)
+		implements Index {
 }

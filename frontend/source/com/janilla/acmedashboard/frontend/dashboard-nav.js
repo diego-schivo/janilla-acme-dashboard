@@ -36,14 +36,16 @@ export default class DashboardNav extends WebComponent {
 
     connectedCallback() {
         super.connectedCallback();
+
         addEventListener("statepushed", this.handleStatePushed);
         this.addEventListener("submit", this.handleSubmit);
     }
 
     disconnectedCallback() {
-        super.disconnectedCallback();
         removeEventListener("statepushed", this.handleStatePushed);
         this.removeEventListener("submit", this.handleSubmit);
+
+        super.disconnectedCallback();
     }
 
     async updateDisplay() {
@@ -84,7 +86,7 @@ export default class DashboardNav extends WebComponent {
                 method: "DELETE",
                 credentials: "include"
             });
-			a.navigate(new URL("/login", location.href));
+            a.navigate(new URL("/login", location.href));
         } finally {
             event.submitter.setAttribute("aria-disabled", "false");
         }

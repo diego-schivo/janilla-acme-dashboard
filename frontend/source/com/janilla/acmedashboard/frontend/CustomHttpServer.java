@@ -47,6 +47,6 @@ public class CustomHttpServer extends HttpServer {
 
 	@Override
 	protected HttpExchange createExchange(HttpRequest request, HttpResponse response) {
-		return diFactory.create(diFactory.actualType(HttpExchange.class), Map.of("request", request, "response", response));
+		return diFactory.newInstance(diFactory.classFor(HttpExchange.class), Map.of("request", request, "response", response));
 	}
 }

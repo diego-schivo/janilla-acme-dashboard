@@ -24,59 +24,51 @@
  */
 package com.janilla.acmedashboard.frontend;
 
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-public class IndexFactory {
+import com.janilla.frontend.Index;
+import com.janilla.frontend.AbstractIndexFactory;
+import com.janilla.frontend.Template;
+import com.janilla.http.HttpExchange;
+import com.janilla.web.ResourceMap;
+
+public class IndexFactoryImpl extends AbstractIndexFactory {
 
 	protected final Properties configuration;
 
-	protected final Fetcher fetcher;
-
-	protected Map<String, String> imports;
-
-	public IndexFactory(Properties configuration, Fetcher fetcher) {
+	public IndexFactoryImpl(ResourceMap resourceMap, Properties configuration) {
+		super(resourceMap);
 		this.configuration = configuration;
-		this.fetcher = fetcher;
 	}
 
-	public Index index(FrontendExchange exchange) {
-		return new Index(imports(), configuration.getProperty("acme-dashboard.api.url"), state(exchange));
+	@Override
+	public Index newIndex(HttpExchange exchange) {
+		return new IndexImpl("Acme Dashboard", imports(), scripts(),
+				new AppImpl(configuration.getProperty("acme-dashboard.api.url"), state(exchange)), templates());
 	}
 
-	protected Map<String, String> imports() {
-		if (imports == null)
-			synchronized (this) {
-				if (imports == null) {
-					imports = new LinkedHashMap<String, String>();
-					putImports(imports);
-				}
-			}
-		return imports;
-	}
-
+	@Override
 	protected void putImports(Map<String, String> map) {
-		Stream.of("app", "intl-format", "web-component").map(this::baseImportKey)
-				.forEach(x -> map.put(x, "/" + x + ".js"));
+		super.putImports(map);
 		Stream.of("acme-logo", "app", "breadcrumb-nav", "card-wrapper", "customers-page", "dashboard-page",
 				"dashboard-layout", "dashboard-nav", "hero-icon", "invoice-page", "invoice-status", "invoices-layout",
 				"invoices-page", "latest-invoices", "login-page", "pagination-nav", "revenue-chart", "single-card",
-				"welcome-page").map(this::acmeImportKey).forEach(x -> map.put(x, "/" + x + ".js"));
+				"welcome-page").forEach(x -> map.put(x, "/" + x + ".js"));
 	}
 
+	@Override
 	protected String baseImportKey(String name) {
 		return "base/" + name;
 	}
 
-	protected String acmeImportKey(String name) {
-		return name;
-	}
-
-	protected Map<String, Object> state(FrontendExchange exchange) {
-		var x = new LinkedHashMap<String, Object>();
-		x.put("user", exchange.getSessionUser());
-		return x;
+	@Override
+	protected void addTemplates(List<Template> list) {
+		Stream.of("acme-logo", "app", "breadcrumb-nav", "card-wrapper", "customers-page", "dashboard-page",
+				"dashboard-layout", "dashboard-nav", "hero-icon", "invoice-page", "invoice-status", "invoices-layout",
+				"invoices-page", "latest-invoices", "login-page", "pagination-nav", "revenue-chart", "single-card",
+				"welcome-page").map(this::template).forEach(list::add);
 	}
 }

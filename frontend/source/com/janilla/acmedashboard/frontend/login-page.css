@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 @media (min-width: 768px) {
-  root-layout:has(login-page[slot]) {
+  app-element:has(login-page[slot]) {
     align-items: center;
     display: flex;
     height: 100vh;

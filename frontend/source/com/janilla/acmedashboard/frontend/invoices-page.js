@@ -40,32 +40,35 @@ export default class InvoicesPage extends WebComponent {
 
     connectedCallback() {
         super.connectedCallback();
+
         this.addEventListener("input", this.handleInput);
         this.addEventListener("submit", this.handleSubmit);
     }
 
     disconnectedCallback() {
-        super.disconnectedCallback();
         this.removeEventListener("input", this.handleInput);
         this.removeEventListener("submit", this.handleSubmit);
+
+        super.disconnectedCallback();
     }
 
     async updateDisplay() {
-        const s = history.state ?? {};
+        const s = history.state;
         const u = new URL("/dashboard/invoices", location.href);
         const q = this.dataset.query;
         if (q)
             u.searchParams.append("query", q);
         const p = this.dataset.page;
+
         this.appendChild(this.interpolateDom({
             $template: "",
             ...this.dataset,
-            articles: this.slot && s.invoices ? s.invoices.items?.map(x => ({
+            articles: this.slot && s.invoices ? s.invoices.elements.map(x => ({
                 $template: "article",
                 ...x,
                 href: `/dashboard/invoices/${x.id}/edit`
             })) : Array.from({ length: 6 }).map(() => ({ $template: "article-skeleton" })),
-            rows: this.slot && s.invoices ? s.invoices.items?.map(x => ({
+            rows: this.slot && s.invoices ? s.invoices.elements.map(x => ({
                 $template: "row",
                 ...x,
                 href: `/dashboard/invoices/${x.id}/edit`
@@ -73,9 +76,10 @@ export default class InvoicesPage extends WebComponent {
             pagination: this.slot && s.invoices ? {
                 href: u.pathname + u.search,
                 page: p ?? 1,
-                pageCount: Math.ceil((s.invoices.total ?? 0) / 6)
+                pageCount: Math.ceil((s.invoices.totalSize ?? 0) / 6)
             } : null
         }));
+
         if (this.slot && !s.invoices) {
             const a = this.closest("app-element");
             const u = new URL(`${a.dataset.apiUrl}/invoices`, a.dataset.apiUrl.startsWith("/") ? location.href : undefined);
@@ -83,11 +87,13 @@ export default class InvoicesPage extends WebComponent {
                 if (this.dataset[x])
                     u.searchParams.append(x, this.dataset[x]);
             });
+
             const x = await (await fetch(u, { credentials: "include" })).json();
             history.replaceState({
                 ...history.state,
-                invoices: x
+                invoices: x ?? []
             }, "");
+
             this.requestDisplay();
         }
     }

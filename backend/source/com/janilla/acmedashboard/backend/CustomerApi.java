@@ -65,11 +65,9 @@ public class CustomerApi {
 			BigDecimal paidAmount) {
 
 		public static Customer2 of(Customer customer) {
-//			var c = (InvoiceCrud) INSTANCE.get().persistence.crud(Invoice.class);
-//			return new Customer2(customer, c.count("customerId", customer.id()),
-//					c.getAmount(customer.id(), InvoiceStatus.PENDING),
-//					c.getAmount(customer.id(), InvoiceStatus.PAID));
-			throw new RuntimeException();
+			var c = (InvoiceCrud) AcmeDashboardBackend.INSTANCE.get().persistence().crud(Invoice.class);
+			return new Customer2(customer, c.count("customer", new Object[] { customer.id() }),
+					c.getAmount(customer.id(), InvoiceStatus.PENDING), c.getAmount(customer.id(), InvoiceStatus.PAID));
 		}
 	}
 }

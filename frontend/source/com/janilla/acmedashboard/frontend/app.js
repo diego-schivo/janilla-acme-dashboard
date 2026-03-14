@@ -24,8 +24,6 @@
  */
 import BaseApp from "base/app";
 
-const adminRegex = /^\/admin(\/.*)?$/;
-
 export default class App extends BaseApp {
 
     static get moduleUrl() {

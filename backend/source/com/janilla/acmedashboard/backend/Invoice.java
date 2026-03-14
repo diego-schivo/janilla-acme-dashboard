@@ -36,10 +36,6 @@ import com.janilla.persistence.Store;
 public record Invoice(UUID id, @Index Customer customer, BigDecimal amount, @Index InvoiceStatus status,
 		@Index LocalDate date) implements Entity<UUID> {
 
-//	public Invoice withCustomer(Customer customer) {
-//		return new Invoice(id, customer, amount, status, date);
-//	}
-
 	public Invoice withDate(LocalDate date) {
 		return new Invoice(id, customer, amount, status, date);
 	}

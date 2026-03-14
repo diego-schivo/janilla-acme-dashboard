@@ -40,12 +40,14 @@ export default class LoginPage extends WebComponent {
 
     connectedCallback() {
         super.connectedCallback();
+
         this.addEventListener("submit", this.handleSubmit);
     }
 
     disconnectedCallback() {
-        super.disconnectedCallback();
         this.removeEventListener("submit", this.handleSubmit);
+
+        super.disconnectedCallback();
     }
 
     handleSubmit = async event => {

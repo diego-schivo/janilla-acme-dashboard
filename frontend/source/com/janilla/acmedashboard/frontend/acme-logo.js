@@ -33,8 +33,4 @@ export default class AcmeLogo extends WebComponent {
     static get templateNames() {
         return ["acme-logo"];
     }
-
-    constructor() {
-        super();
-    }
 }

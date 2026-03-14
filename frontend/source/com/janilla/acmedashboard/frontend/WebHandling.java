@@ -34,28 +34,28 @@ import com.janilla.web.Handle;
 
 public class WebHandling {
 
-	protected final IndexFactory indexFactory;
+	protected final IndexFactoryImpl indexFactory;
 
 	protected final DiFactory diFactory;
 
-	public WebHandling(IndexFactory indexFactory, DiFactory diFactory) {
+	public WebHandling(IndexFactoryImpl indexFactory, DiFactory diFactory) {
 		this.indexFactory = indexFactory;
 		this.diFactory = diFactory;
 	}
 
 	@Handle(method = "GET", path = "/")
 	public Object root(FrontendExchange exchange) {
-		return indexFactory.index(exchange);
+		return indexFactory.newIndex(exchange);
 	}
 
 	@Handle(method = "GET", path = "/login")
 	public Object login(FrontendExchange exchange) {
-		return indexFactory.index(exchange);
+		return indexFactory.newIndex(exchange);
 	}
 
 	@Handle(method = "GET", path = "/dashboard")
 	public Object dashboard(FrontendExchange exchange) {
-		var i = indexFactory.index(exchange);
+		var i = indexFactory.newIndex(exchange);
 		var f = fetcher(exchange.request());
 		var oo = new Object[3];
 //		IO.println(LocalDateTime.now() + ", 1");
@@ -68,42 +68,42 @@ public class WebHandling {
 				throw new RuntimeException(e);
 			}
 //		IO.println(LocalDateTime.now() + ", 2");
-		i.state().put("cards", oo[0]);
-		i.state().put("revenue", oo[1]);
-		i.state().put("invoices", oo[2]);
+		i.app().state().put("cards", oo[0]);
+		i.app().state().put("revenue", oo[1]);
+		i.app().state().put("invoices", oo[2]);
 		return i;
 	}
 
 	@Handle(method = "GET", path = "/dashboard/invoices")
 	public Object invoices(String query, Integer page, FrontendExchange exchange) {
-		var i = indexFactory.index(exchange);
-		i.state().put("invoices", fetcher(exchange.request()).invoices(query, page));
+		var i = indexFactory.newIndex(exchange);
+		i.app().state().put("invoices", fetcher(exchange.request()).invoices(query, page));
 		return i;
 	}
 
 	@Handle(method = "GET", path = "/dashboard/invoices/create")
 	public Object createInvoice(FrontendExchange exchange) {
-		var i = indexFactory.index(exchange);
-		i.state().put("invoice", new Invoice2(null, fetcher(exchange.request()).customerNames()));
+		var i = indexFactory.newIndex(exchange);
+		i.app().state().put("invoice", new Invoice2(null, fetcher(exchange.request()).customerNames()));
 		return i;
 	}
 
 	@Handle(method = "GET", path = "/dashboard/invoices/([^/]+)/edit")
 	public Object editInvoice(UUID id, FrontendExchange exchange) {
-		var i = indexFactory.index(exchange);
+		var i = indexFactory.newIndex(exchange);
 		var f = fetcher(exchange.request());
-		i.state().put("invoice", new Invoice2(f.invoice(id), f.customerNames()));
+		i.app().state().put("invoice", new Invoice2(f.invoice(id), f.customerNames()));
 		return i;
 	}
 
 	@Handle(method = "GET", path = "/dashboard/customers")
 	public Object customers(String query, FrontendExchange exchange) {
-		var i = indexFactory.index(exchange);
-		i.state().put("customers", fetcher(exchange.request()).customers(query));
+		var i = indexFactory.newIndex(exchange);
+		i.app().state().put("customers", fetcher(exchange.request()).customers(query));
 		return i;
 	}
 
 	protected Fetcher fetcher(HttpRequest request) {
-		return diFactory.create(diFactory.actualType(Fetcher.class), Map.of("request", request));
+		return diFactory.newInstance(diFactory.classFor(Fetcher.class), Map.of("request", request));
 	}
 }

@@ -22,36 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.testing;
+module com.janilla.acmedashboard.test {
 
-import java.net.SocketAddress;
-import java.util.Map;
+	exports com.janilla.acmedashboard.test;
 
-import javax.net.ssl.SSLContext;
+	opens com.janilla.acmedashboard.test;
 
-import com.janilla.acmedashboard.fullstack.AcmeDashboardFullstack;
-import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpHandler;
-import com.janilla.http.HttpRequest;
-import com.janilla.http.HttpResponse;
-import com.janilla.http.HttpServer;
-
-public class CustomHttpServer extends HttpServer {
-
-	protected final AcmeDashboardFullstack fullstack;
-
-	public CustomHttpServer(SSLContext sslContext, SocketAddress endpoint, HttpHandler handler,
-			AcmeDashboardFullstack fullstack) {
-		super(sslContext, endpoint, handler);
-		this.fullstack = fullstack;
-	}
-
-	@Override
-	protected HttpExchange createExchange(HttpRequest request, HttpResponse response) {
-		return Test.ONGOING.get()
-				? (request.getPath().startsWith("/api/") ? fullstack.backend().diFactory()
-						: fullstack.frontend().diFactory())
-						.create(HttpExchange.class, Map.of("request", request, "response", response))
-				: super.createExchange(request, response);
-	}
+	requires transitive com.janilla.acmedashboard.fullstack;
 }

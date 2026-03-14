@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.acmedashboard.testing;
+package com.janilla.acmedashboard.test;
 
 import java.io.IOException;
 import java.nio.channels.Channels;
@@ -48,10 +48,11 @@ public class Test {
 //		IO.println("Test.start, this=" + this);
 		if (ONGOING.getAndSet(true))
 			throw new IllegalStateException();
-		var fch = (FileChannel) fullstack.backend().persistence().database().channel().channel();
-		try (var ch = Channels.newChannel(getClass().getResourceAsStream("acme-dashboard-test.database"))) {
-			var s = fch.transferFrom(ch, 0, Long.MAX_VALUE);
-			fch.truncate(s);
+
+		var ch1 = (FileChannel) fullstack.backend().persistence().database().channel().channel();
+		try (var ch2 = Channels.newChannel(getClass().getResourceAsStream("acme-dashboard-test.db"))) {
+			var s = ch1.transferFrom(ch2, 0, Long.MAX_VALUE);
+			ch1.truncate(s);
 		}
 	}
 

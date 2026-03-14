@@ -69,7 +69,7 @@ public class FrontendExchange extends SimpleHttpExchange {
 
 	public Object getSessionUser() {
 		if (!session.containsKey("user")) {
-			var u = diFactory.create(diFactory.actualType(Fetcher.class), Map.of("request", request)).authentication();
+			var u = diFactory.newInstance(diFactory.classFor(Fetcher.class), Map.of("request", request)).authentication();
 			session.put("user", u);
 		}
 		return session.get("user");

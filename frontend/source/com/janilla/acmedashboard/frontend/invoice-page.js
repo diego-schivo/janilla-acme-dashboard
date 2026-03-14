@@ -40,12 +40,14 @@ export default class InvoicePage extends WebComponent {
 
     connectedCallback() {
         super.connectedCallback();
+
         this.addEventListener("submit", this.handleSubmit);
     }
 
     disconnectedCallback() {
-        super.disconnectedCallback();
         this.removeEventListener("submit", this.handleSubmit);
+
+        super.disconnectedCallback();
     }
 
     async updateDisplay() {
@@ -116,7 +118,7 @@ export default class InvoicePage extends WebComponent {
             });
 
             if (r.ok)
-				a.navigate(new URL("/dashboard/invoices", location.href));
+                a.navigate(new URL("/dashboard/invoices", location.href));
             else {
                 const t = await r.text();
                 this.querySelector(".error").innerHTML = `<p>${t}</p>`;

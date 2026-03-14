@@ -40,16 +40,19 @@ export default class CustomersPage extends WebComponent {
 
     connectedCallback() {
         super.connectedCallback();
+
         this.addEventListener("input", this.handleInput);
     }
 
     disconnectedCallback() {
-        super.disconnectedCallback();
         this.removeEventListener("input", this.handleInput);
+
+        super.disconnectedCallback();
     }
 
     async updateDisplay() {
-        const s = history.state ?? {};
+        const s = history.state;
+
         this.appendChild(this.interpolateDom({
             $template: "",
             ...this.dataset,
@@ -62,16 +65,19 @@ export default class CustomersPage extends WebComponent {
                 ...x
             })) : Array.from({ length: 6 }).map(() => ({ $template: "row-skeleton" }))
         }));
+
         if (this.slot && !s.customers) {
             const a = this.closest("app-element");
             const u = new URL(`${a.dataset.apiUrl}/customers`, a.dataset.apiUrl.startsWith("/") ? location.href : undefined);
             if (this.dataset.query)
                 u.searchParams.append("query", this.dataset.query);
+
             const x = await (await fetch(u, { credentials: "include" })).json();
             history.replaceState({
                 ...history.state,
-                customers: x
+                customers: x ?? []
             }, "");
+
             this.requestDisplay(0);
         }
     }

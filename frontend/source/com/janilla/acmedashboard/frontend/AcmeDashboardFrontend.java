@@ -42,6 +42,7 @@ import javax.net.ssl.SSLContext;
 import com.janilla.http.HttpClient;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
+import com.janilla.ioc.DefaultDiFactory;
 import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
 import com.janilla.web.ApplicationHandlerFactory;
@@ -57,7 +58,7 @@ public class AcmeDashboardFrontend {
 
 	public static void main(String[] args) {
 		IO.println(ProcessHandle.current().pid());
-		var f = new DiFactory(
+		var f = new DefaultDiFactory(
 				Arrays.stream(DI_PACKAGES).flatMap(x -> Java.getPackageClasses(x, false).stream()).toList());
 		serve(f, args.length > 0 ? args[0] : null);
 	}
@@ -65,7 +66,7 @@ public class AcmeDashboardFrontend {
 	protected static void serve(DiFactory diFactory, String configurationPath) {
 		AcmeDashboardFrontend a;
 		{
-			a = diFactory.create(diFactory.actualType(AcmeDashboardFrontend.class),
+			a = diFactory.newInstance(diFactory.classFor(AcmeDashboardFrontend.class),
 					Java.hashMap("diFactory", diFactory, "configurationFile",
 							configurationPath != null ? Path.of(configurationPath.startsWith("~")
 									? System.getProperty("user.home") + configurationPath.substring(1)
@@ -77,7 +78,7 @@ public class AcmeDashboardFrontend {
 		HttpServer s;
 		{
 			var p = Integer.parseInt(a.configuration.getProperty("acme-dashboard.server.port"));
-			s = a.diFactory.create(a.diFactory.actualType(HttpServer.class),
+			s = a.diFactory.newInstance(a.diFactory.classFor(HttpServer.class),
 					Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 		}
 		s.serve();
@@ -110,7 +111,7 @@ public class AcmeDashboardFrontend {
 
 	protected final HttpClient httpClient;
 
-	protected final IndexFactory indexFactory;
+	protected final IndexFactoryImpl indexFactory;
 
 	protected final InvocationResolver invocationResolver;
 
@@ -121,15 +122,20 @@ public class AcmeDashboardFrontend {
 	public AcmeDashboardFrontend(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
 		diFactory.context(this);
-		configuration = diFactory.create(diFactory.actualType(Properties.class),
+		configuration = diFactory.newInstance(diFactory.classFor(Properties.class),
 				Collections.singletonMap("file", configurationFile));
 
-		httpClient = diFactory.create(diFactory.actualType(HttpClient.class),
+		httpClient = diFactory.newInstance(diFactory.classFor(HttpClient.class),
 				Map.of("sslContext", sslContext(configuration)));
-		fetcher = diFactory.create(diFactory.actualType(Fetcher.class));
-		indexFactory = diFactory.create(diFactory.actualType(IndexFactory.class));
+		fetcher = diFactory.newInstance(diFactory.classFor(Fetcher.class));
+		resourceMap = diFactory.newInstance(diFactory.classFor(ResourceMap.class), Map.of("paths",
+				Map.of("/base",
+						Java.getPackagePaths("com.janilla.frontend", false).filter(Files::isRegularFile).toList(), "",
+						Java.getPackagePaths(AcmeDashboardFrontend.class.getPackageName(), false)
+								.filter(Files::isRegularFile).toList())));
+		indexFactory = diFactory.newInstance(diFactory.classFor(IndexFactoryImpl.class));
 
-		invocationResolver = diFactory.create(diFactory.actualType(InvocationResolver.class),
+		invocationResolver = diFactory.newInstance(diFactory.classFor(InvocationResolver.class),
 				Map.of("invocables",
 						diFactory.types().stream()
 								.flatMap(x -> Arrays.stream(x.getMethods())
@@ -140,16 +146,11 @@ public class AcmeDashboardFrontend {
 							var y = diFactory.context();
 //							IO.println("x=" + x + ", y=" + y);
 							return x.isAssignableFrom(y.getClass()) ? diFactory.context()
-									: diFactory.create(diFactory.actualType(x));
+									: diFactory.newInstance(diFactory.classFor(x));
 						}));
-		resourceMap = diFactory.create(diFactory.actualType(ResourceMap.class), Map.of("paths",
-				Map.of("/base",
-						Java.getPackagePaths("com.janilla.frontend", false).filter(Files::isRegularFile).toList(), "",
-						Java.getPackagePaths(AcmeDashboardFrontend.class.getPackageName(), false)
-								.filter(Files::isRegularFile).toList())));
-		renderableFactory = diFactory.create(diFactory.actualType(RenderableFactory.class));
+		renderableFactory = diFactory.newInstance(diFactory.classFor(RenderableFactory.class));
 		{
-			var f = diFactory.create(diFactory.actualType(ApplicationHandlerFactory.class));
+			var f = diFactory.newInstance(diFactory.classFor(ApplicationHandlerFactory.class));
 			handler = x -> {
 				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
 				if (h == null)
@@ -179,7 +180,7 @@ public class AcmeDashboardFrontend {
 		return httpClient;
 	}
 
-	public IndexFactory indexFactory() {
+	public IndexFactoryImpl indexFactory() {
 		return indexFactory;
 	}
 
