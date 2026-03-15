@@ -27,6 +27,7 @@ package com.janilla.acmedashboard.backend;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.janilla.java.TypeResolver;
 import com.janilla.json.JsonToken;
 import com.janilla.json.ReflectionJsonIterator;
 
@@ -36,14 +37,12 @@ public class CustomReflectionJsonIterator extends ReflectionJsonIterator {
 		super(object);
 	}
 
-	public CustomReflectionJsonIterator(Object object, boolean includeType) {
-		super(object, includeType);
-	}
-
-//	@Override
-//	public Iterator<JsonToken<?>> newObjectIterator(Stream<Entry<String, Object>> entries) {
-//		return super.newObjectIterator(entries.filter(x -> !x.getKey().equals("customerOptional")));
+//	public CustomReflectionJsonIterator(Object object, boolean includeType) {
+//		super(object, includeType);
 //	}
+	public CustomReflectionJsonIterator(Object object, TypeResolver typeResolver) {
+		super(object, typeResolver);
+	}
 
 	@Override
 	public Iterator<JsonToken<?>> newValueIterator(Object object) {
